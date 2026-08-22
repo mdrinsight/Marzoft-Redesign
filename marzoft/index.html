@@ -10,10 +10,10 @@
     <meta name="description" content="We design and build custom websites, online storefronts, and digital systems that help businesses look credible, get understood, and turn visitors into customers.">
     <meta name="author" content="Marzoft Technologies">
 
-    <!-- Google Fonts: Plus Jakarta Sans (Modern Sans) + Newsreader (Editorial Serif Italic) -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <!-- Google Fonts: Plus Jakarta Sans (Modern Sans) + Newsreader (Editorial Serif Italic) + Caveat (Handwritten Notes) -->
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@1,6..72,400;1,6..72,500;1,6..72,600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Newsreader:ital,opsz,wght@1,6..72,400;1,6..72,500;1,6..72,600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     <style>
         /* ==========================================================================
@@ -50,15 +50,18 @@
             --radius-full: 9999px;
             
             --shadow-subtle: 0 4px 20px rgba(11, 16, 32, 0.04);
-            --shadow-card: 0 10px 30px rgba(11, 16, 32, 0.06);
+            --shadow-card: 0 10px 30px rgba(11, 16, 32, 0.08);
             --shadow-float: 0 20px 50px rgba(37, 99, 235, 0.12);
-            --shadow-window: 0 30px 70px rgba(11, 16, 32, 0.12);
+            --shadow-window: 0 30px 80px rgba(11, 16, 32, 0.14);
             
             --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
             --font-serif: 'Newsreader', Georgia, serif;
+            --font-hand: 'Caveat', cursive;
             
             --nav-height: 72px;
             --ease: cubic-bezier(0.16, 1, 0.3, 1);
+            --mx: 0px;
+            --my: 0px;
         }
 
         *, *::before, *::after {
@@ -102,7 +105,7 @@
         }
 
         .container {
-            width: min(1240px, calc(100% - 48px));
+            width: min(1280px, calc(100% - 48px));
             margin-inline: auto;
             position: relative;
         }
@@ -121,12 +124,14 @@
 
         /* Typography */
         .hero-headline {
-            font-size: clamp(3.2rem, 7vw, 6.2rem);
+            font-size: clamp(2.4rem, 4.8vw, 4.8rem);
             font-weight: 800;
-            line-height: 0.94;
-            letter-spacing: -0.045em;
+            line-height: 1.02;
+            letter-spacing: -0.04em;
             text-transform: uppercase;
             color: var(--text-navy);
+            user-select: none;
+            margin-bottom: 16px;
         }
 
         .hero-headline .blue-text {
@@ -153,7 +158,7 @@
         }
 
         .sub-lead {
-            font-size: clamp(1.05rem, 1.35vw, 1.2rem);
+            font-size: clamp(0.96rem, 1.2vw, 1.12rem);
             color: var(--text-muted);
             line-height: 1.6;
         }
@@ -175,13 +180,21 @@
             margin-bottom: 16px;
         }
 
+        .handwritten-badge {
+            font-family: var(--font-hand);
+            font-size: 1.35rem;
+            color: var(--text-navy);
+            line-height: 1.15;
+            display: inline-block;
+        }
+
         /* Buttons */
         .btn {
             display: inline-flex;
             align-items: center;
             justify-content: center;
             gap: 10px;
-            padding: 14px 30px;
+            padding: 14px 32px;
             min-height: 48px;
             border-radius: var(--radius-full);
             font-size: 0.96rem;
@@ -339,59 +352,190 @@
         .mobile-menu-list a { font-size: 1.6rem; font-weight: 800; color: var(--text-navy); }
 
         /* ==========================================================================
-           03. HERO SECTION (CLEAN & GRAND)
+           03. HERO SECTION (CHARACTERS POSITIONED BESIDE THE WORDS)
            ========================================================================== */
         .hero-section {
-            min-height: calc(100svh - 40px);
+            min-height: 100svh;
             display: flex;
             align-items: center;
-            padding-top: calc(var(--nav-height) + 40px);
-            padding-bottom: 60px;
+            justify-content: center;
+            padding: calc(var(--nav-height) + 54px) 0 48px;
             position: relative;
             overflow: clip;
         }
 
-        .hero-glow-bg {
+        .hero-ambient-mesh {
             position: absolute;
-            width: min(700px, 90vw);
-            height: min(450px, 70vw);
-            background: radial-gradient(circle, rgba(37, 99, 235, 0.1) 0%, rgba(236, 72, 153, 0.06) 50%, rgba(255, 255, 255, 0) 70%);
-            top: 15%;
+            width: min(1000px, 95vw);
+            height: min(600px, 80vw);
+            background: radial-gradient(ellipse at 50% 40%, rgba(37, 99, 235, 0.12) 0%, rgba(236, 72, 153, 0.05) 45%, rgba(255, 255, 255, 0) 70%);
+            top: 5%;
             left: 50%;
             transform: translateX(-50%);
             pointer-events: none;
-            filter: blur(80px);
+            filter: blur(90px);
             z-index: 0;
         }
 
-        .hero-layout-stack {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
+        .hero-stage-depth-wrapper {
             position: relative;
-            z-index: 1;
             width: 100%;
-            max-width: 960px;
+            max-width: 1160px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: minmax(0, 1.08fr) minmax(300px, .92fr);
+            gap: clamp(34px, 7vw, 100px);
+            align-items: center;
         }
 
-        .hero-headline-block {
+        /* Characters Vertically Centered Beside the Headline & Words */
+        .hero-founder-actor {
+            position: absolute;
+            top: 50%;
+            z-index: 2;
+            pointer-events: none;
+            overflow: visible;
+        }
+
+        .hero-founder-actor img {
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+            filter: drop-shadow(0 20px 35px rgba(15, 23, 42, 0.16));
+        }
+
+        #heroActorMDR {
+            left: clamp(-10px, 1.5vw, 25px);
+            width: clamp(240px, 22vw, 360px);
+            transform: translateY(calc(-48% + var(--my) * -0.025px)) translateX(calc(var(--mx) * -0.025px));
+        }
+
+        #heroActorCK {
+            right: clamp(-10px, 1.5vw, 25px);
+            width: clamp(240px, 22vw, 360px);
+            transform: translateY(calc(-48% + var(--my) * 0.025px)) translateX(calc(var(--mx) * 0.025px));
+        }
+
+        /* Badges Placed Neatly Above Shoulders */
+        .founder-floating-badge {
+            position: absolute;
+            z-index: 5;
+            background: #FFFFFF;
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-md);
+            padding: 7px 15px;
+            box-shadow: var(--shadow-card);
+            pointer-events: none;
+            white-space: nowrap;
+        }
+
+        .mdr-badge {
+            top: 6%;
+            right: -15px;
+            transform: rotate(-3deg);
+        }
+
+        .ck-badge {
+            top: 3%;
+            left: -20px;
+            transform: rotate(3deg);
+        }
+
+        /* Center Column Content (Clean & Unobstructed) */
+        .hero-center-content {
+            position: relative;
+            z-index: 3;
+            max-width: 690px;
+            margin: 0;
+            text-align: left;
+        }
+
+        .hero-sublead {
+            font-size: clamp(0.96rem, 1.2vw, 1.12rem);
+            color: var(--text-muted);
+            line-height: 1.6;
             margin-bottom: 24px;
         }
 
-        .hero-description-block {
-            margin-bottom: 36px;
-        }
-
-        .hero-description-block .sub-lead {
-            max-width: 640px;
-        }
-
-        .hero-actions-cluster {
+        .hero-cta-cluster {
             display: flex;
             align-items: center;
+            justify-content: flex-start;
             gap: 16px;
             flex-wrap: wrap;
         }
+
+        .hero-kicker {
+            font-size: .74rem;
+            line-height: 1;
+            font-weight: 800;
+            letter-spacing: .11em;
+            text-transform: uppercase;
+            color: var(--blue-primary);
+            margin-bottom: 20px;
+        }
+
+        .hero-headline {
+            font-size: clamp(4rem, 7vw, 7.2rem);
+            font-weight: 800;
+            line-height: .84;
+            letter-spacing: -.075em;
+            margin-bottom: 30px;
+        }
+
+        .hero-headline .line { display: block; animation: heroRise .9s var(--ease) both; }
+        .hero-headline .line:nth-child(2) { animation-delay: .08s; }
+        .hero-headline .line:nth-child(3) { animation-delay: .16s; }
+        .hero-headline .serif-italic { display: block; margin-left: .08em; animation-delay: .24s; }
+
+        .hero-art {
+            position: relative;
+            min-height: clamp(370px, 40vw, 490px);
+            display: grid;
+            place-items: center;
+            isolation: isolate;
+        }
+        .hero-art::before {
+            content: "";
+            position: absolute;
+            inset: 7%;
+            border-radius: 50%;
+            border: 1px solid rgba(37, 99, 235, .18);
+            animation: spinSlow 22s linear infinite;
+        }
+        .hero-art::after {
+            content: "";
+            position: absolute;
+            width: 66%; aspect-ratio: 1;
+            border-radius: 50%;
+            background: conic-gradient(from 30deg, #ffc0d8, #7c73ff, #2563eb, #9feada, #ffc875, #ffc0d8);
+            box-shadow: 0 38px 80px rgba(37, 99, 235, .2), inset 0 0 35px rgba(255,255,255,.75);
+            z-index: -2;
+            animation: colourOrbit 12s linear infinite;
+        }
+        .hero-core {
+            width: 43%; aspect-ratio: 1; border-radius: 50%;
+            background: rgba(255,255,255,.87); border: 1px solid rgba(255,255,255,.8);
+            box-shadow: 0 15px 40px rgba(15, 23, 42, .08); backdrop-filter: blur(10px);
+        }
+        .hero-note {
+            position: absolute; z-index: 1; background: rgba(255,255,255,.92);
+            border: 1px solid rgba(226,232,240,.9); border-radius: 13px;
+            padding: 11px 14px; box-shadow: var(--shadow-card);
+            font-size: .68rem; font-weight: 800; letter-spacing: .08em; line-height: 1.4;
+            animation: softFloat 5s ease-in-out infinite;
+        }
+        .hero-note small { display:block; margin-top: 3px; font-size: .72rem; font-weight: 600; letter-spacing: 0; color: var(--text-muted); }
+        .note-one { top: 13%; right: 2%; transform: rotate(5deg); }
+        .note-two { bottom: 12%; left: 0; transform: rotate(-5deg); animation-delay: -2.4s; }
+        .note-three { top: 46%; left: -2%; color: var(--blue-primary); animation-delay: -1.2s; }
+        .hero-proof { display: flex; align-items: center; gap: 10px; margin-top: 32px; color: var(--text-muted); font-size: .79rem; font-weight: 600; }
+        .hero-proof b { color: var(--text-navy); }
+
+        @keyframes heroRise { from { opacity:0; transform:translateY(35px); filter:blur(8px); } to { opacity:1; transform:none; filter:none; } }
+        @keyframes softFloat { 50% { translate: 0 -12px; } }
+        @keyframes spinSlow { to { transform: rotate(360deg); } }
+        @keyframes colourOrbit { to { transform: rotate(360deg); } }
 
         /* ==========================================================================
            04. SECTION 2: CUSTOMER JOURNEY / THE PROBLEM
@@ -715,7 +859,6 @@
         .faq-item.active .faq-body { display: block; }
         .faq-item.active .faq-icon { transform: rotate(45deg); color: var(--blue-primary); }
 
-        /* Right Side: Aligned & Lowered */
         .faq-right-col {
             margin-top: clamp(28px, 4.2vh, 52px);
         }
@@ -753,6 +896,62 @@
             font-size: 0.86rem;
             margin-bottom: 20px;
             line-height: 1.45;
+        }
+
+        /* =======================================================================
+           08. DATE-ONLY BOOKING — A COMPLETE MONTH, NO TIME-SLOT CLUTTER
+           ======================================================================= */
+        .booking-section {
+            min-height: 100svh;
+            display: grid;
+            align-items: center;
+            background: #090e20;
+            color: #FFFFFF;
+            overflow: hidden;
+            position: relative;
+            padding-block: clamp(72px, 8vw, 110px);
+        }
+        .booking-section::before {
+            content: "";
+            position: absolute;
+            width: 58vw; aspect-ratio: 1; border-radius: 50%;
+            background: radial-gradient(circle, rgba(56, 111, 255, .33), transparent 66%);
+            top: -45%; right: -18%; filter: blur(15px);
+        }
+        .booking-grid { position:relative; z-index:1; display:grid; grid-template-columns: minmax(0,.85fr) minmax(360px,1.15fr); gap: clamp(38px,7vw,105px); align-items:center; }
+        .booking-kicker { color:#98b5ff; font-size:.74rem; font-weight:800; letter-spacing:.1em; text-transform:uppercase; margin-bottom:18px; }
+        .booking-title { font-size:clamp(3.5rem,6.6vw,6.8rem); line-height:.85; letter-spacing:-.075em; margin-bottom:22px; }
+        .booking-title em { font-family:var(--font-serif); font-weight:500; }
+        .booking-copy { max-width:410px; color:#b9c4d9; font-size:1.04rem; line-height:1.6; }
+        .booking-status { margin-top:30px; display:inline-flex; align-items:center; gap:8px; color:#a9b6ce; font-size:.8rem; font-weight:600; }
+        .booking-status i { width:8px; height:8px; background:#76e4a1; border-radius:50%; display:inline-block; box-shadow:0 0 0 5px rgba(118,228,161,.12); }
+
+        /* Give the middle of the page more breathing room and a visual rhythm. */
+        .journey-section,.process-section,.approach-section { min-height: min(92svh, 780px); display:grid; align-items:center; }
+        .journey-header { margin-bottom:48px; }
+        .journey-step-card { padding:16px 8px; }
+        .journey-icon-circle { width:78px; height:78px; }
+        .process-section { background:linear-gradient(180deg,#f7f9ff,#ffffff); }
+        .process-step-item { min-height:290px; border-radius:24px; padding:27px 17px; }
+        .process-step-item:nth-child(2) { transform:translateY(20px); }
+        .process-step-item:nth-child(4) { transform:translateY(20px); }
+        .process-step-item:hover { transform:translateY(-5px); }
+        .approach-cards-row { grid-template-columns:repeat(2,minmax(0,1fr)); gap:18px; }
+        .approach-card { min-height:215px; padding:24px; }
+        .faq-section { min-height:min(92svh,820px); display:grid; align-items:center; }
+
+        @media (max-width: 768px) {
+            .hero-section { padding:115px 0 65px; min-height:auto; }
+            .hero-stage-depth-wrapper { grid-template-columns:1fr; text-align:center; }
+            .hero-center-content { text-align:center; order:2; }
+            .hero-cta-cluster { justify-content:center; }
+            .hero-proof { justify-content:center; }
+            .hero-art { order:1; min-height:310px; margin:-25px auto 0; width:min(100%,390px); }
+            .hero-headline { font-size:clamp(4rem,17vw,6rem); }
+            .booking-grid { grid-template-columns:1fr; }
+            .booking-section { min-height:auto; }
+            .journey-section,.process-section,.approach-section,.faq-section { min-height:auto; display:block; }
+            .process-step-item:nth-child(2),.process-step-item:nth-child(4) { transform:none; }
         }
 
         /* ==========================================================================
@@ -804,13 +1003,6 @@
             justify-content: center;
             gap: 16px;
             flex-wrap: wrap;
-            margin-bottom: 30px;
-        }
-
-        .final-cta-trust {
-            font-size: 0.82rem;
-            color: #64748B;
-            letter-spacing: 0.02em;
         }
 
         /* ==========================================================================
@@ -852,6 +1044,14 @@
         /* ==========================================================================
            10. RESPONSIVE BREAKPOINTS
            ========================================================================== */
+        @media (max-width: 1100px) {
+            .hero-headline {
+                font-size: clamp(2.2rem, 4.2vw, 3.8rem);
+            }
+            #heroActorMDR { left: -25px; width: clamp(200px, 20vw, 280px); }
+            #heroActorCK { right: -25px; width: clamp(200px, 20vw, 280px); }
+        }
+
         @media (max-width: 1024px) {
             .approach-grid {
                 grid-template-columns: 1fr;
@@ -873,6 +1073,8 @@
         @media (max-width: 768px) {
             .nav-links, .nav-actions .login-link { display: none; }
             .menu-toggle { display: flex; }
+
+            #heroActorMDR, #heroActorCK { display: none; }
 
             .journey-steps-row {
                 grid-template-columns: 1fr;
@@ -903,6 +1105,194 @@
                 transition-duration: 0.01ms !important;
                 scroll-behavior: auto !important;
             }
+        }
+        /* =======================================================================
+           REFINEMENT PASS — EDITORIAL APPROACH, PROJECT DESK, FAQ & FINAL CTA
+           ======================================================================= */
+        .approach-section { background:#f6f8fc; overflow:hidden; }
+        .approach-reframe { display:grid; grid-template-columns:minmax(0,.78fr) minmax(420px,1.22fr); align-items:stretch; gap:clamp(36px,7vw,100px); }
+        .approach-intro { display:flex; flex-direction:column; justify-content:center; padding:clamp(18px,4vw,52px) 0; }
+        .approach-intro h2 { margin:0 0 25px; font-size:clamp(3.6rem,5.8vw,6.25rem); line-height:.86; letter-spacing:-.075em; }
+        .approach-intro h2 span { color:var(--blue-primary); }
+        .approach-intro p { max-width:355px; color:var(--text-muted); font-size:1rem; line-height:1.62; }
+        .approach-statement { min-height:480px; position:relative; display:flex; flex-direction:column; justify-content:space-between; padding:clamp(28px,4vw,54px); border-radius:32px; color:#fff; background:radial-gradient(circle at 105% 0,#507dfc 0,rgba(80,125,252,0) 43%),linear-gradient(135deg,#111833,#172c77); box-shadow:0 28px 50px rgba(23,44,119,.2); overflow:hidden; }
+        .approach-statement::after { content:""; position:absolute; width:240px; aspect-ratio:1; bottom:-110px; right:12%; border-radius:50%; border:1px solid rgba(255,255,255,.2); box-shadow:0 0 0 28px rgba(255,255,255,.035),0 0 0 56px rgba(255,255,255,.025); }
+        .statement-mark { display:grid; place-items:center; width:46px; height:46px; border-radius:50%; color:#fff; background:rgba(255,255,255,.13); font-size:1.1rem; }
+        .approach-statement > p { margin:56px 0 34px; max-width:620px; position:relative; z-index:1; font-size:clamp(2.4rem,4vw,4.3rem); font-weight:800; letter-spacing:-.065em; line-height:.92; }
+        .approach-statement > p em { display:block; color:#aac1ff; font-family:var(--font-serif); font-weight:500; }
+        .approach-principles { position:relative; z-index:1; display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
+        .approach-principles div { border-top:1px solid rgba(255,255,255,.21); padding-top:14px; }
+        .approach-principles b { display:block; color:#9fb9ff; font-size:.68rem; letter-spacing:.1em; margin-bottom:8px; }
+        .approach-principles span { display:block; color:#d9e2ff; font-size:.8rem; line-height:1.42; }
+
+        .booking-section { background:radial-gradient(circle at 98% 5%,rgba(47,94,255,.36),transparent 37%),#080d20; }
+        .booking-grid { grid-template-columns:minmax(0,.84fr) minmax(400px,1.16fr); }
+        .project-desk { min-height:470px; display:flex; flex-direction:column; padding:clamp(27px,4vw,48px); border-radius:29px; background:#f7f9ff; color:var(--text-navy); box-shadow:0 32px 75px rgba(0,0,0,.38); position:relative; overflow:hidden; }
+        .project-desk::after { content:""; position:absolute; width:270px; aspect-ratio:1; right:-82px; bottom:-100px; border-radius:50%; background:radial-gradient(circle at 35% 35%,#a7c4ff,#4f67f5 52%,#2e3eae); box-shadow:0 0 0 22px rgba(81,110,246,.10),0 0 0 44px rgba(81,110,246,.06); }
+        .project-desk-top { display:flex; align-items:center; justify-content:space-between; color:#8290ab; font-size:.68rem; font-weight:800; letter-spacing:.1em; }
+        .project-desk-top i { width:9px; height:9px; border-radius:50%; background:#56d890; box-shadow:0 0 0 6px #56d89022; }
+        .project-desk-icon { display:grid; place-items:center; width:52px; height:52px; margin-top:clamp(45px,7vw,76px); background:var(--blue-primary); color:white; border-radius:17px; font-size:1.25rem; transform:rotate(-10deg); }
+        .project-desk h3 { position:relative; z-index:1; margin:18px 0 12px; font-size:clamp(2.6rem,4.2vw,4.5rem); line-height:.87; letter-spacing:-.075em; }
+        .project-desk p { position:relative; z-index:1; max-width:350px; color:var(--text-muted); line-height:1.52; }
+        .project-desk-actions { position:relative; z-index:1; display:flex; align-items:center; flex-wrap:wrap; gap:17px; margin-top:auto; padding-top:36px; }
+        .project-desk-actions .btn { background:#101735; color:white; padding:14px 22px; }
+        .desk-whatsapp { color:var(--text-navy); font-size:.88rem; font-weight:800; }
+        .desk-whatsapp span { color:var(--blue-primary); font-size:1rem; }
+
+        .faq-section { min-height:100svh; padding-block:clamp(90px,10vw,135px); background:#fff; }
+        .faq-reframe { display:grid; grid-template-columns:minmax(0,.8fr) minmax(440px,1.2fr); gap:clamp(45px,9vw,125px); align-items:start; }
+        .faq-intro { position:sticky; top:120px; }
+        .faq-intro h2 { margin:0 0 23px; font-size:clamp(3.7rem,5.4vw,5.9rem); letter-spacing:-.08em; line-height:.82; }
+        .faq-intro h2 em { display:block; color:var(--blue-primary); font-family:var(--font-serif); font-weight:500; }
+        .faq-intro p { max-width:340px; color:var(--text-muted); line-height:1.62; }
+        .faq-link { display:inline-flex; gap:9px; margin-top:29px; padding-bottom:6px; border-bottom:1px solid var(--blue-primary); color:var(--blue-primary); font-size:.87rem; font-weight:800; }
+        .faq-accordion-list { gap:0; margin:0; border-top:1px solid var(--border-light); }
+        .faq-item { border:0; border-bottom:1px solid var(--border-light); border-radius:0; overflow:visible; }
+        .faq-header { padding:24px 0; font-size:clamp(1rem,1.35vw,1.18rem); letter-spacing:-.025em; }
+        .faq-icon { display:grid; place-items:center; width:31px; height:31px; flex:0 0 auto; border:1px solid var(--border-light); border-radius:50%; color:var(--text-navy); transition:all .3s var(--ease); }
+        .faq-item.active .faq-icon { background:var(--blue-primary); color:white; border-color:var(--blue-primary); }
+        .faq-body { max-width:570px; padding:0 52px 0 0; font-size:.95rem; line-height:1.65; }
+        .faq-item.active .faq-body { display:block; padding-bottom:23px; }
+
+        .final-cta-section { min-height:100svh; display:grid; place-items:center; padding-block:100px; background:radial-gradient(circle at 7% 105%,#7548f4 0,transparent 31%),radial-gradient(circle at 100% 0,#3680ff 0,transparent 38%),#255cf0; border:0; }
+        .final-cta-section::before,.final-cta-section::after { content:""; position:absolute; border:1px solid rgba(255,255,255,.22); border-radius:50%; width:40vw; aspect-ratio:1; pointer-events:none; }
+        .final-cta-section::before { top:-27vw; left:-11vw; }.final-cta-section::after { right:-18vw; bottom:-27vw; }
+        .final-cta-box { max-width:1060px; }
+        .final-overline { display:inline-block; padding:7px 12px; border:1px solid rgba(255,255,255,.38); border-radius:99px; font-size:.67rem; font-weight:800; letter-spacing:.11em; color:#fff; }
+        .final-cta-box h2 { margin:24px 0 25px; color:#fff; font-size:clamp(4.3rem,8.4vw,8.6rem); text-transform:none; line-height:.8; letter-spacing:-.087em; }
+        .final-cta-box h2 span { display:block; font-family:var(--font-serif); font-size:1.08em; font-weight:500; letter-spacing:-.08em; }
+        .final-cta-box p { max-width:495px; margin:0 auto 34px; color:#dbe7ff; }
+        .final-cta-actions { gap:20px; }
+        .final-main-action { background:#fff; color:var(--blue-primary); padding:16px 27px; }
+        .final-main-action:hover { background:#f3f6ff; }
+        .final-secondary-action { color:#fff; font-weight:800; font-size:.94rem; }.final-secondary-action span { margin-left:5px; }
+        .final-side-note { display:block; margin-top:76px; color:#d3e0ff; font-size:.66rem; letter-spacing:.13em; font-weight:800; }
+
+        @media (max-width: 900px) {
+            .approach-reframe,.booking-grid,.faq-reframe { grid-template-columns:1fr; }
+            .approach-intro { padding-top:0; }.approach-statement { min-height:430px; }
+            .booking-grid { gap:38px; }.project-desk { min-height:410px; }
+            .faq-intro { position:static; }.faq-section { min-height:auto; }
+        }
+        @media (max-width: 600px) {
+            .approach-principles { grid-template-columns:1fr; gap:11px; }.approach-statement { min-height:auto; }
+            .approach-statement > p { margin:44px 0 31px; }.approach-statement::after { opacity:.55; }
+            .booking-title { font-size:clamp(4.1rem,18vw,5.8rem); }.project-desk { padding:26px; }
+            .project-desk-icon { margin-top:46px; }.faq-header { padding:20px 0; }.faq-body { padding-right:18px; }
+            .final-cta-box h2 { font-size:clamp(4.2rem,17vw,6.1rem); }.final-side-note { margin-top:55px; }
+        }
+        /* =======================================================================
+           SECOND REFINEMENT — HERO FIT, FAQ PRESENCE & BRIGHTER FINAL MOMENT
+           ======================================================================= */
+        .hero-section { height:100svh; min-height:0; padding:110px 0 30px; }
+        .hero-section > .container { height:100%; display:flex; align-items:center; }
+        .hero-stage-depth-wrapper { width:100%; min-height:0; height:100%; grid-template-columns:minmax(0,1.08fr) minmax(340px,.92fr); align-items:center; }
+        .hero-center-content { align-self:center; }
+        .hero-kicker { margin-bottom:14px; }
+        .hero-headline { margin-bottom:21px; font-size:clamp(3.8rem,6.05vw,6.25rem); line-height:.81; }
+        .hero-sublead { max-width:510px; margin-bottom:20px; font-size:clamp(.98rem,1.1vw,1.07rem); line-height:1.48; }
+        .hero-cta-cluster { gap:14px; }
+        .hero-proof { margin-top:21px; }
+        .hero-art { min-height:clamp(330px,33vw,435px); }
+        .hero-art::before { inset:8%; }
+        .hero-note { padding:9px 12px; }
+        .note-one { top:10%; }.note-two { bottom:10%; }.note-three { top:47%; }
+        @media (max-height: 780px) and (min-width: 769px) {
+            .hero-section { padding-top:96px; padding-bottom:18px; }
+            .hero-headline { font-size:clamp(3.5rem,5.45vw,5.6rem); margin-bottom:17px; }
+            .hero-sublead { margin-bottom:16px; }.hero-proof { margin-top:15px; }
+            .hero-art { min-height:310px; }
+        }
+
+        .faq-section { position:relative; min-height:100svh; display:grid; align-items:center; padding-block:clamp(115px,12vh,150px) clamp(80px,9vh,115px); overflow:hidden; background:radial-gradient(circle at 0 100%,rgba(50,88,239,.38),transparent 39%),radial-gradient(circle at 100% 0,rgba(81,157,255,.17),transparent 33%),#090f22; }
+        .faq-section::before { content:""; position:absolute; width:48vw; aspect-ratio:1; right:-22vw; bottom:-30vw; border:1px solid rgba(163,192,255,.15); border-radius:50%; box-shadow:0 0 0 38px rgba(163,192,255,.025),0 0 0 76px rgba(163,192,255,.016); }
+        .faq-section .container { position:relative; z-index:1; }
+        .faq-reframe { grid-template-columns:minmax(0,.82fr) minmax(460px,1.18fr); gap:clamp(55px,9vw,135px); }
+        .faq-intro { color:#fff; }.faq-intro .eyebrow-pill { color:#a9c1ff; background:rgba(255,255,255,.05); border-color:rgba(255,255,255,.18); box-shadow:none; }
+        .faq-intro h2 { color:#fff; font-size:clamp(3.9rem,5.8vw,6.3rem); line-height:.78; }
+        .faq-intro h2 em { color:#92b0ff; }
+        .faq-intro > p { color:#b5c1d9; max-width:355px; }
+        .faq-intro-note { max-width:340px; display:flex; gap:12px; align-items:flex-start; margin-top:31px; padding:15px 16px; border:1px solid rgba(255,255,255,.14); border-radius:15px; background:rgba(255,255,255,.055); }
+        .faq-intro-note span { display:grid; place-items:center; width:27px; height:27px; flex:0 0 auto; color:#b9ccff; border-radius:50%; background:#4268e5; font-size:.7rem; }
+        .faq-intro-note p { margin:0; color:#d4def4; font-size:.8rem; line-height:1.45; }.faq-intro-note b { color:#fff; }
+        .faq-link { color:#a9c2ff; border-bottom-color:#a9c2ff; }
+        .faq-accordion-list { border-top-color:rgba(255,255,255,.19); }.faq-item { border-bottom-color:rgba(255,255,255,.19); }
+        .faq-header { color:#fff; padding:25px 0; }.faq-icon { color:#fff; border-color:rgba(255,255,255,.22); }.faq-item.active .faq-icon { background:#fff; color:#1b45d7; border-color:#fff; }
+        .faq-body { color:#bac6df; }.faq-item.active .faq-body { padding-bottom:24px; }
+
+        .final-cta-section { min-height:100svh; display:grid; align-items:center; padding:clamp(80px,10vh,125px) 0; overflow:hidden; background:radial-gradient(circle at 5% 90%,#ffd26a 0,rgba(255,210,106,.45) 11%,transparent 29%),radial-gradient(circle at 100% 0,#afcaff 0,transparent 34%),#e8efff; }
+        .final-cta-section::before,.final-cta-section::after { opacity:.55; border-color:#2d5ee944; }.final-cta-section::before { top:-19vw; left:-13vw; }.final-cta-section::after { bottom:-24vw; right:-14vw; }
+        .final-cta-box { width:100%; max-width:none; min-height:clamp(520px,67svh,680px); display:flex; flex-direction:column; align-items:center; justify-content:center; padding:clamp(48px,7vw,86px); isolation:isolate; overflow:hidden; border-radius:clamp(28px,3vw,42px); background:radial-gradient(circle at 95% 3%,#698bff 0,rgba(105,139,255,0) 34%),radial-gradient(circle at 3% 100%,#3350d1 0,rgba(51,80,209,0) 35%),linear-gradient(135deg,#070d23 0%,#101c4b 48%,#1c49c7 100%); box-shadow:0 32px 76px rgba(37,73,180,.27); }
+        .final-cta-box::before { content:""; position:absolute; width:360px; aspect-ratio:1; right:-120px; top:-155px; z-index:-1; border-radius:50%; background:radial-gradient(circle,#ffffff99 0,rgba(148,178,255,.27) 31%,transparent 64%); }.final-cta-box::after { content:""; position:absolute; z-index:-1; width:510px; height:160px; border-radius:50%; left:50%; bottom:-113px; transform:translateX(-50%); background:rgba(89,136,255,.45); filter:blur(35px); }
+        .final-overline { color:#e5edff; border-color:#e5edff66; }.final-cta-box h2 { margin:26px 0 24px; font-size:clamp(4.2rem,8.2vw,8.55rem); color:#fff; }.final-cta-box h2 span { color:#bfd0ff; }
+        .final-cta-box p { color:#cbd8f5; }.final-main-action { box-shadow:0 12px 24px rgba(0,0,0,.2); }.final-secondary-action { color:#fff; }.final-side-note { color:#bacbff; }
+        .final-orbit { position:absolute; z-index:-1; display:block; border:1px solid rgba(255,255,255,.24); border-radius:50%; pointer-events:none; }.orbit-one { width:240px; aspect-ratio:1; left:-95px; top:31%; }.orbit-two { width:460px; aspect-ratio:1; right:-240px; bottom:-300px; }
+
+        @media (max-width: 768px) {
+            .hero-section { height:auto; min-height:100svh; padding:105px 0 52px; }.hero-section > .container { display:block; }
+            .hero-stage-depth-wrapper { height:auto; }.hero-headline { font-size:clamp(3.8rem,17.2vw,5.55rem); }.hero-art { min-height:300px; }
+            .faq-section { padding-top:118px; }.faq-reframe { grid-template-columns:1fr; gap:54px; }.faq-intro-note { margin-top:25px; }
+            .final-cta-section { padding:60px 0; }.final-cta-box { min-height:620px; padding:40px 22px; }.final-cta-box h2 { font-size:clamp(4rem,16.5vw,5.8rem); }.final-cta-box p { max-width:330px; }.final-side-note { margin-top:54px; }
+        }
+        /* =======================================================================
+           FINAL VISUAL PASS — CINEMATIC HERO, LIGHT FAQ & EDITORIAL CLOSING CTA
+           ======================================================================= */
+        .hero-section { isolation:isolate; background:linear-gradient(125deg,#fcfdff 0%,#f9f9ff 47%,#f5f1ff 100%); }
+        .hero-section::before { content:""; position:absolute; z-index:-2; width:min(74vw,1120px); aspect-ratio:1.45; left:-25vw; bottom:-61%; border-radius:50%; background:radial-gradient(ellipse at center,rgba(65,107,255,.17),transparent 66%); filter:blur(16px); animation:heroLightDrift 16s ease-in-out infinite alternate; }
+        .hero-section::after { content:""; position:absolute; z-index:-1; inset:0; pointer-events:none; opacity:.34; background-image:radial-gradient(rgba(34,58,130,.16) .55px,transparent .65px); background-size:7px 7px; mix-blend-mode:multiply; mask-image:linear-gradient(90deg,transparent 0%,#000 32%,#000 80%,transparent); }
+        .hero-ambient-mesh { width:min(1100px,80vw); height:min(680px,66vw); top:5%; left:58%; opacity:.9; background:radial-gradient(ellipse at 50% 47%,rgba(91,112,255,.19) 0%,rgba(220,133,255,.12) 35%,rgba(255,222,166,.09) 52%,transparent 71%); animation:heroMeshPulse 10s ease-in-out infinite alternate; }
+        .hero-center-content { position:relative; }.hero-center-content::before { content:""; position:absolute; width:34px; height:1px; top:8px; left:-48px; background:var(--blue-primary); box-shadow:0 7px 0 rgba(37,99,235,.25); }
+        .hero-headline .line { text-shadow:0 8px 32px rgba(45,79,180,.045); }.hero-headline .blue-text { background:linear-gradient(105deg,#1553e9,#3e72ff 56%,#744fe8); background-clip:text; -webkit-background-clip:text; color:transparent; background-size:200% auto; animation:heroRise .9s .16s var(--ease) both,blueShift 6s linear infinite; }
+        .hero-art { transform:perspective(1000px) rotateY(calc(var(--mx) * .002deg)) rotateX(calc(var(--my) * -.0014deg)); transition:transform .6s var(--ease); }
+        .hero-art::before { border-color:rgba(45,99,245,.24); box-shadow:0 0 0 24px rgba(75,107,255,.035),0 0 0 54px rgba(75,107,255,.018); }
+        .hero-art::after { background:conic-gradient(from 15deg,#ffc4de,#7b60ff,#1d65f5,#69d8dc,#ffe496,#ffc4de); box-shadow:0 35px 95px rgba(55,71,213,.27),inset 0 0 40px rgba(255,255,255,.72); }
+        .hero-core { position:relative; background:radial-gradient(circle at 31% 28%,#ffffff 0%,#f9f9fd 44%,#e4ebff 100%); box-shadow:inset -18px -18px 30px rgba(66,89,208,.12),inset 14px 15px 31px rgba(255,255,255,.95),0 15px 42px rgba(39,58,177,.12); animation:coreFloat 7s ease-in-out infinite; }
+        .hero-core::after { content:""; position:absolute; width:27%; height:12%; top:21%; left:19%; border-radius:50%; background:rgba(255,255,255,.8); filter:blur(5px); transform:rotate(-34deg); }
+        .hero-note { backdrop-filter:blur(14px); background:rgba(255,255,255,.78); border-color:rgba(255,255,255,.95); box-shadow:0 17px 34px rgba(35,45,107,.17); }
+        .hero-glint { position:absolute; z-index:2; width:9px; aspect-ratio:1; border-radius:50%; background:#fff; box-shadow:0 0 0 5px rgba(255,255,255,.16),0 0 24px 7px rgba(92,129,255,.65); animation:glint 3.8s ease-in-out infinite; }
+        .glint-a { top:17%; left:22%; animation-delay:-.7s; }.glint-b { right:18%; bottom:20%; width:6px; animation-delay:-2.2s; }.glint-c { left:7%; bottom:31%; width:5px; animation-delay:-1.5s; }
+        .hero-scanline { position:absolute; z-index:-1; width:91%; height:1px; top:50%; left:4%; background:linear-gradient(90deg,transparent,rgba(45,99,245,.42),transparent); animation:scan 6s ease-in-out infinite; }
+        @keyframes heroLightDrift { to { transform:translate(16vw,-7vh) scale(1.08); } }
+        @keyframes heroMeshPulse { to { transform:translateX(-50%) scale(1.12) rotate(8deg); filter:blur(105px); } }
+        @keyframes blueShift { to { background-position:200% center; } }
+        @keyframes coreFloat { 50% { transform:translateY(-13px) scale(1.025); } }
+        @keyframes glint { 50% { transform:scale(1.9); opacity:.32; } }
+        @keyframes scan { 50% { transform:translateY(115px); opacity:.2; } }
+
+        /* A normal, refined light FAQ section — deliberately unlike the dark sections. */
+        .faq-section { min-height:100svh; background:radial-gradient(circle at 92% 12%,#edf1ff 0,transparent 25%),radial-gradient(circle at 5% 95%,#fff2d2 0,transparent 24%),#fff; }
+        .faq-section::before { width:440px; right:-220px; bottom:-240px; border-color:rgba(37,99,235,.12); box-shadow:0 0 0 36px rgba(37,99,235,.022),0 0 0 72px rgba(37,99,235,.012); }
+        .faq-intro { color:var(--text-navy); }.faq-intro .eyebrow-pill { color:var(--blue-primary); background:#fff; border-color:var(--border-light); box-shadow:var(--shadow-subtle); }
+        .faq-intro h2 { color:var(--text-navy); }.faq-intro h2 em { color:var(--blue-primary); }
+        .faq-intro > p { color:var(--text-muted); }.faq-intro-note { border-color:#dfe6f7; background:#fff; box-shadow:0 14px 29px rgba(22,43,95,.06); }.faq-intro-note span { background:#2f63ec; color:#fff; }.faq-intro-note p { color:#66738c; }.faq-intro-note b { color:var(--text-navy); }
+        .faq-link { color:var(--blue-primary); border-bottom-color:var(--blue-primary); }
+        .faq-accordion-list { padding:7px 27px; border:1px solid #e2e8f3; border-radius:24px; background:rgba(255,255,255,.78); box-shadow:0 20px 50px rgba(27,53,114,.08); backdrop-filter:blur(12px); }
+        .faq-item { background:transparent; border-bottom-color:#e2e8f3; }.faq-item:last-child { border-bottom:0; }
+        .faq-header { color:var(--text-navy); }.faq-icon { color:var(--text-navy); border-color:#dfe5f1; background:#fff; }.faq-item.active .faq-icon { color:#fff; background:var(--blue-primary); border-color:var(--blue-primary); }
+        .faq-body { color:var(--text-muted); }
+
+        /* Fresh, bright final composition: no dark card and no recycled hero treatment. */
+        .final-cta-section { min-height:100svh; padding:clamp(80px,10vh,120px) 0; background:radial-gradient(circle at 8% 82%,#ffe3a4 0,transparent 24%),radial-gradient(circle at 93% 8%,#c7d9ff 0,transparent 31%),#f9fbff; }
+        .final-cta-section::before,.final-cta-section::after { display:none; }
+        .final-cta-box { min-height:0; width:100%; max-width:1240px; margin:0 auto; padding:0; display:grid; grid-template-columns:minmax(0,1.1fr) minmax(360px,.9fr); align-items:center; gap:clamp(40px,8vw,115px); overflow:visible; background:transparent; box-shadow:none; border-radius:0; text-align:left; }
+        .final-cta-box::before,.final-cta-box::after { display:none; }
+        .final-copy { position:relative; z-index:2; }.final-overline { color:var(--blue-primary); border-color:#bfd1ff; background:rgba(255,255,255,.72); }
+        .final-cta-box h2 { margin:24px 0 25px; color:var(--text-navy); font-size:clamp(4.25rem,7.4vw,7.8rem); letter-spacing:-.09em; line-height:.8; }.final-cta-box h2 span { color:var(--blue-primary); }
+        .final-cta-box p { max-width:470px; margin:0 0 28px; color:var(--text-muted); font-size:clamp(1rem,1.3vw,1.18rem); line-height:1.55; }.final-secondary-action { color:var(--text-navy); display:inline-flex; gap:7px; padding-bottom:6px; border-bottom:1px solid var(--blue-primary); }.final-secondary-action span { color:var(--blue-primary); }
+        .final-object { width:min(33vw,440px); min-width:350px; aspect-ratio:1; justify-self:end; position:relative; display:grid; place-items:center; border-radius:50%; background:conic-gradient(from 230deg,#ffb6d4,#965cff,#2e61f4,#71dfdd,#ffe18f,#ffb6d4); box-shadow:0 35px 68px rgba(55,84,214,.22),inset 0 0 45px rgba(255,255,255,.75); animation:objectBob 7s ease-in-out infinite; }
+        .final-object::before { content:""; position:absolute; inset:12%; border-radius:50%; background:radial-gradient(circle at 35% 26%,#fff,#f9fbff 49%,#e3eaff); box-shadow:inset -15px -16px 30px rgba(51,82,202,.12),0 9px 30px rgba(51,82,202,.14); }
+        .final-ring { position:absolute; border:1px solid rgba(42,82,220,.22); border-radius:50%; pointer-events:none; }.ring-outer { width:123%; aspect-ratio:1; border-style:dashed; animation:spinSlow 24s linear infinite; }.ring-inner { width:106%; aspect-ratio:1; border-color:rgba(255,255,255,.68); }
+        .final-main-action { position:relative; z-index:2; display:grid; place-items:center; width:52%; aspect-ratio:1; border-radius:50%; color:#fff; background:#101a43; text-align:center; font-size:.75rem; font-weight:800; letter-spacing:.08em; line-height:1.35; box-shadow:0 18px 30px rgba(18,29,75,.3); transition:transform .35s var(--ease),background .35s; }.final-main-action:hover { transform:scale(1.09) rotate(5deg); background:var(--blue-primary); }.final-main-action b { display:block; margin-top:6px; color:#9eb9ff; font-size:1.3rem; font-weight:400; }
+        .final-orbit-text { position:absolute; bottom:-32px; left:50%; transform:translateX(-50%); width:max-content; color:#60708f; font-size:.63rem; font-weight:800; letter-spacing:.13em; }
+        @keyframes objectBob { 50% { transform:translateY(-16px) rotate(3deg); } }
+
+        @media (max-width: 900px) {
+            .final-cta-box { grid-template-columns:1fr; text-align:center; }.final-copy { text-align:center; }.final-cta-box p { margin-inline:auto; }.final-object { justify-self:center; width:min(74vw,420px); min-width:0; margin-top:16px; }
+        }
+        @media (max-width: 768px) {
+            .hero-center-content::before { display:none; }.hero-section::before { width:110vw; left:-39vw; }.hero-art { transform:none; }.hero-glint { display:none; }.hero-scanline { display:none; }
+            .faq-section { padding-block:112px 80px; }.faq-accordion-list { padding:4px 18px; border-radius:20px; }.faq-header { font-size:1rem; }.faq-intro h2 { font-size:clamp(3.9rem,17vw,5.7rem); }
+            .final-cta-box h2 { font-size:clamp(4rem,16.5vw,6rem); }.final-object { width:min(78vw,390px); }
         }
     </style>
 </head>
@@ -962,33 +1352,42 @@
     <main>
 
         <!-- ==========================================================================
-             02. HERO SECTION (CLEAN, GRAND & EDITORIAL)
+             02. HERO SECTION (CHARACTERS FLANKING DIRECTLY BESIDE WORDS)
              ========================================================================== -->
-        <section class="hero-section">
-            <div class="hero-glow-bg"></div>
+        <section class="hero-section" id="home">
+            <div class="hero-ambient-mesh"></div>
 
             <div class="container">
-                <div class="hero-layout-stack">
-                    
-                    <div class="hero-headline-block">
+                <div class="hero-stage-depth-wrapper">
+                    <div class="hero-center-content">
+                        <p class="hero-kicker">Creative · Development · Strategy</p>
                         <h1 class="hero-headline">
-                            WE BUILD <br>
-                            WEBSITES <br>
-                            <span class="blue-text">PEOPLE</span> 
-                            <span class="serif-italic">remember.</span>
+                            <span class="line">WE BUILD</span>
+                            <span class="line">WEBSITES</span>
+                            <span class="line blue-text">PEOPLE</span>
+                            <span class="line serif-italic">remember.</span>
                         </h1>
-                    </div>
 
-                    <!-- Clean, Names-Free Subheadline -->
-                    <div class="hero-description-block">
-                        <p class="sub-lead">
-                            We design and build custom websites and digital systems that help your business look exceptional, work properly, and turn visitors into customers. Zero templates, zero bloated code, built to last.
+                        <p class="hero-sublead">
+                            Your website is your first impression. We make digital experiences that help ambitious businesses look credible, get understood, and get chosen.
                         </p>
+
+                        <div class="hero-cta-cluster">
+                            <a href="start.html" class="btn btn-primary">Start a Project →</a>
+                            <a href="#booking" class="btn-text-link">Let's talk about it →</a>
+                        </div>
+                        <div class="hero-proof"><span>✦</span><span>Built around <b>clarity, trust,</b> and momentum.</span></div>
                     </div>
 
-                    <div class="hero-actions-cluster">
-                        <a href="start.html" class="btn btn-primary">Start a Project →</a>
-                        <a href="https://wa.me/919999999999?text=Hi%20Marzoft,%20I'd%20like%20to%20discuss%20a%20website" class="btn btn-whatsapp" target="_blank" rel="noopener">Chat on WhatsApp 💬</a>
+                    <div class="hero-art" aria-hidden="true">
+                        <span class="hero-glint glint-a"></span>
+                        <span class="hero-glint glint-b"></span>
+                        <span class="hero-glint glint-c"></span>
+                        <span class="hero-scanline"></span>
+                        <div class="hero-core"></div>
+                        <div class="hero-note note-one">01 / STRATEGY<small>Find the signal</small></div>
+                        <div class="hero-note note-two">02 / DESIGN<small>Make it felt</small></div>
+                        <div class="hero-note note-three">03 / BUILD<small>Move with intent</small></div>
                     </div>
 
                 </div>
@@ -1129,57 +1528,19 @@
              ========================================================================== -->
         <section class="section-padding approach-section" id="approach">
             <div class="container">
-                <div class="approach-grid">
-                    <div>
+                <div class="approach-reframe">
+                    <div class="approach-intro">
                         <span class="eyebrow-pill">OUR APPROACH</span>
-                        <h2 class="section-headline">
-                            Honest <span style="color: var(--blue-primary);">about</span> <br>
-                            where we are.
-                        </h2>
+                        <h2>Honest <span>about</span><br>where we are.</h2>
+                        <p>We’re not interested in pretending to be a huge agency. We’re a close creative and technical team, doing focused work with people who care about the details.</p>
                     </div>
-
-                    <div class="approach-cards-row">
-                        <!-- Card 1 -->
-                        <div class="approach-card">
-                            <div class="approach-badge-icon badge-blue">🔒</div>
-                            <div>
-                                <h3>We're early.</h3>
-                                <p>We're building Marzoft for the long run, with real clients and real projects.</p>
-                            </div>
-                            <div class="card-num">01</div>
-                        </div>
-
-                        <!-- Card 2 -->
-                        <div class="approach-card">
-                            <div class="approach-badge-icon badge-amber">📁</div>
-                            <div>
-                                <h3>Work in progress.</h3>
-                                <p>Some projects are private. Some are launching soon. We'll show you when we can.</p>
-                            </div>
-                            <div class="card-num">02</div>
-                        </div>
-
-                        <!-- Card 3 -->
-                        <div class="approach-card">
-                            <div class="approach-badge-icon badge-pink">💙</div>
-                            <div>
-                                <h3>Focus on impact.</h3>
-                                <p>We don't chase numbers. We chase the result that actually matters.</p>
-                            </div>
-                            <div class="card-num">03</div>
-                        </div>
-
-                        <!-- Card 4 -->
-                        <div class="approach-card">
-                            <div class="approach-badge-icon badge-purple">💬</div>
-                            <div>
-                                <h3>Want to see our work?</h3>
-                                <p>Let's talk. We'll share the right things with the right people.</p>
-                            </div>
-                            <div>
-                                <a href="whatsapp.html" class="btn-text-link" style="font-size: 0.85rem; color: var(--blue-primary);">Let's Connect →</a>
-                                <div class="card-num">04</div>
-                            </div>
+                    <div class="approach-statement">
+                        <span class="statement-mark">✦</span>
+                        <p>Small by design.<br><em>Serious about impact.</em></p>
+                        <div class="approach-principles">
+                            <div><b>01</b><span>Direct access to the people doing the work.</span></div>
+                            <div><b>02</b><span>Decisions made for your business, not our portfolio.</span></div>
+                            <div><b>03</b><span>Clear scope, clear updates, no agency theatre.</span></div>
                         </div>
                     </div>
                 </div>
@@ -1187,21 +1548,42 @@
         </section>
 
         <!-- ==========================================================================
-             06. FAQ SECTION & WHATSAPP DESK (BALANCED & PROPERLY ALIGNED)
+             06. FAQ SECTION & WHATSAPP DESK
              ========================================================================== -->
+        <section class="booking-section" id="booking">
+            <div class="container">
+                <div class="booking-grid">
+                    <div>
+                        <p class="booking-kicker">Start a conversation</p>
+                        <h2 class="booking-title">Ready to<br><em>begin?</em></h2>
+                        <p class="booking-copy">You don’t need a perfect brief. Start with the idea, the problem, or even the feeling you want people to leave with. We’ll find the right next move together.</p>
+                        <p class="booking-status"><i></i> Currently taking on select projects</p>
+                    </div>
+                    <div class="project-desk">
+                        <div class="project-desk-top"><span>MARZOFT / NEW PROJECT</span><i></i></div>
+                        <div class="project-desk-icon">✦</div>
+                        <h3>Have a project<br>in mind?</h3>
+                        <p>Tell us where you want to go. We’ll help make the route clear.</p>
+                        <div class="project-desk-actions">
+                            <a href="start.html" class="btn btn-white">Start a Project <span>→</span></a>
+                            <a href="https://wa.me/919999999999?text=Hi%20Marzoft,%20I'd%20like%20to%20discuss%20a%20project" class="desk-whatsapp" target="_blank" rel="noopener">Or message us on WhatsApp <span>↗</span></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <section class="section-padding faq-section" id="faqs">
             <div class="container">
-                <div class="faq-grid">
-                    
-                    <!-- Left: Questions Accordion -->
-                    <div class="faq-left-col">
+                <div class="faq-reframe">
+                    <div class="faq-intro">
                         <span class="eyebrow-pill">FREQUENTLY ASKED</span>
-                        <h2 class="section-headline">
-                            Questions? <br>
-                            <span class="serif-italic" style="font-family: var(--font-serif); font-style: italic;">We've got answers.</span>
-                        </h2>
-
-                        <div class="faq-accordion-list" role="region" aria-label="FAQ Accordion">
+                        <h2>Questions?<br><em>We've got answers.</em></h2>
+                        <p>The short version: we make the process simple, collaborative, and built around what your business genuinely needs.</p>
+                        <div class="faq-intro-note"><span>✦</span><p>Small by design.<br><b>Serious about impact.</b></p></div>
+                        <a href="whatsapp.html" class="faq-link">Ask us something else <span>→</span></a>
+                    </div>
+                    <div class="faq-accordion-list" role="region" aria-label="FAQ Accordion">
                             <div class="faq-item active">
                                 <button class="faq-header" onclick="toggleFaq(this)" aria-expanded="true">
                                     <span>How fast will my project be completed?</span>
@@ -1251,29 +1633,7 @@
                                     You share a quick brief about your idea. We review it, reach out on WhatsApp or phone call for a quick chat, and send you a clear proposal.
                                 </div>
                             </div>
-                        </div>
-
-                        <a href="whatsapp.html" class="btn-text-link" style="margin-top: 18px; color: var(--blue-primary);">View all questions on WhatsApp Desk →</a>
                     </div>
-
-                    <!-- Right: Aligned & Lowered -->
-                    <div class="faq-right-col">
-                        <div class="faq-callout-card">
-                            <div class="callout-emoji-badge">💬</div>
-                            <h3>Have a project in mind?</h3>
-                            <p>Tell us what you need or message us directly on WhatsApp for an immediate response.</p>
-                            <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px;">
-                                <a href="start.html" class="btn btn-white" style="width: 100%; min-height: 44px; padding: 10px 20px; font-size: 0.92rem;">Start a Project →</a>
-                                <a href="https://wa.me/919999999999?text=Hi%20Marzoft,%20I'd%20like%20to%20discuss%20a%20project" class="btn btn-whatsapp" style="width: 100%; min-height: 44px; padding: 10px 20px; font-size: 0.92rem;" target="_blank" rel="noopener">Chat on WhatsApp 💬</a>
-                            </div>
-                            
-                            <!-- Replaced Section Note (Without MDR & CK) -->
-                            <div style="font-size: 0.82rem; color: #CBD5E1; line-height: 1.45; border-top: 1px solid rgba(255, 255, 255, 0.12); padding-top: 16px;">
-                                Zero templates, zero bloated code, built to last.
-                            </div>
-                        </div>
-                    </div>
-
                 </div>
             </div>
         </section>
@@ -1284,20 +1644,17 @@
         <section class="final-cta-section" id="final-cta">
             <div class="container">
                 <div class="final-cta-box">
-                    <span class="eyebrow-pill" style="color: var(--blue-primary);">READY TO BUILD?</span>
-                    <h2>
-                        So... what does your business <br>
-                        look like <span class="blue-italic">online?</span>
-                    </h2>
-                    <p>
-                        Every project is different. Let's discuss what your business actually needs and build something people remember.
-                    </p>
-                    <div class="final-cta-actions">
-                        <a href="start.html" class="btn btn-primary" style="padding: 16px 36px; font-size: 1.05rem;">Start a Project →</a>
-                        <a href="https://wa.me/919999999999?text=Hi%20Marzoft,%20I'd%20like%20to%20discuss%20a%20project" class="btn btn-whatsapp" style="padding: 16px 36px; font-size: 1.05rem;" target="_blank" rel="noopener">Chat on WhatsApp 💬</a>
+                    <div class="final-copy">
+                        <span class="final-overline">MARZOFT / CREATIVE DIGITAL STUDIO</span>
+                        <h2>Your next website<br>should <span>be felt.</span></h2>
+                        <p>Not another digital brochure. A sharp first impression that makes the right people want to know more.</p>
+                        <a href="https://wa.me/919999999999?text=Hi%20Marzoft,%20I'd%20like%20to%20discuss%20a%20project" class="final-secondary-action" target="_blank" rel="noopener">Or start with a quick WhatsApp message <span>↗</span></a>
                     </div>
-                    <div class="final-cta-trust">
-                        Directly built by the founders • Worldwide Reach • Based in Tamil Nadu, India
+                    <div class="final-object" aria-label="Start a project">
+                        <span class="final-ring ring-outer"></span>
+                        <span class="final-ring ring-inner"></span>
+                        <a href="start.html" class="final-main-action"><span>START A<br>PROJECT</span><b>→</b></a>
+                        <span class="final-orbit-text">STRATEGY · DESIGN · DEVELOPMENT ·</span>
                     </div>
                 </div>
             </div>
@@ -1329,10 +1686,18 @@
     </footer>
 
     <!-- ==========================================================================
-         09. INTERACTIVE JAVASCRIPT
+         09. INTERACTIVE JAVASCRIPT & PARALLAX ENGINE
          ========================================================================== -->
     <script>
-        // 1. Mobile Drawer Navigation Toggle
+        // 1. Mouse Movement Parallax Engine for Depth Layers
+        document.addEventListener('mousemove', (e) => {
+            const x = (e.clientX - window.innerWidth / 2);
+            const y = (e.clientY - window.innerHeight / 2);
+            document.documentElement.style.setProperty('--mx', `${x}px`);
+            document.documentElement.style.setProperty('--my', `${y}px`);
+        });
+
+        // 2. Mobile Drawer Navigation Toggle
         const menuToggle = document.getElementById('menuToggle');
         const mobileDrawer = document.getElementById('mobileDrawer');
         menuToggle.addEventListener('click', () => {
@@ -1350,7 +1715,7 @@
             });
         });
 
-        // 2. FAQ Accordion Interaction
+        // 3. FAQ Accordion Interaction
         function toggleFaq(button) {
             const item = button.parentElement;
             const isOpen = item.classList.contains('active');
@@ -1366,6 +1731,7 @@
                 button.setAttribute('aria-expanded', 'true');
             }
         }
+
     </script>
 </body>
 </html>
