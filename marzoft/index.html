@@ -1,0 +1,1371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Primary SEO & Meta -->
+    <title>MARZOFT — We Build Websites People Remember</title>
+    <meta name="title" content="MARZOFT — We Build Websites People Remember">
+    <meta name="description" content="We design and build custom websites, online storefronts, and digital systems that help businesses look credible, get understood, and turn visitors into customers.">
+    <meta name="author" content="Marzoft Technologies">
+
+    <!-- Google Fonts: Plus Jakarta Sans (Modern Sans) + Newsreader (Editorial Serif Italic) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@1,6..72,400;1,6..72,500;1,6..72,600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        /* ==========================================================================
+           01. DESIGN TOKENS & SYSTEM RESET
+           ========================================================================== */
+        :root {
+            --bg-canvas: #FFFFFF;
+            --bg-offwhite: #F8F9FC;
+            --text-navy: #0B1020;
+            --text-muted: #526079;
+            --text-light: #94A3B8;
+            
+            --blue-primary: #2563EB;
+            --blue-hover: #1D4ED8;
+            --blue-soft: #EFF6FF;
+            --blue-sky: #DBEAFE;
+            --blue-deep: #163E91;
+            
+            --accent-pink: #EC4899;
+            --accent-purple: #7C3AED;
+            --accent-orange: #F97316;
+            --accent-green: #22C55E;
+            --wa-green: #25D366;
+            
+            --dark-cta-bg: #050816;
+            --dark-card-bg: #0C1226;
+            
+            --border-light: #E2E8F0;
+            --border-subtle: #F1F5F9;
+            
+            --radius-sm: 8px;
+            --radius-md: 14px;
+            --radius-lg: 20px;
+            --radius-full: 9999px;
+            
+            --shadow-subtle: 0 4px 20px rgba(11, 16, 32, 0.04);
+            --shadow-card: 0 10px 30px rgba(11, 16, 32, 0.06);
+            --shadow-float: 0 20px 50px rgba(37, 99, 235, 0.12);
+            --shadow-window: 0 30px 70px rgba(11, 16, 32, 0.12);
+            
+            --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+            --font-serif: 'Newsreader', Georgia, serif;
+            
+            --nav-height: 72px;
+            --ease: cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            min-height: 100%;
+            overflow-x: hidden;
+            background-color: var(--bg-canvas);
+            color: var(--text-navy);
+            font-family: var(--font-sans);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        img, svg {
+            max-width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+            transition: all 0.25s var(--ease);
+        }
+
+        button {
+            font-family: inherit;
+            cursor: pointer;
+            border: none;
+            outline: none;
+            background: none;
+        }
+
+        .container {
+            width: min(1240px, calc(100% - 48px));
+            margin-inline: auto;
+            position: relative;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                width: min(100%, calc(100% - 32px));
+            }
+        }
+
+        .section-padding {
+            padding-block: clamp(60px, 7vw, 110px);
+            position: relative;
+            overflow: clip;
+        }
+
+        /* Typography */
+        .hero-headline {
+            font-size: clamp(3.2rem, 7vw, 6.2rem);
+            font-weight: 800;
+            line-height: 0.94;
+            letter-spacing: -0.045em;
+            text-transform: uppercase;
+            color: var(--text-navy);
+        }
+
+        .hero-headline .blue-text {
+            color: var(--blue-primary);
+            display: inline-block;
+        }
+
+        .hero-headline .serif-italic {
+            font-family: var(--font-serif);
+            font-style: italic;
+            font-weight: 500;
+            text-transform: lowercase;
+            letter-spacing: -0.01em;
+            color: var(--text-navy);
+            display: inline-block;
+        }
+
+        .section-headline {
+            font-size: clamp(2rem, 3.4vw, 3rem);
+            font-weight: 800;
+            line-height: 1.1;
+            letter-spacing: -0.035em;
+            color: var(--text-navy);
+        }
+
+        .sub-lead {
+            font-size: clamp(1.05rem, 1.35vw, 1.2rem);
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        .eyebrow-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 5px 14px;
+            background-color: #FFFFFF;
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-full);
+            font-size: 0.72rem;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--blue-primary);
+            box-shadow: var(--shadow-subtle);
+            margin-bottom: 16px;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 14px 30px;
+            min-height: 48px;
+            border-radius: var(--radius-full);
+            font-size: 0.96rem;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+            transition: all 0.25s var(--ease);
+            white-space: nowrap;
+        }
+
+        .btn-primary {
+            background-color: var(--blue-primary);
+            color: #FFFFFF;
+            box-shadow: 0 8px 22px rgba(37, 99, 235, 0.25);
+        }
+        .btn-primary:hover {
+            background-color: var(--blue-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 12px 28px rgba(37, 99, 235, 0.35);
+        }
+
+        .btn-whatsapp {
+            background-color: var(--wa-green);
+            color: #FFFFFF;
+        }
+        .btn-whatsapp:hover {
+            background-color: #1EBE5D;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(37, 211, 102, 0.3);
+        }
+
+        .btn-white {
+            background-color: #FFFFFF;
+            color: var(--text-navy);
+        }
+        .btn-white:hover {
+            background-color: #F8FAFC;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        .btn-text-link {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text-navy);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-text-link:hover {
+            color: var(--blue-primary);
+        }
+
+        /* ==========================================================================
+           02. FLOATING STICKY NAVIGATION
+           ========================================================================== */
+        .site-header {
+            position: fixed;
+            top: 16px;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            pointer-events: none;
+            transition: all 0.3s var(--ease);
+        }
+
+        .nav-inner {
+            pointer-events: auto;
+            max-width: 1100px;
+            margin-inline: auto;
+            padding: 7px 10px 7px 22px;
+            background: rgba(255, 255, 255, 0.94);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-full);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: var(--shadow-subtle);
+        }
+
+        .brand-logo {
+            font-weight: 800;
+            font-size: 1.22rem;
+            letter-spacing: -0.04em;
+            color: var(--text-navy);
+            display: flex;
+            align-items: center;
+            gap: 2px;
+        }
+        .brand-logo .dot {
+            width: 6px;
+            height: 6px;
+            background-color: var(--blue-primary);
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+            list-style: none;
+        }
+        .nav-links a {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+        .nav-links a:hover {
+            color: var(--blue-primary);
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .login-link {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-navy);
+        }
+
+        .menu-toggle {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            padding: 8px;
+        }
+        .menu-toggle span {
+            width: 22px;
+            height: 2px;
+            background-color: var(--text-navy);
+        }
+
+        /* Mobile Drawer */
+        .mobile-drawer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100dvh;
+            background-color: #FFFFFF;
+            z-index: 999;
+            padding: 100px 24px 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transform: translateY(-100%);
+            transition: transform 0.35s var(--ease);
+        }
+        .mobile-drawer.active { transform: translateY(0); }
+        .mobile-menu-list { list-style: none; display: flex; flex-direction: column; gap: 20px; }
+        .mobile-menu-list a { font-size: 1.6rem; font-weight: 800; color: var(--text-navy); }
+
+        /* ==========================================================================
+           03. HERO SECTION (CLEAN & GRAND)
+           ========================================================================== */
+        .hero-section {
+            min-height: calc(100svh - 40px);
+            display: flex;
+            align-items: center;
+            padding-top: calc(var(--nav-height) + 40px);
+            padding-bottom: 60px;
+            position: relative;
+            overflow: clip;
+        }
+
+        .hero-glow-bg {
+            position: absolute;
+            width: min(700px, 90vw);
+            height: min(450px, 70vw);
+            background: radial-gradient(circle, rgba(37, 99, 235, 0.1) 0%, rgba(236, 72, 153, 0.06) 50%, rgba(255, 255, 255, 0) 70%);
+            top: 15%;
+            left: 50%;
+            transform: translateX(-50%);
+            pointer-events: none;
+            filter: blur(80px);
+            z-index: 0;
+        }
+
+        .hero-layout-stack {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 960px;
+        }
+
+        .hero-headline-block {
+            margin-bottom: 24px;
+        }
+
+        .hero-description-block {
+            margin-bottom: 36px;
+        }
+
+        .hero-description-block .sub-lead {
+            max-width: 640px;
+        }
+
+        .hero-actions-cluster {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        /* ==========================================================================
+           04. SECTION 2: CUSTOMER JOURNEY / THE PROBLEM
+           ========================================================================== */
+        .journey-section {
+            border-top: 1px solid var(--border-light);
+            background-color: var(--bg-canvas);
+        }
+
+        .journey-header {
+            max-width: 600px;
+            margin-bottom: 36px;
+        }
+
+        .journey-timeline-wrapper {
+            position: relative;
+            margin-top: 20px;
+        }
+
+        .journey-connecting-line {
+            position: absolute;
+            top: 36px;
+            left: 5%;
+            right: 5%;
+            height: 2px;
+            background: repeating-linear-gradient(to right, #CBD5E1 0, #CBD5E1 6px, transparent 6px, transparent 12px);
+            z-index: 1;
+        }
+
+        .journey-steps-row {
+            display: grid;
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+            gap: 16px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .journey-step-card {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .journey-icon-circle {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background-color: #FFFFFF;
+            border: 2px solid var(--border-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.35rem;
+            margin-bottom: 14px;
+            box-shadow: var(--shadow-subtle);
+            transition: all 0.3s var(--ease);
+        }
+
+        .journey-step-card:hover .journey-icon-circle {
+            transform: scale(1.08);
+            border-color: var(--blue-primary);
+            box-shadow: var(--shadow-float);
+        }
+
+        .step-blue .journey-icon-circle { color: var(--blue-primary); border-color: var(--blue-sky); }
+        .step-pink .journey-icon-circle { color: var(--accent-pink); border-color: #FCE7F3; }
+        .step-orange .journey-icon-circle { color: var(--accent-orange); border-color: #FFEDD5; }
+        .step-green .journey-icon-circle { color: var(--accent-green); border-color: #DCFCE7; }
+        .step-dark .journey-icon-circle { color: #FFFFFF; background-color: var(--blue-primary); border-color: var(--blue-primary); }
+
+        .journey-step-title {
+            font-size: 0.9rem;
+            font-weight: 800;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            color: var(--text-navy);
+            margin-bottom: 4px;
+        }
+        .journey-step-desc {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+            max-width: 140px;
+        }
+
+        .journey-takeaway-card {
+            width: min(440px, 100%);
+            margin: 36px auto 0;
+            background-color: #FFFFFF;
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-md);
+            padding: 12px 18px;
+            box-shadow: var(--shadow-card);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+        .journey-takeaway-text {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--text-navy);
+        }
+
+        /* ==========================================================================
+           05. SECTION 3: WHAT WE DO / PROCESS
+           ========================================================================== */
+        .process-section {
+            border-top: 1px solid var(--border-light);
+            background-color: var(--bg-offwhite);
+            text-align: center;
+        }
+
+        .process-header {
+            max-width: 700px;
+            margin: 0 auto clamp(36px, 5vw, 50px);
+        }
+
+        .process-steps-grid {
+            display: grid;
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+            gap: 14px;
+            position: relative;
+        }
+
+        .process-step-item {
+            background-color: #FFFFFF;
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-lg);
+            padding: 24px 14px;
+            box-shadow: var(--shadow-subtle);
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            min-height: 250px;
+            transition: all 0.3s var(--ease);
+        }
+
+        .process-step-item:hover {
+            transform: translateY(-4px);
+            border-color: var(--blue-primary);
+            box-shadow: var(--shadow-card);
+        }
+
+        .process-step-num {
+            font-size: 1rem;
+            font-weight: 800;
+            color: var(--blue-primary);
+            margin-bottom: 2px;
+        }
+        .process-step-name {
+            font-size: 0.9rem;
+            font-weight: 800;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            color: var(--text-navy);
+            margin-bottom: 14px;
+        }
+
+        .process-visual-box {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            margin-bottom: 14px;
+        }
+        .box-idea { background-color: #FEF3C7; color: #D97706; }
+        .box-design { background-color: #FCE7F3; color: var(--accent-pink); }
+        .box-code { background-color: var(--blue-soft); color: var(--blue-primary); }
+        .box-test { background-color: #DCFCE7; color: var(--accent-green); }
+        .box-launch { background-color: #EDE9FE; color: var(--accent-purple); }
+
+        .process-step-info {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            line-height: 1.45;
+        }
+
+        /* ==========================================================================
+           06. SECTION 4: OUR APPROACH
+           ========================================================================== */
+        .approach-section {
+            border-top: 1px solid var(--border-light);
+            background-color: var(--bg-canvas);
+        }
+
+        .approach-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 0.75fr) minmax(0, 1.25fr);
+            gap: 36px;
+            align-items: flex-start;
+        }
+
+        .approach-cards-row {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 14px;
+        }
+
+        .approach-card {
+            background-color: #FFFFFF;
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-lg);
+            padding: 24px 16px;
+            box-shadow: var(--shadow-subtle);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 260px;
+            transition: all 0.3s var(--ease);
+        }
+        .approach-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-card);
+            border-color: var(--blue-primary);
+        }
+
+        .approach-badge-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            margin-bottom: 14px;
+        }
+        .badge-blue { background-color: var(--blue-soft); color: var(--blue-primary); }
+        .badge-amber { background-color: #FEF3C7; color: #D97706; }
+        .badge-pink { background-color: #FCE7F3; color: var(--accent-pink); }
+        .badge-purple { background-color: #EDE9FE; color: var(--accent-purple); }
+
+        .approach-card h3 {
+            font-size: 1.05rem;
+            font-weight: 800;
+            color: var(--text-navy);
+            margin-bottom: 6px;
+        }
+        .approach-card p {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            line-height: 1.45;
+        }
+        .approach-card .card-num {
+            font-size: 0.75rem;
+            font-weight: 800;
+            color: var(--text-light);
+            margin-top: 12px;
+        }
+
+        /* ==========================================================================
+           07. SECTION 5: FAQ SECTION (BALANCED & PROPERLY ALIGNED)
+           ========================================================================== */
+        .faq-section {
+            border-top: 1px solid var(--border-light);
+            background-color: var(--bg-canvas);
+            padding-block: clamp(45px, 5.5vh, 75px);
+        }
+
+        .faq-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+            gap: clamp(24px, 3.5vw, 48px);
+            align-items: flex-start;
+        }
+
+        .faq-left-col {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .faq-accordion-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 18px;
+        }
+
+        .faq-item {
+            background-color: #FFFFFF;
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            transition: all 0.2s var(--ease);
+        }
+
+        .faq-header {
+            width: 100%;
+            padding: 13px 18px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.92rem;
+            font-weight: 700;
+            color: var(--text-navy);
+            cursor: pointer;
+            text-align: left;
+            gap: 12px;
+        }
+        .faq-icon {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            transition: transform 0.25s var(--ease);
+            flex-shrink: 0;
+        }
+
+        .faq-body {
+            padding: 0 18px 14px;
+            font-size: 0.86rem;
+            color: var(--text-muted);
+            line-height: 1.55;
+            display: none;
+        }
+
+        .faq-item.active .faq-body { display: block; }
+        .faq-item.active .faq-icon { transform: rotate(45deg); color: var(--blue-primary); }
+
+        /* Right Side: Aligned & Lowered */
+        .faq-right-col {
+            margin-top: clamp(28px, 4.2vh, 52px);
+        }
+
+        .faq-callout-card {
+            background: linear-gradient(135deg, #0B1020 0%, #1E1B4B 50%, #163E91 100%);
+            border-radius: var(--radius-lg);
+            padding: clamp(24px, 3vh, 32px) clamp(20px, 2.5vw, 28px);
+            color: #FFFFFF;
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow-window);
+        }
+
+        .callout-emoji-badge {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: var(--blue-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            margin-bottom: 16px;
+        }
+
+        .faq-callout-card h3 {
+            font-size: clamp(1.4rem, 2.2vw, 1.75rem);
+            font-weight: 800;
+            line-height: 1.15;
+            margin-bottom: 6px;
+        }
+        .faq-callout-card p {
+            color: #CBD5E1;
+            font-size: 0.86rem;
+            margin-bottom: 20px;
+            line-height: 1.45;
+        }
+
+        /* ==========================================================================
+           08. SECTION 6: PDF-COMPLIANT FINAL CTA
+           ========================================================================== */
+        .final-cta-section {
+            background: linear-gradient(135deg, var(--dark-cta-bg) 0%, #0A1430 100%);
+            color: #FFFFFF;
+            padding-block: clamp(80px, 9vw, 120px);
+            position: relative;
+            overflow: clip;
+            border-top: 1px solid #1E293B;
+            text-align: center;
+        }
+
+        .final-cta-box {
+            max-width: 820px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 2;
+        }
+
+        .final-cta-box h2 {
+            font-size: clamp(2.3rem, 4.4vw, 3.8rem);
+            font-weight: 800;
+            line-height: 1.05;
+            letter-spacing: -0.04em;
+            text-transform: uppercase;
+            margin-bottom: 18px;
+        }
+        .final-cta-box .blue-italic {
+            font-family: var(--font-serif);
+            font-style: italic;
+            font-weight: 500;
+            text-transform: lowercase;
+            color: var(--blue-primary);
+        }
+
+        .final-cta-box p {
+            color: #94A3B8;
+            font-size: clamp(1rem, 1.35vw, 1.2rem);
+            line-height: 1.6;
+            margin-bottom: 32px;
+        }
+
+        .final-cta-actions {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+        }
+
+        .final-cta-trust {
+            font-size: 0.82rem;
+            color: #64748B;
+            letter-spacing: 0.02em;
+        }
+
+        /* ==========================================================================
+           09. FOOTER
+           ========================================================================== */
+        .site-footer {
+            background-color: var(--dark-cta-bg);
+            border-top: 1px solid #1E293B;
+            padding: 26px 0;
+            color: #64748B;
+            font-size: 0.86rem;
+        }
+
+        .footer-inner {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 20px;
+            list-style: none;
+            flex-wrap: wrap;
+        }
+        .footer-links a:hover {
+            color: #FFFFFF;
+        }
+
+        .footer-socials {
+            display: flex;
+            gap: 16px;
+            font-size: 1.05rem;
+            color: #E2E8F0;
+        }
+
+        /* ==========================================================================
+           10. RESPONSIVE BREAKPOINTS
+           ========================================================================== */
+        @media (max-width: 1024px) {
+            .approach-grid {
+                grid-template-columns: 1fr;
+            }
+            .approach-cards-row {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+            .faq-grid {
+                grid-template-columns: 1fr;
+            }
+            .faq-right-col {
+                margin-top: 0;
+            }
+            .process-steps-grid {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-links, .nav-actions .login-link { display: none; }
+            .menu-toggle { display: flex; }
+
+            .journey-steps-row {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            .journey-connecting-line { display: none; }
+            
+            .process-steps-grid {
+                grid-template-columns: 1fr;
+            }
+            .approach-cards-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .footer-inner {
+                flex-direction: column;
+                text-align: center;
+                gap: 14px;
+            }
+            .footer-links {
+                justify-content: center;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+                scroll-behavior: auto !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ==========================================================================
+         01. FLOATING NAVIGATION BAR
+         ========================================================================== -->
+    <div class="site-header">
+        <div class="container">
+            <header class="nav-inner">
+                <a href="index.html" class="brand-logo" aria-label="Marzoft Home">
+                    MARZOFT<span class="dot"></span>
+                </a>
+                
+                <nav aria-label="Main Navigation">
+                    <ul class="nav-links">
+                        <li><a href="work.html">Work</a></li>
+                        <li><a href="about.html">About</a></li>
+                        <li><a href="#process">Process</a></li>
+                        <li><a href="#approach">Approach</a></li>
+                        <li><a href="whatsapp.html">WhatsApp</a></li>
+                    </ul>
+                </nav>
+
+                <div class="nav-actions">
+                    <a href="login.html" class="login-link">Login</a>
+                    <a href="start.html" class="btn btn-primary" style="padding: 8px 18px; min-height: 40px; font-size: 0.84rem;">
+                        Start a Project →
+                    </a>
+                    <button class="menu-toggle" id="menuToggle" aria-label="Open Navigation Menu" aria-expanded="false">
+                        <span></span>
+                        <span></span>
+                    </button>
+                </div>
+            </header>
+        </div>
+    </div>
+
+    <!-- Mobile Drawer -->
+    <div class="mobile-drawer" id="mobileDrawer" aria-hidden="true">
+        <ul class="mobile-menu-list">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="work.html">Work</a></li>
+            <li><a href="about.html">About</a></li>
+            <li><a href="#process">Process</a></li>
+            <li><a href="#approach">Approach</a></li>
+            <li><a href="whatsapp.html">WhatsApp Desk</a></li>
+        </ul>
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+            <a href="start.html" class="btn btn-primary" style="width: 100%;">Start a Project →</a>
+            <a href="login.html" class="btn-text-link" style="justify-content: center;">Client Login</a>
+        </div>
+    </div>
+
+    <main>
+
+        <!-- ==========================================================================
+             02. HERO SECTION (CLEAN, GRAND & EDITORIAL)
+             ========================================================================== -->
+        <section class="hero-section">
+            <div class="hero-glow-bg"></div>
+
+            <div class="container">
+                <div class="hero-layout-stack">
+                    
+                    <div class="hero-headline-block">
+                        <h1 class="hero-headline">
+                            WE BUILD <br>
+                            WEBSITES <br>
+                            <span class="blue-text">PEOPLE</span> 
+                            <span class="serif-italic">remember.</span>
+                        </h1>
+                    </div>
+
+                    <!-- Clean, Names-Free Subheadline -->
+                    <div class="hero-description-block">
+                        <p class="sub-lead">
+                            We design and build custom websites and digital systems that help your business look exceptional, work properly, and turn visitors into customers. Zero templates, zero bloated code, built to last.
+                        </p>
+                    </div>
+
+                    <div class="hero-actions-cluster">
+                        <a href="start.html" class="btn btn-primary">Start a Project →</a>
+                        <a href="https://wa.me/919999999999?text=Hi%20Marzoft,%20I'd%20like%20to%20discuss%20a%20website" class="btn btn-whatsapp" target="_blank" rel="noopener">Chat on WhatsApp 💬</a>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- ==========================================================================
+             03. CUSTOMER JOURNEY / THE PROBLEM SECTION
+             ========================================================================== -->
+        <section class="section-padding journey-section" id="problem">
+            <div class="container">
+                <div class="journey-header">
+                    <span class="eyebrow-pill">THE PROBLEM</span>
+                    <h2 class="section-headline">
+                        Someone hears about your business. <br>
+                        <span style="color: var(--blue-primary);">What do they do next?</span>
+                    </h2>
+                </div>
+
+                <div class="journey-timeline-wrapper">
+                    <div class="journey-connecting-line"></div>
+
+                    <div class="journey-steps-row">
+                        <!-- Step 1 -->
+                        <div class="journey-step-card step-blue">
+                            <div class="journey-icon-circle">📡</div>
+                            <div class="journey-step-title">HEAR</div>
+                            <p class="journey-step-desc">A friend, ad, or social post.</p>
+                        </div>
+
+                        <!-- Step 2 -->
+                        <div class="journey-step-card step-pink">
+                            <div class="journey-icon-circle">🔍</div>
+                            <div class="journey-step-title">SEARCH</div>
+                            <p class="journey-step-desc">They look you up.</p>
+                        </div>
+
+                        <!-- Step 3 -->
+                        <div class="journey-step-card step-orange">
+                            <div class="journey-icon-circle">👁️</div>
+                            <div class="journey-step-title">CHECK</div>
+                            <p class="journey-step-desc">They explore your website.</p>
+                        </div>
+
+                        <!-- Step 4 -->
+                        <div class="journey-step-card step-green">
+                            <div class="journey-icon-circle">⚖️</div>
+                            <div class="journey-step-title">COMPARE</div>
+                            <p class="journey-step-desc">They compare with others.</p>
+                        </div>
+
+                        <!-- Step 5 -->
+                        <div class="journey-step-card step-dark">
+                            <div class="journey-icon-circle">✓</div>
+                            <div class="journey-step-title">DECIDE</div>
+                            <p class="journey-step-desc">They choose who to trust.</p>
+                        </div>
+                    </div>
+
+                    <div class="journey-takeaway-card" id="takeawayCard">
+                        <div class="journey-takeaway-text">
+                            If they don't find you, you've already lost them.
+                        </div>
+                        <button onclick="document.getElementById('takeawayCard').style.display='none'" aria-label="Dismiss Note" style="color: var(--blue-primary); font-weight: 800; font-size: 1.1rem; padding: 4px;">✕</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==========================================================================
+             04. WHAT WE DO / PROCESS SECTION
+             ========================================================================== -->
+        <section class="section-padding process-section" id="process">
+            <div class="container">
+                <div class="process-header">
+                    <span class="eyebrow-pill">WHAT WE DO</span>
+                    <h2 class="section-headline">
+                        We turn ideas into powerful <span style="color: var(--blue-primary);">digital experiences.</span>
+                    </h2>
+                </div>
+
+                <div class="process-steps-grid">
+                    <!-- 01 IDEA -->
+                    <div class="process-step-item">
+                        <div>
+                            <div class="process-step-num">01</div>
+                            <div class="process-step-name">IDEA</div>
+                        </div>
+                        <div class="process-visual-box box-idea">✦</div>
+                        <p class="process-step-info">We start with ideas, research, and planning the right way.</p>
+                    </div>
+
+                    <!-- 02 DESIGN -->
+                    <div class="process-step-item">
+                        <div>
+                            <div class="process-step-num">02</div>
+                            <div class="process-step-name">DESIGN</div>
+                        </div>
+                        <div class="process-visual-box box-design">📐</div>
+                        <p class="process-step-info">We design clean, modern interfaces your users will love.</p>
+                    </div>
+
+                    <!-- 03 CODE -->
+                    <div class="process-step-item">
+                        <div>
+                            <div class="process-step-num">03</div>
+                            <div class="process-step-name">CODE</div>
+                        </div>
+                        <div class="process-visual-box box-code">&lt;/&gt;</div>
+                        <p class="process-step-info">We write clean, scalable code using modern technologies.</p>
+                    </div>
+
+                    <!-- 04 TEST -->
+                    <div class="process-step-item">
+                        <div>
+                            <div class="process-step-num">04</div>
+                            <div class="process-step-name">TEST</div>
+                        </div>
+                        <div class="process-visual-box box-test">✓</div>
+                        <p class="process-step-info">We test everything for speed, security, and performance.</p>
+                    </div>
+
+                    <!-- 05 LAUNCH -->
+                    <div class="process-step-item">
+                        <div>
+                            <div class="process-step-num">05</div>
+                            <div class="process-step-name">LAUNCH</div>
+                        </div>
+                        <div class="process-visual-box box-launch">🚀</div>
+                        <p class="process-step-info">We launch, monitor, and support your website to grow.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==========================================================================
+             05. OUR APPROACH SECTION
+             ========================================================================== -->
+        <section class="section-padding approach-section" id="approach">
+            <div class="container">
+                <div class="approach-grid">
+                    <div>
+                        <span class="eyebrow-pill">OUR APPROACH</span>
+                        <h2 class="section-headline">
+                            Honest <span style="color: var(--blue-primary);">about</span> <br>
+                            where we are.
+                        </h2>
+                    </div>
+
+                    <div class="approach-cards-row">
+                        <!-- Card 1 -->
+                        <div class="approach-card">
+                            <div class="approach-badge-icon badge-blue">🔒</div>
+                            <div>
+                                <h3>We're early.</h3>
+                                <p>We're building Marzoft for the long run, with real clients and real projects.</p>
+                            </div>
+                            <div class="card-num">01</div>
+                        </div>
+
+                        <!-- Card 2 -->
+                        <div class="approach-card">
+                            <div class="approach-badge-icon badge-amber">📁</div>
+                            <div>
+                                <h3>Work in progress.</h3>
+                                <p>Some projects are private. Some are launching soon. We'll show you when we can.</p>
+                            </div>
+                            <div class="card-num">02</div>
+                        </div>
+
+                        <!-- Card 3 -->
+                        <div class="approach-card">
+                            <div class="approach-badge-icon badge-pink">💙</div>
+                            <div>
+                                <h3>Focus on impact.</h3>
+                                <p>We don't chase numbers. We chase the result that actually matters.</p>
+                            </div>
+                            <div class="card-num">03</div>
+                        </div>
+
+                        <!-- Card 4 -->
+                        <div class="approach-card">
+                            <div class="approach-badge-icon badge-purple">💬</div>
+                            <div>
+                                <h3>Want to see our work?</h3>
+                                <p>Let's talk. We'll share the right things with the right people.</p>
+                            </div>
+                            <div>
+                                <a href="whatsapp.html" class="btn-text-link" style="font-size: 0.85rem; color: var(--blue-primary);">Let's Connect →</a>
+                                <div class="card-num">04</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==========================================================================
+             06. FAQ SECTION & WHATSAPP DESK (BALANCED & PROPERLY ALIGNED)
+             ========================================================================== -->
+        <section class="section-padding faq-section" id="faqs">
+            <div class="container">
+                <div class="faq-grid">
+                    
+                    <!-- Left: Questions Accordion -->
+                    <div class="faq-left-col">
+                        <span class="eyebrow-pill">FREQUENTLY ASKED</span>
+                        <h2 class="section-headline">
+                            Questions? <br>
+                            <span class="serif-italic" style="font-family: var(--font-serif); font-style: italic;">We've got answers.</span>
+                        </h2>
+
+                        <div class="faq-accordion-list" role="region" aria-label="FAQ Accordion">
+                            <div class="faq-item active">
+                                <button class="faq-header" onclick="toggleFaq(this)" aria-expanded="true">
+                                    <span>How fast will my project be completed?</span>
+                                    <span class="faq-icon">+</span>
+                                </button>
+                                <div class="faq-body">
+                                    Most standard business websites are completed in 1 to 2 weeks. Custom digital platforms take 3 to 4 weeks. We provide a precise timeline before starting.
+                                </div>
+                            </div>
+
+                            <div class="faq-item">
+                                <button class="faq-header" onclick="toggleFaq(this)" aria-expanded="false">
+                                    <span>Can I update photos and prices myself later?</span>
+                                    <span class="faq-icon">+</span>
+                                </button>
+                                <div class="faq-body">
+                                    Yes! We can set up a simple editor so you or your staff can update photos, text, and prices anytime without writing code.
+                                </div>
+                            </div>
+
+                            <div class="faq-item">
+                                <button class="faq-header" onclick="toggleFaq(this)" aria-expanded="false">
+                                    <span>Who will I be working with?</span>
+                                    <span class="faq-icon">+</span>
+                                </button>
+                                <div class="faq-body">
+                                    You work directly with the builders. Zero junior account managers or outsourced subcontractors.
+                                </div>
+                            </div>
+
+                            <div class="faq-item">
+                                <button class="faq-header" onclick="toggleFaq(this)" aria-expanded="false">
+                                    <span>Do I need to buy domain &amp; hosting first?</span>
+                                    <span class="faq-icon">+</span>
+                                </button>
+                                <div class="faq-body">
+                                    No. If you already have them, we connect them. If you don't, we will guide you step-by-step or set them up directly for you.
+                                </div>
+                            </div>
+
+                            <div class="faq-item">
+                                <button class="faq-header" onclick="toggleFaq(this)" aria-expanded="false">
+                                    <span>What happens after I click 'Start a Project'?</span>
+                                    <span class="faq-icon">+</span>
+                                </button>
+                                <div class="faq-body">
+                                    You share a quick brief about your idea. We review it, reach out on WhatsApp or phone call for a quick chat, and send you a clear proposal.
+                                </div>
+                            </div>
+                        </div>
+
+                        <a href="whatsapp.html" class="btn-text-link" style="margin-top: 18px; color: var(--blue-primary);">View all questions on WhatsApp Desk →</a>
+                    </div>
+
+                    <!-- Right: Aligned & Lowered -->
+                    <div class="faq-right-col">
+                        <div class="faq-callout-card">
+                            <div class="callout-emoji-badge">💬</div>
+                            <h3>Have a project in mind?</h3>
+                            <p>Tell us what you need or message us directly on WhatsApp for an immediate response.</p>
+                            <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px;">
+                                <a href="start.html" class="btn btn-white" style="width: 100%; min-height: 44px; padding: 10px 20px; font-size: 0.92rem;">Start a Project →</a>
+                                <a href="https://wa.me/919999999999?text=Hi%20Marzoft,%20I'd%20like%20to%20discuss%20a%20project" class="btn btn-whatsapp" style="width: 100%; min-height: 44px; padding: 10px 20px; font-size: 0.92rem;" target="_blank" rel="noopener">Chat on WhatsApp 💬</a>
+                            </div>
+                            
+                            <!-- Replaced Section Note (Without MDR & CK) -->
+                            <div style="font-size: 0.82rem; color: #CBD5E1; line-height: 1.45; border-top: 1px solid rgba(255, 255, 255, 0.12); padding-top: 16px;">
+                                Zero templates, zero bloated code, built to last.
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- ==========================================================================
+             07. FINAL HIGH-IMPACT CTA SECTION (PDF-COMPLIANT)
+             ========================================================================== -->
+        <section class="final-cta-section" id="final-cta">
+            <div class="container">
+                <div class="final-cta-box">
+                    <span class="eyebrow-pill" style="color: var(--blue-primary);">READY TO BUILD?</span>
+                    <h2>
+                        So... what does your business <br>
+                        look like <span class="blue-italic">online?</span>
+                    </h2>
+                    <p>
+                        Every project is different. Let's discuss what your business actually needs and build something people remember.
+                    </p>
+                    <div class="final-cta-actions">
+                        <a href="start.html" class="btn btn-primary" style="padding: 16px 36px; font-size: 1.05rem;">Start a Project →</a>
+                        <a href="https://wa.me/919999999999?text=Hi%20Marzoft,%20I'd%20like%20to%20discuss%20a%20project" class="btn btn-whatsapp" style="padding: 16px 36px; font-size: 1.05rem;" target="_blank" rel="noopener">Chat on WhatsApp 💬</a>
+                    </div>
+                    <div class="final-cta-trust">
+                        Directly built by the founders • Worldwide Reach • Based in Tamil Nadu, India
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ==========================================================================
+         08. FOOTER
+         ========================================================================== -->
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-inner">
+                <div>© 2026 Marzoft Technologies. All rights reserved.</div>
+                <ul class="footer-links">
+                    <li><a href="work.html">Work</a></li>
+                    <li><a href="about.html">About</a></li>
+                    <li><a href="#process">Process</a></li>
+                    <li><a href="#approach">Approach</a></li>
+                    <li><a href="whatsapp.html">WhatsApp</a></li>
+                </ul>
+                <div class="footer-socials">
+                    <a href="https://linkedin.com" target="_blank" rel="noopener" aria-label="LinkedIn">in</a>
+                    <a href="https://x.com" target="_blank" rel="noopener" aria-label="X">𝕏</a>
+                    <a href="https://instagram.com" target="_blank" rel="noopener" aria-label="Instagram">ig</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ==========================================================================
+         09. INTERACTIVE JAVASCRIPT
+         ========================================================================== -->
+    <script>
+        // 1. Mobile Drawer Navigation Toggle
+        const menuToggle = document.getElementById('menuToggle');
+        const mobileDrawer = document.getElementById('mobileDrawer');
+        menuToggle.addEventListener('click', () => {
+            const isExpanded = menuToggle.getAttribute('aria-expanded') === 'true';
+            menuToggle.setAttribute('aria-expanded', !isExpanded);
+            mobileDrawer.classList.toggle('active');
+            mobileDrawer.setAttribute('aria-hidden', isExpanded);
+        });
+
+        document.querySelectorAll('.mobile-menu-list a').forEach(link => {
+            link.addEventListener('click', () => {
+                mobileDrawer.classList.remove('active');
+                menuToggle.setAttribute('aria-expanded', 'false');
+                mobileDrawer.setAttribute('aria-hidden', 'true');
+            });
+        });
+
+        // 2. FAQ Accordion Interaction
+        function toggleFaq(button) {
+            const item = button.parentElement;
+            const isOpen = item.classList.contains('active');
+            
+            document.querySelectorAll('.faq-item').forEach(el => {
+                el.classList.remove('active');
+                const btn = el.querySelector('.faq-header');
+                if (btn) btn.setAttribute('aria-expanded', 'false');
+            });
+            
+            if (!isOpen) {
+                item.classList.add('active');
+                button.setAttribute('aria-expanded', 'true');
+            }
+        }
+    </script>
+</body>
+</html>
