@@ -1,37 +1,19 @@
-/*
-  MARZOFT — browser-side Supabase connector
-
-  1. Paste your Supabase Project URL and anon/public key below.
-  2. Never put a service_role key, database password, or admin password here.
-  3. Keep RLS enabled in Supabase. Admin actions below call protected RPC functions.
-*/
+/* MARZOFT — browser-side Supabase connector */
 
 (() => {
     'use strict';
 
     const SUPABASE_URL = 'https://thkmhncbievuqlcbtzyj.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_8IKur53fQm-piPGMD45dDQ_MqEA8hQd';
-    const configured = /^https:\/\/.+\.supabase\.co$/i.test(SUPABASE_URL)
-        && !SUPABASE_ANON_KEY.startsWith('PASTE_');
+    const configured = /^https:\/\/.+\.supabase\.co$/i.test(SUPABASE_URL) && !SUPABASE_ANON_KEY.startsWith('PASTE_');
 
-    const unavailable = (message = 'Supabase is not configured yet.') => ({
-        data: null,
-        error: new Error(message)
-    });
+    const unavailable = (message = 'Supabase is not configured yet.') => ({ data: null, error: new Error(message) });
 
     let client = null;
     if (configured && window.supabase?.createClient) {
         client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-            auth: {
-                persistSession: true,
-                autoRefreshToken: true,
-                detectSessionInUrl: true
-            }
+            auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
         });
-    } else if (!configured) {
-        console.info('[Marzoft] Add the public Supabase URL and anon key in supabase.js to enable the live backend.');
-    } else {
-        console.warn('[Marzoft] Supabase library did not load. Check the script tag in index (7).html.');
     }
 
     const needClient = () => client ? null : unavailable();
@@ -58,107 +40,81 @@
         isConfigured: () => Boolean(client),
 
         signInWithGoogle({ redirectTo } = {}) {
-            const missing = needClient();
-            return missing || client.auth.signInWithOAuth({
-                provider: 'google',
-                options: { redirectTo }
-            });
+            return needClient() || client.auth.signInWithOAuth({ provider: 'google', options: { redirectTo } });
         },
-
         signUpWithEmail({ email, password, metadata = {}, redirectTo } = {}) {
-            const missing = needClient();
-            return missing || client.auth.signUp({
-                email,
-                password,
-                options: { data: metadata, emailRedirectTo: redirectTo }
-            });
+            return needClient() || client.auth.signUp({ email, password, options: { data: metadata, emailRedirectTo: redirectTo } });
         },
-
         signInWithEmail({ email, password } = {}) {
-            const missing = needClient();
-            return missing || client.auth.signInWithPassword({ email, password });
+            return needClient() || client.auth.signInWithPassword({ email, password });
+        },
+        signOut() {
+            return needClient() || client.auth.signOut();
         },
 
-        signOut() {
-            const missing = needClient();
-            return missing || client.auth.signOut();
+        // Analytics Tracking (Silent)
+        track(eventType, path = window.location.pathname) {
+            if(!client) return;
+            client.from('analytics').insert({ event_type: eventType, path }).then(); // Fire and forget
         },
 
         async saveProjectRequest(payload = {}) {
             try {
                 const user = await requireUser();
-                return await client.from('project_requests').insert({
-                    client_id: user.id,
-                    project_type: payload.project_type || null,
-                    goals: payload.goals || null,
-                    description: payload.description || null,
-                    budget: payload.budget || null,
-                    name: payload.name || user.user_metadata?.full_name || null,
-                    email: payload.email || user.email || null,
-                    whatsapp: payload.whatsapp || null,
-                    status: 'new'
+                const req = await client.from('project_requests').insert({
+                    client_id: user.id, project_type: payload.project_type || null, goals: payload.goals || null,
+                    description: payload.description || null, budget: payload.budget || null,
+                    name: payload.name || user.user_metadata?.full_name || null, email: payload.email || user.email || null,
+                    whatsapp: payload.whatsapp || null, status: 'new'
                 }).select().single();
-            } catch (error) {
-                return { data: null, error };
-            }
+                
+                // Track Conversion!
+                if(!req.error) this.track('conversion', 'project_started');
+                return req;
+            } catch (error) { return { data: null, error }; }
         },
 
         async getMyProjectRequests() {
             try {
                 const user = await requireUser();
-                return await client.from('project_requests')
-                    .select('*')
-                    .eq('client_id', user.id)
-                    .order('created_at', { ascending: false });
-            } catch (error) {
-                return { data: null, error };
-            }
+                return await client.from('project_requests').select('*').eq('client_id', user.id).order('created_at', { ascending: false });
+            } catch (error) { return { data: null, error }; }
         },
 
         listReviews() {
-            const missing = needClient();
-            return missing || client.from('reviews')
-                .select('*')
-                .eq('published', true)
-                .order('created_at', { ascending: false })
-                .limit(50);
+            return needClient() || client.from('reviews').select('*').eq('published', true).order('created_at', { ascending: false }).limit(50);
         },
 
         async addReview(payload = {}) {
-            const missing = needClient();
-            if (missing) return missing;
+            if (needClient()) return needClient();
             const userResult = await client.auth.getUser();
-            const user = userResult.data?.user || null;
             return client.from('reviews').insert({
-                client_id: user?.id || null,
-                name: payload.name || 'Marzoft client',
-                business: payload.business || null,
-                project_type: payload.project_type || null,
-                rating: Math.max(1, Math.min(5, Number(payload.rating) || 5)),
-                review_text: String(payload.review_text || '').trim(),
-                published: false
+                client_id: userResult.data?.user?.id || null, name: payload.name || 'Marzoft client',
+                business: payload.business || null, project_type: payload.project_type || null,
+                rating: Math.max(1, Math.min(5, Number(payload.rating) || 5)), review_text: String(payload.review_text || '').trim(), published: false
             }).select().single();
         },
 
-        // These call protected database RPC functions. They must verify the signed-in
-        // user's admin role inside Supabase before reading or changing anything.
+        // Admin / Staff RPCs
         adminListProjectRequests() { return rpc('admin_list_project_requests'); },
         adminListReviews() { return rpc('admin_list_reviews'); },
         adminGetSettings() { return rpc('admin_get_settings'); },
-        adminUpdateProjectRequest(id, patch) {
-            return rpc('admin_update_project_request', { p_request_id: id, p_patch: patch });
-        },
-        adminUpdateReview(id, patch) {
-            return rpc('admin_update_review', { p_review_id: id, p_patch: patch });
-        },
+        adminGetAnalytics() { return rpc('admin_get_analytics'); },
+        
+        adminUpdateProjectRequest(id, patch) { return rpc('admin_update_project_request', { p_request_id: id, p_patch: patch }); },
+        adminUpdateReview(id, patch) { return rpc('admin_update_review', { p_review_id: id, p_patch: patch }); },
         adminDeleteReview(id) { return rpc('admin_delete_review', { p_review_id: id }); },
-        adminSetSetting(key, value) {
-            return rpc('admin_set_setting', { p_key: key, p_value: value });
-        },
-        isAdmin() { return rpc('is_admin'); }
+        adminSetSetting(key, value) { return rpc('admin_set_setting', { p_key: key, p_value: value }); },
+        adminUpdateRole(userId, newRole) { return rpc('admin_update_role', { p_user_id: userId, p_role: newRole }); },
+        
+        isAdmin() { return rpc('is_admin'); },
+        isStaffOrAdmin() { return rpc('is_staff_or_admin'); }
     };
 
     window.marzoftBackend = api;
     window.MarzoftSupabase = api;
     window.supabaseClient = client;
+
+    // Automatically track page view on load
+    setTimeout(() => { if(api.track) api.track('page_view'); }, 1000);
 })();

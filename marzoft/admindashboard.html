@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Workspace — MARZOFT</title>
+
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: { 'mz-blue': '#2563EB', 'mz-blue-hover': '#1D4ED8', 'mz-bg-light': '#F8F9FC', 'mz-dark': '#0B1020' },
+                    fontFamily: { display: ['Bricolage Grotesque', 'sans-serif'], sans: ['Plus Jakarta Sans', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+    <script src="supabase.js"></script>
+
+    <style>
+        :root {
+            --bg-main: #F8F9FC; --bg-secondary: #F1F5F9; --bg-panel: #FFFFFF;
+            --text-primary: #0B1020; --text-muted: #64748B; --border-color: #E2E8F0;
+            --accent: #2563EB; --shadow-md: 0 10px 25px rgba(37, 99, 235, 0.1);
+            --table-header: #F1F5F9;
+        }
+        .dark {
+            --bg-main: #0B1020; --bg-panel: #111827; --bg-secondary: #1E293B;
+            --text-primary: #F8FAFC; --text-muted: #94A3B8; --border-color: rgba(255, 255, 255, 0.1);
+            --table-header: #111827;
+        }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-main); color: var(--text-primary); transition: background-color 0.5s ease; margin: 0; overflow-x: hidden; display: flex; height: 100vh; }
+        button { cursor: pointer; border: none; outline: none; background: none; }
+        .glass-panel { background: var(--bg-panel); border: 1px solid var(--border-color); box-shadow: 0 12px 35px rgba(0,0,0,0.05); transition: background-color 0.5s ease, border-color 0.5s ease; }
+        .inner-card { background: var(--bg-secondary); border: 1px solid var(--border-color); transition: background-color 0.5s ease, border-color 0.5s ease; }
+        .admin-input { background: var(--bg-main); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: 12px; padding: 12px 16px; width: 100%; outline: none; transition: all 0.3s ease; }
+        .admin-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15); }
+        .hover-lift { transition: transform 0.3s ease, box-shadow 0.3s ease; }
+        .hover-lift:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 10px; }
+        .admin-table-container { overflow-x: auto; border-radius: 0 0 20px 20px; }
+        .admin-table { width: 100%; border-collapse: collapse; }
+        .admin-table th { background: var(--table-header); color: var(--text-muted); font-size: 11px; font-weight: 700; text-transform: uppercase; padding: 16px; text-align: left; border-bottom: 1px solid var(--border-color); white-space: nowrap; }
+        .admin-table td { padding: 16px; border-bottom: 1px solid var(--border-color); font-size: 13px; color: var(--text-primary); }
+        .admin-table tr:hover td { background-color: rgba(37, 99, 235, 0.02); }
+        .admin-section { display: none; animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) both; }
+        .admin-section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .badge { padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; display: inline-block; }
+        .badge-blue { background: rgba(37,99,235,0.1); color: #2563EB; }
+        .badge-green { background: rgba(34,197,94,0.1); color: #16A34A; }
+        .badge-yellow { background: rgba(245,158,11,0.1); color: #D97706; }
+        .badge-purple { background: rgba(168,85,247,0.1); color: #9333EA; }
+        .badge-gray { background: rgba(100,116,139,0.1); color: #64748B; }
+        .btn-action { width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--border-color); display: inline-grid; place-items: center; color: var(--text-muted); transition: all 0.3s ease; margin-right: 6px; }
+        .btn-action:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+        .btn-danger:hover { background: #DC2626; border-color: #DC2626; color: #fff; }
+        .skeleton { background: linear-gradient(90deg, var(--bg-secondary) 25%, var(--border-color) 50%, var(--bg-secondary) 75%); background-size: 200% 100%; animation: skeleton-loading 1.5s infinite; border-radius: 8px; }
+        @keyframes skeleton-loading { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+        #initial-loader { position: absolute; inset: 0; z-index: 100; background: var(--bg-main); display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.5s ease; }
+        .modal-overlay { position: fixed; inset: 0; z-index: 2000; background: rgba(11, 16, 32, 0.4); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
+        .modal-overlay.is-active { opacity: 1; pointer-events: auto; }
+        .modal-box { background: var(--bg-panel); width: min(600px, 90%); border-radius: 24px; padding: 32px; border: 1px solid var(--border-color); box-shadow: 0 25px 50px rgba(0,0,0,0.2); transform: scale(0.95) translateY(20px); transition: transform 0.4s ease; max-height: 90vh; overflow-y: auto; }
+        .modal-overlay.is-active .modal-box { transform: scale(1) translateY(0); }
+        #toast { position: fixed; bottom: 30px; right: 30px; z-index: 3000; background: #10B981; color: #fff; padding: 16px 24px; border-radius: 12px; font-weight: 700; font-size: 0.9rem; box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3); display: flex; align-items: center; gap: 12px; transform: translateY(100px); opacity: 0; transition: all 0.4s ease; }
+        #toast.show { transform: translateY(0); opacity: 1; }
+        #toast.error { background: #EF4444; box-shadow: 0 10px 30px rgba(239, 68, 68, 0.3); }
+        .role-select { padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: 800; text-transform: uppercase; border: 1px solid var(--border-color); background: var(--bg-main); color: var(--text-primary); outline: none; cursor: pointer; }
+    </style>
+</head>
+<body class="h-screen w-screen overflow-hidden flex relative">
+
+  <div id="initial-loader">
+    <div class="w-16 h-16 border-4 border-mz-blue border-t-transparent rounded-full animate-spin mb-4"></div>
+    <p class="font-display font-black text-[var(--text-primary)] tracking-widest uppercase">Securing Workspace...</p>
+  </div>
+
+  <!-- SIDEBAR -->
+  <aside class="w-64 h-full flex flex-col absolute md:relative -translate-x-full md:translate-x-0 transition-transform z-50 border-r border-[var(--border-color)]" style="background-color: var(--bg-panel) !important;" id="sidebar">
+    <div class="p-6 flex justify-between items-center border-b border-[var(--border-color)]">
+      <div class="font-display font-black text-xl tracking-tight flex items-end">
+        MARZOFT<span class="w-2 h-2 bg-mz-blue rounded-full ml-1 mb-1 shadow-[0_0_10px_rgba(37,99,235,0.5)]"></span>
+      </div>
+      <button class="md:hidden text-[var(--text-muted)] text-xl" onclick="toggleSidebar()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+
+    <nav class="flex-1 px-4 py-6 space-y-2 overflow-y-auto custom-scrollbar" id="nav-menu">
+        <button onclick="switchSection('overview')" id="nav-overview" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all bg-blue-50 dark:bg-blue-900/30 text-mz-blue nav-btn active"><i class="fa-solid fa-chart-pie w-5 text-center"></i> Overview</button>
+        <button onclick="switchSection('inquiries')" id="nav-inquiries" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all text-[var(--text-muted)] hover:bg-black/5 dark:hover:bg-white/5 nav-btn"><i class="fa-solid fa-layer-group w-5 text-center"></i> Inquiries</button>
+        <button onclick="switchSection('clients')" id="nav-clients" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all text-[var(--text-muted)] hover:bg-black/5 dark:hover:bg-white/5 nav-btn"><i class="fa-solid fa-users w-5 text-center"></i> Clients</button>
+        
+        <!-- TEAM TAB (Admin Only) -->
+        <button onclick="switchSection('team')" id="nav-team" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all text-[var(--text-muted)] hover:bg-black/5 dark:hover:bg-white/5 nav-btn"><i class="fa-solid fa-id-badge w-5 text-center"></i> Team</button>
+        
+        <button onclick="switchSection('reviews')" id="nav-reviews" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all text-[var(--text-muted)] hover:bg-black/5 dark:hover:bg-white/5 nav-btn"><i class="fa-solid fa-star w-5 text-center"></i> Reviews</button>
+        <button onclick="switchSection('whatsapp')" id="nav-whatsapp" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all text-[var(--text-muted)] hover:bg-black/5 dark:hover:bg-white/5 nav-btn"><i class="fa-brands fa-whatsapp w-5 text-center"></i> Chat Widget</button>
+        
+        <!-- Security (Admin Only) -->
+        <button onclick="switchSection('settings')" id="nav-settings" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all text-[var(--text-muted)] hover:bg-black/5 dark:hover:bg-white/5 nav-btn"><i class="fa-solid fa-shield-halved w-5 text-center"></i> Security</button>
+    </nav>
+    
+    <div class="p-4 border-t border-[var(--border-color)]">
+        <div class="text-xs font-bold text-[var(--text-muted)] mb-3 text-center uppercase tracking-widest" id="user-role-display">ROLE: ADMIN</div>
+        <button onclick="logout()" class="w-full flex items-center justify-center gap-2 px-4 py-3 text-sm font-bold text-red-500 bg-red-50 dark:bg-red-500/10 rounded-xl hover-lift transition-colors"><i class="fa-solid fa-arrow-right-from-bracket"></i> Secure Logout</button>
+    </div>
+  </aside>
+
+  <main class="flex-1 h-full flex flex-col relative z-10 w-full overflow-hidden">
+    <header class="h-20 flex items-center justify-between px-6 bg-[var(--bg-panel)] border-b border-[var(--border-color)] z-40 shadow-sm shrink-0">
+      <div class="flex items-center gap-4">
+        <button class="md:hidden text-xl text-[var(--text-muted)]" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></button>
+        <h2 id="header-title" class="font-display font-bold text-xl">Overview</h2>
+      </div>
+      <div class="flex items-center gap-4">
+        <button onclick="toggleTheme()" class="w-10 h-10 rounded-full inner-card flex items-center justify-center shadow-sm hover:scale-105 transition-transform"><i class="fa-solid fa-moon dark:hidden text-[var(--text-muted)]"></i><i class="fa-solid fa-sun hidden dark:block text-[var(--text-muted)]"></i></button>
+        <div class="w-10 h-10 rounded-full bg-mz-blue text-white flex items-center justify-center font-bold shadow-md">MZ</div>
+      </div>
+    </header>
+
+    <div class="flex-1 overflow-y-auto p-4 md:p-8 relative custom-scrollbar" id="main-content">
+      
+      <!-- OVERVIEW SECTION -->
+      <section id="sec-overview" class="admin-section active">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          <div class="glass-panel p-6 flex items-center justify-between hover-lift">
+            <div><p class="text-xs font-bold uppercase text-[var(--text-muted)] tracking-wider">Page Views (Week)</p><h3 class="text-3xl font-black font-display mt-1" id="stat-views"><div class="skeleton w-12 h-8"></div></h3></div>
+            <div class="w-14 h-14 rounded-full bg-indigo-100 dark:bg-indigo-500/20 flex items-center justify-center text-2xl text-indigo-600"><i class="fa-solid fa-eye"></i></div>
+          </div>
+          <div class="glass-panel p-6 flex items-center justify-between hover-lift">
+            <div><p class="text-xs font-bold uppercase text-[var(--text-muted)] tracking-wider">Conversion Rate</p><h3 class="text-3xl font-black font-display mt-1 text-green-500" id="stat-rate"><div class="skeleton w-12 h-8"></div></h3></div>
+            <div class="w-14 h-14 rounded-full bg-green-100 dark:bg-green-500/20 flex items-center justify-center text-2xl text-green-600"><i class="fa-solid fa-arrow-trend-up"></i></div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div class="glass-panel p-6 flex items-center gap-5 hover-lift cursor-pointer" onclick="switchSection('inquiries')">
+            <div class="w-14 h-14 rounded-full bg-blue-100 dark:bg-blue-500/20 flex items-center justify-center text-2xl text-mz-blue"><i class="fa-solid fa-briefcase"></i></div>
+            <div><p class="text-xs font-bold uppercase text-[var(--text-muted)] tracking-wider">Total Inquiries</p><h3 class="text-3xl font-black font-display mt-1" id="stat-projects"><div class="skeleton w-12 h-8"></div></h3></div>
+          </div>
+          <div class="glass-panel p-6 flex items-center gap-5 hover-lift cursor-pointer" onclick="switchSection('clients')">
+            <div class="w-14 h-14 rounded-full bg-green-100 dark:bg-green-500/20 flex items-center justify-center text-2xl text-green-600"><i class="fa-solid fa-users"></i></div>
+            <div><p class="text-xs font-bold uppercase text-[var(--text-muted)] tracking-wider">Registered Clients</p><h3 class="text-3xl font-black font-display mt-1" id="stat-clients"><div class="skeleton w-12 h-8"></div></h3></div>
+          </div>
+          <div class="glass-panel p-6 flex items-center gap-5 hover-lift cursor-pointer" onclick="switchSection('reviews')">
+            <div class="w-14 h-14 rounded-full bg-purple-100 dark:bg-purple-500/20 flex items-center justify-center text-2xl text-purple-600"><i class="fa-solid fa-star"></i></div>
+            <div><p class="text-xs font-bold uppercase text-[var(--text-muted)] tracking-wider">Pending Reviews</p><h3 class="text-3xl font-black font-display mt-1" id="stat-reviews"><div class="skeleton w-12 h-8"></div></h3></div>
+          </div>
+        </div>
+
+        <div class="glass-panel p-6 md:p-8 hover-lift">
+          <div class="flex justify-between items-center mb-6">
+            <h3 class="font-bold font-display text-xl"><i class="fa-solid fa-bolt text-mz-blue mr-2"></i> Recent Pipeline</h3>
+          </div>
+          <div class="admin-table-container">
+            <table class="admin-table">
+              <thead><tr><th>Date</th><th>Client</th><th>Type</th><th>Status</th></tr></thead>
+              <tbody id="recent-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- INQUIRIES SECTION -->
+      <section id="sec-inquiries" class="admin-section">
+        <div class="glass-panel overflow-hidden flex flex-col h-full hover-lift">
+          <div class="p-6 border-b border-[var(--border-color)]" style="background: var(--table-header);">
+            <h3 class="font-bold font-display text-lg">Project Requests</h3>
+            <p class="text-xs text-[var(--text-muted)] mt-1">Manage incoming briefs and update client statuses.</p>
+          </div>
+          <div class="admin-table-container">
+            <table class="admin-table">
+              <thead><tr><th>Date</th><th>Client</th><th>Type & Budget</th><th>Status</th><th class="text-right">Action</th></tr></thead>
+              <tbody id="inquiries-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- CLIENTS SECTION -->
+      <section id="sec-clients" class="admin-section">
+        <div class="glass-panel overflow-hidden flex flex-col h-full hover-lift">
+          <div class="p-6 border-b border-[var(--border-color)] flex justify-between items-center" style="background: var(--table-header);">
+            <div>
+                <h3 class="font-bold font-display text-lg">Client Directory</h3>
+                <p class="text-xs text-[var(--text-muted)] mt-1">Change a client's role to 'staff' to move them to your team.</p>
+            </div>
+          </div>
+          <div class="admin-table-container">
+            <table class="admin-table">
+              <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Joined Date</th></tr></thead>
+              <tbody id="clients-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- NEW TEAM SECTION -->
+      <section id="sec-team" class="admin-section">
+        <div class="glass-panel overflow-hidden flex flex-col h-full hover-lift">
+          <div class="p-6 border-b border-[var(--border-color)] flex flex-col md:flex-row justify-between items-start md:items-center gap-4" style="background: var(--table-header);">
+            <div>
+                <h3 class="font-bold font-display text-lg">Team Directory</h3>
+                <p class="text-xs text-[var(--text-muted)] mt-1">To add a new staff member, ask them to create an account on the website first, then promote them here.</p>
+            </div>
+            <div class="flex items-center gap-2 w-full md:w-auto" id="add-staff-container">
+                <select id="new-staff-select" class="admin-input py-2 px-3 text-xs flex-1 md:w-48">
+                    <option value="">Select client to promote...</option>
+                </select>
+                <button onclick="promoteSelectedToStaff()" class="px-4 py-2 bg-mz-blue text-white font-bold rounded-xl hover:bg-mz-blue-hover transition-colors shadow-md text-xs whitespace-nowrap">Add to Team</button>
+            </div>
+          </div>
+          <div class="admin-table-container">
+            <table class="admin-table">
+              <thead><tr><th>Name</th><th>Email</th><th>Access Level</th><th>Job Title</th><th class="text-right">Action</th></tr></thead>
+              <tbody id="team-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- REVIEWS SECTION -->
+      <section id="sec-reviews" class="admin-section">
+        <div class="glass-panel overflow-hidden flex flex-col h-full hover-lift">
+          <div class="p-6 border-b border-[var(--border-color)] flex justify-between items-center" style="background: var(--table-header);">
+            <div>
+              <h3 class="font-bold font-display text-lg">Review Moderation</h3>
+              <p class="text-xs text-[var(--text-muted)] mt-1">Publish reviews to show them on the public homepage.</p>
+            </div>
+            <button onclick="openAdminReviewModal()" class="px-4 py-2 bg-mz-blue text-white font-bold rounded-xl hover:bg-mz-blue-hover transition-colors shadow-md text-xs whitespace-nowrap"><i class="fa-solid fa-plus mr-1"></i> Add Review</button>
+          </div>
+          <div class="admin-table-container">
+            <table class="admin-table">
+              <thead><tr><th>Client</th><th>Review</th><th>Rating</th><th>Status</th><th class="text-right">Actions</th></tr></thead>
+              <tbody id="reviews-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- WHATSAPP SECTION -->
+      <section id="sec-whatsapp" class="admin-section max-w-5xl mx-auto">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div class="glass-panel p-6 md:p-8 hover-lift">
+            <h3 class="font-bold mb-6 font-display text-xl"><i class="fa-brands fa-whatsapp mr-2 text-[#25D366]"></i>Chat Widget</h3>
+            <div class="space-y-6">
+              <div class="flex gap-3">
+                <div class="w-1/3"><label class="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider mb-2 block">Code</label><input type="text" id="wa-code" class="admin-input" placeholder="91"></div>
+                <div class="w-2/3"><label class="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider mb-2 block">WhatsApp Number</label><input type="text" id="wa-number" class="admin-input" placeholder="9876543210"></div>
+              </div>
+              <div>
+                <div class="flex justify-between items-center mb-2">
+                  <label class="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider">Bot Messages</label>
+                  <button type="button" onclick="addWaMessage()" class="text-xs font-bold text-mz-blue hover:underline"><i class="fa-solid fa-plus"></i> Add Line</button>
+                </div>
+                <div id="wa-messages-list" class="space-y-3"></div>
+              </div>
+              <button onclick="saveWhatsApp()" class="w-full py-3 bg-mz-blue text-white font-bold rounded-xl hover:bg-mz-blue-hover transition-colors shadow-md mt-4">Save Configuration</button>
+            </div>
+          </div>
+          
+          <div class="flex items-center justify-center p-6">
+            <div class="w-[340px] inner-card overflow-hidden shadow-2xl flex flex-col relative rounded-3xl border border-white/20">
+              <div class="bg-gradient-to-r from-[#25D366] to-[#128C7E] p-4 flex items-center gap-3 text-white">
+                <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center"><i class="fa-brands fa-whatsapp text-xl"></i></div>
+                <div><h3 class="font-bold text-sm">Marzoft Concierge</h3><p class="text-[10px] opacity-90">Online</p></div>
+              </div>
+              <div class="p-5 h-[300px] flex flex-col gap-3 overflow-y-auto custom-scrollbar" style="background: var(--bg-main);" id="wa-preview-messages"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECURITY SECTION (Hidden for Staff) -->
+      <section id="sec-settings" class="admin-section max-w-3xl mx-auto">
+        <div class="glass-panel p-6 md:p-8 hover-lift">
+          <h3 class="font-bold mb-6 text-red-500 font-display text-xl"><i class="fa-solid fa-shield-halved mr-2"></i>Security Settings</h3>
+          <div class="space-y-8">
+            <div class="p-5 inner-card border-l-4 border-amber-500 rounded-r-xl">
+              <h4 class="font-bold text-sm mb-1">Gateway Secret Word</h4>
+              <p class="text-xs text-[var(--text-muted)] mb-4">The secret word typed on the website to open the hidden admin login.</p>
+              <div class="space-y-3">
+                <div>
+                  <label class="text-[10px] font-bold uppercase text-[var(--text-muted)] tracking-wider">Current Word</label>
+                  <div class="font-mono text-sm font-bold bg-black/5 dark:bg-white/5 p-2 rounded-lg inline-block px-4 mt-1" id="current-sec-word">adminx</div>
+                </div>
+                <div class="mt-3">
+                  <div class="flex gap-2">
+                    <input type="text" id="set-sec-word" class="admin-input flex-1" placeholder="Type new secret word..." autocomplete="off">
+                    <button onclick="saveSecretWord()" class="px-6 py-2 bg-amber-500 text-white font-bold rounded-xl hover:bg-amber-600 transition-colors shadow-md text-sm">Update</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="p-5 inner-card border-l-4 border-red-500 rounded-r-xl">
+              <h4 class="font-bold text-sm mb-1">Admin Password</h4>
+              <p class="text-xs text-[var(--text-muted)] mb-4">Change the password you use to log into this dashboard.</p>
+              <div class="flex gap-2 mt-1">
+                <input type="password" id="set-sec-pwd" class="admin-input flex-1" placeholder="New password (min 8 chars)" autocomplete="new-password">
+                <button onclick="saveAdminPassword()" class="px-6 py-2 bg-red-500 text-white font-bold rounded-xl hover:bg-red-600 transition-colors shadow-md text-sm">Update</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- MODALS -->
+  <div id="inquiry-modal" class="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity">
+    <div class="glass-panel p-6 md:p-8 w-[90%] max-w-2xl transform scale-95 relative max-h-[90vh] overflow-y-auto custom-scrollbar transition-transform rounded-3xl" id="inquiry-box">
+      <button onclick="closeModal('inquiry-modal', 'inquiry-box')" class="absolute top-6 right-6 w-8 h-8 inner-card rounded-full flex items-center justify-center hover:bg-black/5"><i class="fa-solid fa-xmark"></i></button>
+      
+      <h2 class="font-display font-black text-2xl mb-1">Project Brief</h2>
+      <p class="text-sm text-[var(--text-muted)] mb-6" id="modal-client-info"></p>
+      
+      <div class="inner-card p-5 mb-6">
+        <div class="grid grid-cols-2 gap-4 mb-4">
+          <div><p class="text-[10px] font-bold uppercase text-[var(--text-muted)] tracking-wider">Type</p><p class="font-bold text-sm" id="modal-type"></p></div>
+          <div><p class="text-[10px] font-bold uppercase text-[var(--text-muted)] tracking-wider">Budget</p><p class="font-bold text-sm" id="modal-budget"></p></div>
+          <div class="col-span-2"><p class="text-[10px] font-bold uppercase text-[var(--text-muted)] tracking-wider">Goals</p><p class="font-bold text-sm" id="modal-goals"></p></div>
+        </div>
+        <div class="pt-4 border-t border-[var(--border-color)]">
+          <p class="text-[10px] font-bold uppercase text-[var(--text-muted)] tracking-wider mb-1">Description</p>
+          <p class="text-sm leading-relaxed" id="modal-desc"></p>
+        </div>
+      </div>
+
+      <div class="space-y-4">
+        <div>
+          <label class="text-xs font-bold uppercase text-[var(--text-muted)] tracking-wider mb-2 block">Status</label>
+          <select id="modal-status" class="admin-input py-3">
+            <option value="new">New (Brief Received)</option>
+            <option value="in_progress">In Progress</option>
+            <option value="waiting_for_client">Waiting on Client</option>
+            <option value="completed">Completed</option>
+            <option value="closed">Closed / Cancelled</option>
+          </select>
+        </div>
+        <div>
+          <label class="text-xs font-bold uppercase text-[var(--text-muted)] tracking-wider mb-2 block">Admin Note & Figma Links (Visible to Client)</label>
+          <textarea id="modal-note" class="admin-input" rows="3" placeholder="Leave a note or paste Figma links for the client..."></textarea>
+        </div>
+      </div>
+
+      <div class="mt-6 flex justify-end">
+        <button onclick="saveInquiryUpdate()" class="px-8 py-3 bg-mz-blue text-white rounded-xl font-bold text-sm hover:bg-mz-blue-hover transition-colors shadow-md">Save Updates</button>
+      </div>
+      <input type="hidden" id="modal-id">
+    </div>
+  </div>
+
+  <!-- ADD MANUAL REVIEW MODAL -->
+  <div id="admin-review-modal" class="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity">
+    <div class="glass-panel p-6 md:p-8 w-[90%] max-w-lg transform scale-95 relative max-h-[90vh] overflow-y-auto custom-scrollbar transition-transform rounded-3xl" id="admin-review-box">
+      <button onclick="closeModal('admin-review-modal', 'admin-review-box')" class="absolute top-6 right-6 w-8 h-8 inner-card rounded-full flex items-center justify-center hover:bg-black/5"><i class="fa-solid fa-xmark"></i></button>
+      <h2 class="font-display font-black text-2xl mb-6 border-b border-[var(--border-color)] pb-4">Add Manual Review</h2>
+      
+      <form id="admin-review-form" class="space-y-4">
+        <div class="flex flex-col items-center mb-4">
+          <label class="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider mb-2">Rating</label>
+          <div class="flex gap-2 text-2xl cursor-pointer" id="admin-rev-stars">
+            <i class="fa-solid fa-star text-yellow-500 hover:scale-110 transition-transform" data-val="1"></i>
+            <i class="fa-solid fa-star text-yellow-500 hover:scale-110 transition-transform" data-val="2"></i>
+            <i class="fa-solid fa-star text-yellow-500 hover:scale-110 transition-transform" data-val="3"></i>
+            <i class="fa-solid fa-star text-yellow-500 hover:scale-110 transition-transform" data-val="4"></i>
+            <i class="fa-solid fa-star text-yellow-500 hover:scale-110 transition-transform" data-val="5"></i>
+          </div>
+          <input type="hidden" id="admin-rev-rating" value="5">
+        </div>
+        
+        <div><label class="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider mb-2 block">Client Name</label><input type="text" id="admin-rev-name" class="admin-input" required></div>
+        <div><label class="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider mb-2 block">Review Message</label><textarea id="admin-rev-text" class="admin-input" rows="3" required></textarea></div>
+        
+        <div class="flex items-center justify-between p-4 inner-card rounded-xl mt-2">
+          <span class="font-bold text-sm">Publish Immediately?</span>
+          <label class="toggle-switch"><input type="checkbox" id="admin-rev-publish" checked><span class="slider"></span></label>
+        </div>
+
+        <div class="mt-6 flex justify-end gap-3 pt-4 border-t border-[var(--border-color)]">
+          <button type="button" onclick="closeModal('admin-review-modal', 'admin-review-box')" class="px-6 py-3 inner-card rounded-xl font-bold text-sm">Cancel</button>
+          <button type="submit" class="px-8 py-3 bg-mz-blue text-white rounded-xl font-bold text-sm hover:bg-mz-blue-hover transition-colors shadow-md" id="admin-rev-submit">Save Review</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="confirm-modal" class="fixed inset-0 z-[70] flex items-center justify-center bg-black/40 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity">
+    <div class="glass-panel p-8 w-[90%] max-w-sm transform scale-95 text-center transition-transform rounded-3xl" id="confirm-box">
+      <div class="w-16 h-16 mx-auto bg-red-100 text-red-500 rounded-full flex items-center justify-center text-2xl mb-4"><i class="fa-solid fa-triangle-exclamation"></i></div>
+      <h3 class="font-bold text-lg mb-2">Delete Review?</h3>
+      <p class="text-sm text-[var(--text-muted)] mb-6">This action cannot be undone.</p>
+      <div class="flex gap-3">
+        <button onclick="closeModal('confirm-modal', 'confirm-box')" class="flex-1 py-3 inner-card rounded-xl font-bold text-sm">Cancel</button>
+        <button id="confirm-btn" class="flex-1 py-3 bg-red-500 text-white rounded-xl font-bold text-sm hover:bg-red-600 shadow-md">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOASTS -->
+  <div id="toast-container" class="fixed bottom-6 right-6 z-[100] flex flex-col gap-2"></div>
+
+  <script>
+    const api = window.marzoftBackend || window.MarzoftSupabase;
+    let allInquiries = [];
+    let allReviews = [];
+    let waMessagesArray = [];
+    let currentAdminRole = 'admin';
+
+    // Init & Auth Check
+    document.addEventListener('DOMContentLoaded', async () => {
+      try {
+        if (!api || !api.client) throw new Error();
+        
+        const { data: { user } } = await api.client.auth.getUser();
+        if (!user) throw new Error("No user");
+
+        const { data: profile } = await api.client.from('profiles').select('role').eq('id', user.id).single();
+        currentAdminRole = profile?.role || 'client';
+
+        if (currentAdminRole !== 'admin' && currentAdminRole !== 'staff') {
+            await api.signOut();
+            window.location.href = 'adminlogin.html';
+            return;
+        }
+
+        document.getElementById('user-role-display').innerText = `ROLE: ${currentAdminRole.toUpperCase()}`;
+        if (currentAdminRole === 'staff') {
+            document.getElementById('nav-settings').style.display = 'none';
+            document.getElementById('nav-team').style.display = 'none'; 
+            document.getElementById('add-staff-container').style.display = 'none';
+        }
+        
+        document.getElementById('initial-loader').style.opacity = '0';
+        setTimeout(() => document.getElementById('initial-loader').style.display = 'none', 500);
+
+        setupAdminStars();
+        await loadData();
+
+      } catch (err) {
+        window.location.href = 'adminlogin.html';
+      }
+    });
+
+    // Navigation Logic
+    function switchSection(id) {
+      document.querySelectorAll('.nav-btn').forEach(b => {
+        b.className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all text-[var(--text-muted)] hover:bg-black/5 dark:hover:bg-white/5 nav-btn";
+      });
+      
+      const activeBtn = document.getElementById('nav-' + id);
+      if(activeBtn) {
+          activeBtn.className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all bg-blue-50 dark:bg-blue-900/30 text-mz-blue nav-btn active";
+          document.getElementById('header-title').innerText = activeBtn.innerText.trim();
+      }
+
+      document.querySelectorAll('.admin-section').forEach(sec => sec.classList.remove('active'));
+      const targetSec = document.getElementById('sec-' + id);
+      if (targetSec) targetSec.classList.add('active');
+
+      if(window.innerWidth < 768) document.getElementById('sidebar').classList.add('-translate-x-full');
+    }
+
+    function toggleSidebar() { document.getElementById('sidebar').classList.toggle('-translate-x-full'); }
+    
+    function toggleTheme() {
+      document.documentElement.classList.toggle('dark');
+      localStorage.setItem('mz_theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+    }
+    
+    async function logout() { await api.signOut(); window.location.href = 'adminlogin.html'; }
+
+    // Modals
+    function openModal(modalId, boxId) {
+      const modal = document.getElementById(modalId);
+      modal.classList.remove('pointer-events-none');
+      modal.classList.add('opacity-100');
+      document.getElementById(boxId).classList.remove('scale-95');
+      document.getElementById(boxId).classList.add('scale-100');
+    }
+    function closeModal(modalId, boxId) {
+      const modal = document.getElementById(modalId);
+      modal.classList.remove('opacity-100');
+      document.getElementById(boxId).classList.remove('scale-100');
+      document.getElementById(boxId).classList.add('scale-95');
+      setTimeout(() => modal.classList.add('pointer-events-none'), 300);
+    }
+    function showToast(message, type = 'success') {
+      const container = document.getElementById('toast-container');
+      const bg = type === 'success' ? 'bg-green-600' : 'bg-red-500';
+      const icon = type === 'success' ? 'fa-check' : 'fa-xmark';
+      const toast = document.createElement('div');
+      toast.className = `${bg} text-white px-4 py-3 rounded-xl shadow-lg flex items-center gap-3 text-sm font-bold`;
+      toast.innerHTML = `<i class="fa-solid ${icon}"></i> ${message}`;
+      container.appendChild(toast);
+      setTimeout(() => toast.remove(), 3000);
+    }
+
+    // Load Data
+    async function loadData() {
+      try {
+        const reqPromise = api.client.from('project_requests').select('*').order('created_at', {ascending: false});
+        const revPromise = api.client.from('reviews').select('*').order('created_at', {ascending: false});
+        const profPromise = api.client.from('profiles').select('*').order('created_at', {ascending: false});
+        const setPromise = api.client.from('site_settings').select('*');
+        const analyticsPromise = typeof api.adminGetAnalytics === 'function' ? api.adminGetAnalytics() : Promise.resolve({data: null});
+
+        const [reqRes, revRes, profRes, setRes, anaRes] = await Promise.all([reqPromise, revPromise, profPromise, setPromise, analyticsPromise]);
+
+        allInquiries = reqRes.data || [];
+        allReviews = revRes.data || [];
+        const profiles = profRes.data || [];
+        const settings = setRes.data || [];
+        const analytics = anaRes.data || { views_week: 0, conversion_rate: 0 };
+
+        // Split profiles
+        const clientsOnly = profiles.filter(p => p.role === 'client');
+        const teamOnly = profiles.filter(p => p.role !== 'client');
+
+        // Stats
+        document.getElementById('stat-projects').innerText = allInquiries.length;
+        document.getElementById('stat-clients').innerText = clientsOnly.length;
+        document.getElementById('stat-reviews').innerText = allReviews.filter(r => !r.published).length;
+        
+        // Analytics
+        document.getElementById('stat-views').innerText = analytics.views_week || 0;
+        document.getElementById('stat-rate').innerText = (analytics.conversion_rate || 0) + '%';
+
+        renderInquiries(allInquiries);
+        renderRecent(allInquiries);
+        renderClients(clientsOnly);
+        renderTeam(teamOnly);
+        populateStaffDropdown(clientsOnly);
+        renderReviews(allReviews);
+        populateSettings(settings);
+
+      } catch (e) {
+        showToast("Error fetching data.", "error");
+      }
+    }
+
+    // Renderers
+    const formatDate = (iso) => new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    const formatStatus = (s) => {
+        const map = { 'new': 'New', 'in_progress': 'In Progress', 'waiting_for_client': 'Waiting', 'completed': 'Completed', 'closed': 'Closed' };
+        const colors = { 'new': 'badge-blue', 'in_progress': 'badge-yellow', 'waiting_for_client': 'badge-yellow', 'completed': 'badge-green', 'closed': 'badge-gray' };
+        return `<span class="badge ${colors[s] || 'badge-gray'}">${map[s] || s}</span>`;
+    };
+
+    function renderInquiries(data) {
+        const tbody = document.getElementById('inquiries-tbody');
+        if(!data.length) return tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4">No inquiries.</td></tr>';
+        tbody.innerHTML = data.map(p => `
+            <tr>
+                <td>${formatDate(p.created_at)}</td>
+                <td><strong>${p.name}</strong><br><span class="text-xs text-[var(--text-muted)]">${p.email}</span></td>
+                <td>${p.project_type || 'Custom'}<br><span class="text-xs text-[var(--text-muted)]">${p.budget || '-'}</span></td>
+                <td>${formatStatus(p.status)}</td>
+                <td class="text-right">
+                    <button class="btn-action" onclick="viewInquiry('${p.id}')"><i class="fa-solid fa-eye"></i></button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    function renderRecent(data) {
+        const tbody = document.getElementById('recent-tbody');
+        if(!data.length) return tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4">No activity.</td></tr>';
+        tbody.innerHTML = data.slice(0, 5).map(p => `
+            <tr>
+                <td>${formatDate(p.created_at)}</td>
+                <td><strong>${p.name}</strong></td>
+                <td>${p.project_type || 'Custom'}</td>
+                <td>${formatStatus(p.status)}</td>
+            </tr>
+        `).join('');
+    }
+
+    function renderClients(data) {
+        const tbody = document.getElementById('clients-tbody');
+        if(!data.length) return tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4">No clients.</td></tr>';
+        
+        tbody.innerHTML = data.map(c => {
+            let roleHtml = `<span class="badge badge-gray">${c.role}</span>`;
+            
+            if (currentAdminRole === 'admin' && c.id) {
+                roleHtml = `
+                    <select class="role-select" onchange="promoteToStaff('${c.id}', this.value)">
+                        <option value="client" selected>Client</option>
+                        <option value="staff">Promote to Staff</option>
+                        <option value="admin">Promote to Admin</option>
+                    </select>
+                `;
+            }
+
+            return `
+            <tr>
+                <td><strong>${c.full_name || '-'}</strong></td>
+                <td>${c.email}</td>
+                <td>${roleHtml}</td>
+                <td>${formatDate(c.created_at)}</td>
+            </tr>
+            `;
+        }).join('');
+    }
+
+    function populateStaffDropdown(clients) {
+        const select = document.getElementById('new-staff-select');
+        if(!select) return;
+        select.innerHTML = '<option value="">Select a client to promote...</option>' + 
+            clients.map(c => `<option value="${c.id}">${c.full_name || c.email}</option>`).join('');
+    }
+
+    function renderTeam(data) {
+        const tbody = document.getElementById('team-tbody');
+        if(!data.length) return tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4">No team members found.</td></tr>';
+        
+        tbody.innerHTML = data.map(c => {
+            let roleHtml = `<span class="badge ${c.role==='admin' ? 'badge-blue' : 'badge-purple'}">${c.role}</span>`;
+            const isMasterAdmin = c.email === 'admin@marzoft.com';
+            
+            if (isMasterAdmin) {
+                roleHtml = `<span class="badge badge-blue" style="background:#0B1020; color:#fff;">MASTER ADMIN</span>`;
+            } else if (currentAdminRole === 'admin') {
+                roleHtml = `
+                    <select class="role-select" id="role-${c.id}">
+                        <option value="staff" ${c.role==='staff'?'selected':''}>Staff</option>
+                        <option value="admin" ${c.role==='admin'?'selected':''}>Admin</option>
+                    </select>
+                `;
+            }
+
+            const jobInput = (currentAdminRole === 'admin' && !isMasterAdmin) 
+                ? `<input type="text" id="job-${c.id}" value="${c.job_title||''}" placeholder="e.g. Designer" class="admin-input py-2 px-3 text-xs">`
+                : (isMasterAdmin ? '<strong>Founder</strong>' : (c.job_title || 'No Title'));
+
+            const actionBtn = (currentAdminRole === 'admin' && !isMasterAdmin) 
+                ? `<button class="btn-action" onclick="saveTeamMember('${c.id}')" title="Save Role & Title"><i class="fa-solid fa-check text-green-500"></i></button>
+                   <button class="btn-action btn-danger" onclick="demoteToClient('${c.id}')" title="Remove from Team"><i class="fa-solid fa-user-minus"></i></button>`
+                : '-';
+
+            return `
+            <tr>
+                <td><strong>${c.full_name || '-'}</strong><br><span class="text-[10px] text-[var(--text-muted)]">${c.email}</span></td>
+                <td>${roleHtml}</td>
+                <td>${jobInput}</td>
+                <td class="text-right">${actionBtn}</td>
+            </tr>
+            `;
+        }).join('');
+    }
+
+    function renderReviews(data) {
+        const tbody = document.getElementById('reviews-tbody');
+        if(!data.length) return tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4">No reviews.</td></tr>';
+        
+        tbody.innerHTML = data.map(r => {
+            const deleteBtn = currentAdminRole === 'admin' ? `<button class="btn-action btn-danger" onclick="deleteReview('${r.id}')"><i class="fa-solid fa-trash"></i></button>` : '';
+            return `
+            <tr>
+                <td><strong>${r.name}</strong></td>
+                <td class="max-w-[200px] truncate">"${r.review_text}"</td>
+                <td class="text-yellow-500 text-xs">${'★'.repeat(r.rating)}</td>
+                <td><span class="badge ${r.published ? 'badge-green' : 'badge-gray'}">${r.published ? 'Published' : 'Hidden'}</span></td>
+                <td class="text-right">
+                    <button class="btn-action" onclick="toggleReview('${r.id}', ${!r.published})" title="${r.published ? 'Hide' : 'Publish'}"><i class="fa-solid ${r.published ? 'fa-eye-slash' : 'fa-eye'}"></i></button>
+                    ${deleteBtn}
+                </td>
+            </tr>
+            `;
+        }).join('');
+    }
+
+    // Team Actions
+    window.promoteSelectedToStaff = async () => {
+        const select = document.getElementById('new-staff-select');
+        const id = select.value;
+        if(!id) return showToast("Please select a client to promote.", "error");
+        
+        try {
+            await api.adminUpdateStaff(id, 'staff', null);
+            showToast("Added to Team successfully!");
+            select.value = "";
+            loadData();
+        } catch(e) { showToast("Failed to promote.", "error"); }
+    }
+
+    window.saveTeamMember = async (id) => {
+        const role = document.getElementById(`role-${id}`).value;
+        const job = document.getElementById(`job-${id}`).value.trim();
+        try {
+            await api.adminUpdateStaff(id, role, job);
+            showToast("Team member updated.");
+            loadData();
+        } catch(e) { showToast("Failed to update.", "error"); }
+    }
+
+    window.demoteToClient = async (id) => {
+        if(!confirm("Remove this person from the team? They will become a standard client.")) return;
+        try {
+            await api.adminUpdateStaff(id, 'client', null);
+            showToast("Removed from team.");
+            loadData();
+        } catch(e) { showToast("Failed to remove.", "error"); }
+    }
+
+    // Actions
+    window.viewInquiry = (id) => {
+        const p = allInquiries.find(x => x.id === id);
+        if(!p) return;
+        document.getElementById('modal-id').value = p.id;
+        document.getElementById('modal-client-info').innerHTML = `<strong>${p.name}</strong> • ${p.email} • ${p.whatsapp || '-'}`;
+        document.getElementById('modal-type').innerText = p.project_type || 'Custom';
+        document.getElementById('modal-budget').innerText = p.budget || '-';
+        
+        let goals = p.goals;
+        try { if(typeof goals === 'string') goals = JSON.parse(goals).join(', '); } catch(e){}
+        document.getElementById('modal-goals').innerText = goals || '-';
+        
+        document.getElementById('modal-desc').innerText = p.description || 'No description.';
+        document.getElementById('modal-status').value = p.status;
+        document.getElementById('modal-note').value = p.admin_notes || '';
+        
+        openModal('inquiry-modal', 'inquiry-box');
+    }
+
+    window.saveInquiryUpdate = async () => {
+        const id = document.getElementById('modal-id').value;
+        const patch = {
+            status: document.getElementById('modal-status').value,
+            admin_notes: document.getElementById('modal-note').value.trim()
+        };
+        try {
+            await api.client.from('project_requests').update(patch).eq('id', id); 
+            showToast("Project updated successfully.");
+            closeModal('inquiry-modal', 'inquiry-box');
+            loadData();
+        } catch(e) { showToast("Failed to update.", "error"); }
+    }
+
+    // --- MANUAL REVIEW ADDITION LOGIC ---
+    function setupAdminStars() {
+        const stars = document.querySelectorAll('#admin-rev-stars i');
+        const input = document.getElementById('admin-rev-rating');
+        stars.forEach(star => {
+            star.addEventListener('click', () => {
+                const val = parseInt(star.getAttribute('data-val'));
+                input.value = val;
+                stars.forEach(s => {
+                    if (parseInt(s.getAttribute('data-val')) <= val) {
+                        s.classList.add('fa-solid', 'text-yellow-500');
+                        s.classList.remove('fa-regular', 'text-gray-300', 'dark:text-gray-600');
+                    } else {
+                        s.classList.remove('fa-solid', 'text-yellow-500');
+                        s.classList.add('fa-regular', 'text-gray-300', 'dark:text-gray-600');
+                    }
+                });
+            });
+        });
+    }
+
+    window.openAdminReviewModal = () => {
+        document.getElementById('admin-review-form').reset();
+        document.getElementById('admin-rev-rating').value = 5;
+        document.querySelectorAll('#admin-rev-stars i').forEach(s => {
+            s.classList.add('fa-solid', 'text-yellow-500');
+            s.classList.remove('fa-regular', 'text-gray-300', 'dark:text-gray-600');
+        });
+        openModal('admin-review-modal', 'admin-review-box');
+    }
+
+    document.getElementById('admin-review-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btn = document.getElementById('admin-rev-submit');
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+        btn.disabled = true;
+
+        try {
+            const payload = {
+                name: document.getElementById('admin-rev-name').value,
+                rating: parseInt(document.getElementById('admin-rev-rating').value),
+                review_text: document.getElementById('admin-rev-text').value,
+                published: false // Must insert as false initially due to RLS
+            };
+
+            const { data: newReview, error: insertError } = await api.client.from('reviews').insert(payload).select().single();
+            if (insertError) throw insertError;
+
+            // If checked, publish immediately using RPC
+            if (document.getElementById('admin-rev-publish').checked && newReview?.id) {
+                await api.adminUpdateReview(newReview.id, { published: true });
+            }
+
+            showToast("Review added successfully.");
+            closeModal('admin-review-modal', 'admin-review-box');
+            loadData();
+        } catch (err) {
+            showToast("Failed to add review.", "error");
+            console.error(err);
+        } finally {
+            btn.innerHTML = 'Save Review';
+            btn.disabled = false;
+        }
+    });
+
+    window.toggleReview = async (id, state) => {
+        try {
+            await api.client.from('reviews').update({published: state}).eq('id', id);
+            showToast(state ? "Review Published" : "Review Hidden");
+            loadData();
+        } catch(e) { showToast("Failed to update review.", "error"); }
+    }
+
+    window.deleteReview = (id) => {
+        if(currentAdminRole !== 'admin') return;
+        document.getElementById('confirm-btn').onclick = async () => {
+            try {
+                await api.adminDeleteReview(id);
+                showToast("Review deleted.");
+                closeModal('confirm-modal', 'confirm-box');
+                loadData();
+            } catch(e) { showToast("Delete failed.", "error"); }
+        };
+        openModal('confirm-modal', 'confirm-box');
+    }
+
+    // Settings
+    function populateSettings(settings) {
+        const waNum = settings.find(s => s.key === 'whatsapp_number' || s.key === 'waNumber')?.value || '';
+        let waMsgs = settings.find(s => s.key === 'whatsapp_greeting' || s.key === 'waMessages')?.value || [];
+        if (typeof waMsgs === 'string') waMsgs = [waMsgs];
+        const secWord = settings.find(s => s.key === 'secret_word')?.value || 'adminx';
+
+        document.getElementById('wa-number').value = String(waNum).replace(/['"]/g, '');
+        document.getElementById('current-sec-word').innerText = String(secWord).replace(/['"]/g, '');
+        
+        waMessagesArray = Array.isArray(waMsgs) ? waMsgs : [];
+        renderWaMessages();
+    }
+
+    function renderWaMessages() {
+        const container = document.getElementById('wa-messages-list');
+        container.innerHTML = waMessagesArray.map((msg, i) => `
+            <div class="flex gap-2">
+                <input type="text" class="admin-input flex-1 wa-msg-input" value="${msg.replace(/"/g, '&quot;')}" oninput="updateWaPreview()">
+                <button type="button" onclick="removeWaMessage(${i})" class="w-11 h-11 flex-shrink-0 bg-red-50 text-red-500 rounded-xl hover:bg-red-500 hover:text-white transition-colors"><i class="fa-solid fa-trash"></i></button>
+            </div>
+        `).join('');
+        updateWaPreview();
+    }
+
+    window.addWaMessage = () => { waMessagesArray.push("New message..."); renderWaMessages(); }
+    window.removeWaMessage = (i) => { waMessagesArray.splice(i, 1); renderWaMessages(); }
+    
+    window.updateWaPreview = () => {
+        const inputs = document.querySelectorAll('.wa-msg-input');
+        waMessagesArray = Array.from(inputs).map(i => i.value);
+        const container = document.getElementById('wa-preview-messages');
+        if(!waMessagesArray.length) { container.innerHTML = '<p class="text-xs text-center mt-4 opacity-50">No messages.</p>'; return; }
+        container.innerHTML = waMessagesArray.map(m => `<div class="bg-white text-slate-800 text-xs p-3 rounded-2xl rounded-tl-none w-fit max-w-[90%] shadow-sm">${m}</div>`).join('');
+    }
+
+    window.saveWhatsApp = async () => {
+        const num = document.getElementById('wa-number').value;
+        const msgs = Array.from(document.querySelectorAll('.wa-msg-input')).map(i => i.value.trim()).filter(v => v);
+        try {
+            await api.adminSetSetting('whatsapp_number', num);
+            await api.adminSetSetting('whatsapp_greeting', msgs);
+            showToast("WhatsApp configuration saved.");
+        } catch(e) { showToast("Failed to save config.", "error"); }
+    }
+
+    window.saveSecretWord = async () => {
+        const word = document.getElementById('set-sec-word').value.toLowerCase().trim();
+        if(!word) return showToast("Enter a word", "error");
+        try {
+            await api.adminSetSetting('secret_word', word);
+            document.getElementById('current-sec-word').innerText = word;
+            document.getElementById('set-sec-word').value = '';
+            showToast("Gateway word updated.");
+        } catch(e) { showToast("Failed to update.", "error"); }
+    }
+
+    window.saveAdminPassword = async () => {
+        const pwd = document.getElementById('set-sec-pwd').value;
+        if(pwd.length < 8) return showToast("Min 8 characters required.", "error");
+        try {
+            const { error } = await api.client.auth.updateUser({ password: pwd });
+            if(error) throw error;
+            document.getElementById('set-sec-pwd').value = '';
+            showToast("Password updated securely.");
+        } catch(e) { showToast("Failed to update password.", "error"); }
+    }
+
+  </script>
+</body>
+</html>
