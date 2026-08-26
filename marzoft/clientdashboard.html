@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Client Dashboard — MARZOFT</title>
+<!-- Google Fonts -->
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Caveat:wght@600;700&family=DM+Serif+Display:ital@0;1&family=Instrument+Serif:ital@0;1&family=Newsreader:ital,opsz,wght@1,6..72,400;1,6..72,500;1,6..72,600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<style>
+    :root {
+        /* Marzoft Core Variables */
+        --bg-canvas: #FFFFFF;
+        --bg-offwhite: #F8F9FC;
+        --text-navy: #0B1020;
+        --text-muted: #526079;
+        --blue-primary: #2563EB;
+        --blue-hover: #1D4ED8;
+        --blue-soft: #EFF6FF;
+        --border-light: #E2E8F0;
+        --radius-md: 14px;
+        --radius-lg: 24px;
+        --radius-full: 9999px;
+        --shadow-subtle: 0 4px 20px rgba(11, 16, 32, 0.04);
+        --shadow-card: 0 16px 40px rgba(11, 16, 32, 0.06);
+        --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+        --font-serif: 'Newsreader', Georgia, serif;
+        --font-display: 'Bricolage Grotesque', sans-serif;
+        --ease: cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    *, ::after, ::before { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body, html {
+        background-color: var(--bg-offwhite);
+        color: var(--text-navy);
+        font-family: var(--font-sans);
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+        min-height: 100vh;
+        overflow-x: hidden;
+    }
+
+    /* Flex architecture to push footer to bottom */
+    body {
+        display: flex;
+        flex-direction: column;
+    }
+
+    a { color: inherit; text-decoration: none; transition: all 0.3s var(--ease); }
+    button { font-family: inherit; cursor: pointer; border: none; outline: none; background: none; }
+    
+    .container {
+        width: min(1160px, calc(100% - 48px));
+        margin-inline: auto;
+        position: relative;
+    }
+
+    /* Ambient Background */
+    .ambient-mesh {
+        position: fixed;
+        width: min(1000px, 95vw);
+        height: min(600px, 80vw);
+        background: radial-gradient(ellipse at 50% 40%, rgba(37, 99, 235, 0.08) 0%, rgba(236, 72, 153, 0.03) 45%, rgba(255, 255, 255, 0) 70%);
+        top: -10%;
+        left: 50%;
+        transform: translateX(-50%);
+        pointer-events: none;
+        filter: blur(80px);
+        z-index: 0;
+    }
+
+    /* Glassmorphic Header */
+    .site-header {
+        position: fixed;
+        top: 20px;
+        left: 0;
+        width: 100%;
+        z-index: 1000;
+    }
+    .nav-inner {
+        max-width: 1280px;
+        margin-inline: auto;
+        min-height: 60px;
+        padding: 8px 12px 8px 24px;
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(20px) saturate(120%);
+        -webkit-backdrop-filter: blur(20px) saturate(120%);
+        border: 1px solid var(--border-light);
+        border-radius: var(--radius-full);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        box-shadow: var(--shadow-subtle);
+    }
+    .brand-logo {
+        font-family: var(--font-display);
+        font-weight: 800;
+        font-size: 1.15rem;
+        letter-spacing: -0.05em;
+        color: var(--text-navy);
+        display: flex;
+        align-items: center;
+    }
+    .brand-logo .dot {
+        width: 6px;
+        height: 6px;
+        background-color: var(--blue-primary);
+        border-radius: 50%;
+        display: inline-block;
+        margin-left: 2px;
+        margin-bottom: 2px;
+    }
+    .nav-actions {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+    .nav-profile {
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: var(--text-muted);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .nav-profile i {
+        width: 32px;
+        height: 32px;
+        background: var(--blue-soft);
+        color: var(--blue-primary);
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        font-style: normal;
+        font-size: 0.8rem;
+    }
+    .btn-logout {
+        padding: 10px 20px;
+        background: #fff;
+        border: 1px solid var(--border-light);
+        border-radius: var(--radius-full);
+        font-size: 0.8rem;
+        font-weight: 700;
+        color: var(--text-navy);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+        transition: all 0.3s var(--ease);
+    }
+    .btn-logout:hover {
+        border-color: #cbd5e1;
+        transform: translateY(-1px);
+        box-shadow: 0 6px 15px rgba(0,0,0,0.05);
+    }
+
+    /* Dashboard Layout - Tightened spacing for 100vh fit */
+    .dashboard-main {
+        flex: 1; /* Pushes footer to bottom */
+        padding-top: 105px;
+        padding-bottom: 30px;
+        position: relative;
+        z-index: 1;
+        display: flex;
+        flex-direction: column;
+    }
+    .dashboard-header {
+        margin-bottom: 20px;
+        animation: quietRise 0.8s var(--ease) both;
+    }
+    .dashboard-title {
+        font-family: var(--font-display);
+        font-size: clamp(2rem, 4vw, 2.8rem);
+        font-weight: 800;
+        line-height: 1.05;
+        letter-spacing: -0.05em;
+        color: var(--text-navy);
+    }
+    .dashboard-title em {
+        font-family: var(--font-serif);
+        font-style: italic;
+        font-weight: 500;
+        color: var(--blue-primary);
+    }
+    .dashboard-subtitle {
+        margin-top: 8px;
+        font-size: 0.95rem;
+        color: var(--text-muted);
+        font-weight: 500;
+    }
+
+    /* Projects Grid */
+    .projects-layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(300px, 0.35fr);
+        gap: 24px;
+        align-items: start;
+        flex: 1;
+    }
+    @media (max-width: 900px) {
+        .projects-layout { grid-template-columns: 1fr; }
+    }
+
+    .projects-list {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+    }
+
+    /* Project Card */
+    .project-card {
+        background: #fff;
+        border: 1px solid var(--border-light);
+        border-radius: var(--radius-lg);
+        padding: clamp(24px, 4vw, 32px);
+        box-shadow: var(--shadow-subtle);
+        transition: all 0.4s var(--ease);
+        animation: quietRise 0.8s var(--ease) both;
+        animation-delay: 0.15s;
+    }
+    .project-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-card);
+        border-color: #cbd5e1;
+    }
+    
+    .project-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+        gap: 16px;
+    }
+    .project-meta {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+    .project-date {
+        font-size: 0.7rem;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        color: var(--text-light);
+        text-transform: uppercase;
+    }
+    .project-type {
+        font-family: var(--font-display);
+        font-size: 1.5rem;
+        font-weight: 800;
+        letter-spacing: -0.04em;
+        line-height: 1.1;
+    }
+
+    /* Status Badge */
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 14px;
+        border-radius: var(--radius-full);
+        font-size: 0.75rem;
+        font-weight: 800;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+    }
+    .status-badge::before {
+        content: "";
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+    }
+    .status-new { background: var(--blue-soft); color: var(--blue-primary); }
+    .status-new::before { background: var(--blue-primary); box-shadow: 0 0 8px var(--blue-primary); }
+    
+    .status-in_progress { background: #fef3c7; color: #d97706; }
+    .status-in_progress::before { background: #d97706; box-shadow: 0 0 8px #d97706; }
+    
+    .status-completed { background: #dcfce7; color: #15803d; }
+    .status-completed::before { background: #15803d; box-shadow: 0 0 8px #15803d; }
+    
+    .status-closed { background: #f1f5f9; color: #64748b; }
+    .status-closed::before { background: #64748b; }
+
+    /* Project Details */
+    .project-details {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 16px;
+        padding-block: 20px;
+        border-top: 1px solid var(--border-light);
+        border-bottom: 1px solid var(--border-light);
+        margin-bottom: 20px;
+    }
+    .detail-item span {
+        display: block;
+        font-size: 0.7rem;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        color: var(--text-light);
+        text-transform: uppercase;
+        margin-bottom: 2px;
+    }
+    .detail-item p {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: var(--text-navy);
+    }
+
+    /* Admin Note */
+    .admin-note {
+        background: linear-gradient(145deg, #f8faff, #eff6ff);
+        border: 1px solid #dbeafe;
+        border-radius: var(--radius-md);
+        padding: 16px 20px;
+        position: relative;
+    }
+    .admin-note-label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.65rem;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        color: var(--blue-primary);
+        text-transform: uppercase;
+        margin-bottom: 6px;
+    }
+    .admin-note-label i {
+        color: #fff;
+        background: var(--blue-primary);
+        width: 16px;
+        height: 16px;
+        display: grid;
+        place-items: center;
+        border-radius: 4px;
+        font-size: 0.5rem;
+    }
+    .admin-note p {
+        font-family: var(--font-serif);
+        font-style: italic;
+        font-size: 1.05rem;
+        color: var(--text-navy);
+        line-height: 1.4;
+    }
+
+    /* Sidebar Actions - Compacted */
+    .dashboard-sidebar {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        animation: quietRise 0.8s var(--ease) both;
+        animation-delay: 0.25s;
+        position: sticky;
+        top: 100px;
+    }
+    .action-card {
+        background: #fff;
+        border: 1px solid var(--border-light);
+        border-radius: var(--radius-lg);
+        padding: 24px 20px;
+        text-align: center;
+        box-shadow: var(--shadow-subtle);
+    }
+    .action-card i {
+        font-size: 1.25rem;
+        color: var(--blue-primary);
+        margin-bottom: 12px;
+        display: inline-block;
+    }
+    .action-card h3 {
+        font-family: var(--font-display);
+        font-size: 1.1rem;
+        font-weight: 800;
+        margin-bottom: 6px;
+    }
+    .action-card p {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        margin-bottom: 16px;
+        line-height: 1.5;
+    }
+    .btn-primary {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 12px 24px;
+        width: 100%;
+        background-color: var(--blue-primary);
+        color: #fff;
+        border-radius: var(--radius-full);
+        font-size: 0.85rem;
+        font-weight: 700;
+        box-shadow: 0 8px 22px rgba(37,99,235,0.25);
+        transition: all 0.3s var(--ease);
+    }
+    .btn-primary:hover {
+        background-color: var(--blue-hover);
+        transform: translateY(-2px);
+        box-shadow: 0 12px 28px rgba(37,99,235,0.35);
+    }
+    .btn-outline {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 12px 24px;
+        width: 100%;
+        background-color: transparent;
+        color: var(--text-navy);
+        border: 1px solid var(--border-light);
+        border-radius: var(--radius-full);
+        font-size: 0.85rem;
+        font-weight: 700;
+        transition: all 0.3s var(--ease);
+    }
+    .btn-outline:hover {
+        background-color: var(--bg-offwhite);
+        border-color: #cbd5e1;
+    }
+
+    /* Loading & Empty States */
+    .state-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 40px 20px;
+        background: #fff;
+        border: 1px dashed var(--border-light);
+        border-radius: var(--radius-lg);
+        height: 100%;
+        min-height: 280px;
+    }
+    .state-container i {
+        font-size: 1.75rem;
+        color: var(--border-light);
+        margin-bottom: 12px;
+    }
+    .spinner {
+        width: 28px;
+        height: 28px;
+        border: 3px solid var(--border-light);
+        border-top-color: var(--blue-primary);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin-bottom: 16px;
+    }
+
+    @keyframes quietRise {
+        from { opacity: 0; transform: translateY(20px); filter: blur(4px); }
+        to { opacity: 1; transform: none; filter: none; }
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Footer */
+    .site-footer {
+        margin-top: auto;
+        border-top: 1px solid var(--border-light);
+        padding: 20px 0;
+        text-align: center;
+        color: var(--text-light);
+        font-size: 0.8rem;
+        font-weight: 500;
+        background: var(--bg-offwhite);
+    }
+</style>
+</head>
+<body>
+    <div class="ambient-mesh"></div>
+
+<header class="site-header">
+    <div class="nav-inner">
+        <a href="index.html" class="brand-logo">
+            MARZOFT<span class="dot"></span>
+        </a>
+        <div class="nav-actions">
+            <div class="nav-profile" id="userProfileBadge" style="display: none;">
+                <i id="userInitial">M</i>
+                <span class="hidden-mobile" id="userName">Client</span>
+            </div>
+            <button class="btn-logout" id="btnSignOut">Sign out</button>
+        </div>
+    </div>
+</header>
+
+<main class="dashboard-main container">
+    <div class="dashboard-header">
+        <h1 class="dashboard-title">Welcome back, <br><em>Your project space.</em></h1>
+        <p class="dashboard-subtitle">Track your brief, status, and updates from the team.</p>
+    </div>
+
+    <div class="projects-layout">
+        <!-- Project List Area -->
+        <div class="projects-list" id="projectsContainer">
+            <!-- Loading State -->
+            <div class="state-container" id="loadingState">
+                <div class="spinner"></div>
+                <h3 style="font-family: var(--font-display); font-weight: 700; font-size: 1.2rem;">Syncing your workspace...</h3>
+            </div>
+        </div>
+
+        <!-- Sidebar Actions -->
+        <div class="dashboard-sidebar">
+            <div class="action-card">
+                <i class="fa-solid fa-layer-group"></i>
+                <h3>New project?</h3>
+                <p>Have another idea? Submit a new brief to get started.</p>
+                <a href="index.html#booking" class="btn-primary">Start a project <span>→</span></a>
+            </div>
+            
+            <div class="action-card">
+                <h3 style="font-size: 1rem; margin-bottom: 8px;">Need assistance?</h3>
+                <a href="https://wa.me/919999999999" target="_blank" class="btn-outline">
+                    <i class="fa-brands fa-whatsapp" style="margin:0; font-size: 1.1rem; color: inherit;"></i> Message us
+                </a>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer class="site-footer">
+    <div class="container">
+        © 2026 Marzoft Technologies. Private Client Portal.
+    </div>
+</footer>
+
+<!-- Supabase & Backend Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="supabase.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', async () => {
+        const container = document.getElementById('projectsContainer');
+        const loadingState = document.getElementById('loadingState');
+        const btnSignOut = document.getElementById('btnSignOut');
+        const userNameDisplay = document.getElementById('userName');
+        const userInitialDisplay = document.getElementById('userInitial');
+        const profileBadge = document.getElementById('userProfileBadge');
+
+        // 1. Resolve Backend API
+        const api = window.marzoftBackend || window.MarzoftSupabase || {};
+
+        // 2. Auth Check & Guard
+        try {
+            if (!api.client) throw new Error("Backend not initialized");
+            
+            const { data: { user }, error } = await api.client.auth.getUser();
+            if (error || !user) {
+                window.location.href = 'index.html#client-login';
+                return;
+            }
+
+            // Update Profile Badge
+            const fullName = user.user_metadata?.full_name || user.email.split('@')[0];
+            userNameDisplay.textContent = fullName;
+            userInitialDisplay.textContent = fullName.charAt(0).toUpperCase();
+            profileBadge.style.display = 'flex';
+
+            // 3. Load Projects
+            loadProjects();
+
+        } catch (err) {
+            console.error("Auth Error:", err);
+            window.location.href = 'index.html#client-login';
+        }
+
+        // 4. Sign Out Handler
+        btnSignOut.addEventListener('click', async () => {
+            await api.signOut();
+            window.location.href = 'index.html';
+        });
+
+        // Status Badge Formatting Helper
+        const formatStatus = (status) => {
+            const map = {
+                'new': { label: 'Brief Received', class: 'status-new' },
+                'in_progress': { label: 'In Progress', class: 'status-in_progress' },
+                'waiting_for_client': { label: 'Action Required', class: 'status-in_progress' },
+                'completed': { label: 'Completed', class: 'status-completed' },
+                'closed': { label: 'Closed', class: 'status-closed' }
+            };
+            return map[status] || { label: status, class: 'status-closed' };
+        };
+
+        // Format Date Helper
+        const formatDate = (isoString) => {
+            const date = new Date(isoString);
+            return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+        };
+
+        // Main Load Function
+        async function loadProjects() {
+            try {
+                const result = await api.getMyProjectRequests();
+                loadingState.style.display = 'none';
+
+                if (result.error) throw result.error;
+                
+                const projects = result.data || [];
+
+                if (projects.length === 0) {
+                    container.innerHTML = `
+                        <div class="state-container" style="animation: quietRise 0.5s ease both;">
+                            <i class="fa-regular fa-folder-open"></i>
+                            <h3 style="font-family: var(--font-display); font-weight: 800; font-size: 1.3rem; margin-bottom: 6px;">No projects yet</h3>
+                            <p style="color: var(--text-muted); font-size: 0.9rem;">You haven't submitted a project brief yet.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                // Render Cards
+                container.innerHTML = projects.map((proj, index) => {
+                    const statusObj = formatStatus(proj.status);
+                    const delay = 0.15 + (index * 0.1);
+                    
+                    let goalsHtml = '';
+                    if (proj.goals && proj.goals.length > 0) {
+                        try {
+                            const goalsArr = typeof proj.goals === 'string' ? JSON.parse(proj.goals) : proj.goals;
+                            goalsHtml = `<p>${goalsArr.join(', ')}</p>`;
+                        } catch(e) {
+                            goalsHtml = `<p>${proj.goals}</p>`;
+                        }
+                    } else {
+                        goalsHtml = `<p>Not specified</p>`;
+                    }
+
+                    let adminNoteHtml = '';
+                    if (proj.admin_notes) {
+                        adminNoteHtml = `
+                            <div class="admin-note">
+                                <div class="admin-note-label">
+                                    <i class="fa-solid fa-asterisk"></i> Note from Marzoft
+                                </div>
+                                <p>"${proj.admin_notes}"</p>
+                            </div>
+                        `;
+                    }
+
+                    return `
+                        <article class="project-card" style="animation-delay: ${delay}s">
+                            <div class="project-card-header">
+                                <div class="project-meta">
+                                    <span class="project-date">Submitted on ${formatDate(proj.created_at)}</span>
+                                    <h2 class="project-type">${proj.project_type || 'Custom Project'}</h2>
+                                </div>
+                                <div class="status-badge ${statusObj.class}">${statusObj.label}</div>
+                            </div>
+
+                            <div class="project-details">
+                                <div class="detail-item">
+                                    <span>Budget</span>
+                                    <p>${proj.budget || 'To be discussed'}</p>
+                                </div>
+                                <div class="detail-item">
+                                    <span>Key Goals</span>
+                                    ${goalsHtml}
+                                </div>
+                            </div>
+
+                            ${proj.description ? `<p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 20px; line-height: 1.6;">${proj.description}</p>` : ''}
+                            
+                            ${adminNoteHtml}
+                        </article>
+                    `;
+                }).join('');
+
+            } catch (error) {
+                console.error("Failed to load projects:", error);
+                container.innerHTML = `
+                    <div class="state-container">
+                        <i class="fa-solid fa-triangle-exclamation" style="color: #ef4444;"></i>
+                        <h3 style="font-family: var(--font-display); font-weight: 800; font-size: 1.25rem;">Could not load projects</h3>
+                        <p style="color: var(--text-muted); font-size: 0.9rem;">Please refresh the page to try again.</p>
+                    </div>
+                `;
+            }
+        }
+    });
+</script>
+</body>
+</html>
