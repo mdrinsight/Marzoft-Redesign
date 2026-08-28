@@ -361,14 +361,14 @@
       <input type="hidden" id="modal-id">
     </div>
   </div>
-
-  <!-- ADD MANUAL REVIEW MODAL -->
+<!-- ADD / EDIT REVIEW MODAL -->
   <div id="admin-review-modal" class="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity">
     <div class="glass-panel p-6 md:p-8 w-[90%] max-w-lg transform scale-95 relative max-h-[90vh] overflow-y-auto custom-scrollbar transition-transform rounded-3xl" id="admin-review-box">
       <button onclick="closeModal('admin-review-modal', 'admin-review-box')" class="absolute top-6 right-6 w-8 h-8 inner-card rounded-full flex items-center justify-center hover:bg-black/5"><i class="fa-solid fa-xmark"></i></button>
-      <h2 class="font-display font-black text-2xl mb-6 border-b border-[var(--border-color)] pb-4">Add Manual Review</h2>
+      <h2 id="admin-review-modal-title" class="font-display font-black text-2xl mb-6 border-b border-[var(--border-color)] pb-4">Add Manual Review</h2>
       
       <form id="admin-review-form" class="space-y-4">
+        <input type="hidden" id="admin-rev-id" value="">
         <div class="flex flex-col items-center mb-4">
           <label class="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider mb-2">Rating</label>
           <div class="flex gap-2 text-2xl cursor-pointer" id="admin-rev-stars">
@@ -661,21 +661,22 @@
             `;
         }).join('');
     }
-
-    function renderReviews(data) {
+function renderReviews(data) {
         const tbody = document.getElementById('reviews-tbody');
         if(!data.length) return tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4">No reviews.</td></tr>';
         
         tbody.innerHTML = data.map(r => {
+            const editBtn = `<button class="btn-action" onclick="editReview('${r.id}')" title="Edit Review"><i class="fa-solid fa-pen"></i></button>`;
             const deleteBtn = currentAdminRole === 'admin' ? `<button class="btn-action btn-danger" onclick="deleteReview('${r.id}')"><i class="fa-solid fa-trash"></i></button>` : '';
             return `
             <tr>
                 <td><strong>${r.name}</strong></td>
-                <td class="max-w-[200px] truncate">"${r.review_text}"</td>
+                <td class="max-w-[200px] truncate" title="${r.review_text.replace(/"/g, '&quot;')}">"${r.review_text}"</td>
                 <td class="text-yellow-500 text-xs">${'★'.repeat(r.rating)}</td>
                 <td><span class="badge ${r.published ? 'badge-green' : 'badge-gray'}">${r.published ? 'Published' : 'Hidden'}</span></td>
-                <td class="text-right">
+                <td class="text-right whitespace-nowrap">
                     <button class="btn-action" onclick="toggleReview('${r.id}', ${!r.published})" title="${r.published ? 'Hide' : 'Publish'}"><i class="fa-solid ${r.published ? 'fa-eye-slash' : 'fa-eye'}"></i></button>
+                    ${editBtn}
                     ${deleteBtn}
                 </td>
             </tr>
@@ -750,7 +751,7 @@
         } catch(e) { showToast("Failed to update.", "error"); }
     }
 
-    // --- MANUAL REVIEW ADDITION LOGIC ---
+   // --- MANUAL REVIEW ADDITION & EDITING LOGIC ---
     function setupAdminStars() {
         const stars = document.querySelectorAll('#admin-rev-stars i');
         const input = document.getElementById('admin-rev-rating');
@@ -773,10 +774,35 @@
 
     window.openAdminReviewModal = () => {
         document.getElementById('admin-review-form').reset();
+        document.getElementById('admin-rev-id').value = '';
+        document.getElementById('admin-review-modal-title').innerText = 'Add Manual Review';
         document.getElementById('admin-rev-rating').value = 5;
         document.querySelectorAll('#admin-rev-stars i').forEach(s => {
             s.classList.add('fa-solid', 'text-yellow-500');
             s.classList.remove('fa-regular', 'text-gray-300', 'dark:text-gray-600');
+        });
+        document.getElementById('admin-rev-publish').checked = true;
+        openModal('admin-review-modal', 'admin-review-box');
+    }
+
+    window.editReview = (id) => {
+        const r = allReviews.find(x => x.id === id);
+        if(!r) return;
+        document.getElementById('admin-rev-id').value = r.id;
+        document.getElementById('admin-review-modal-title').innerText = 'Edit Review';
+        document.getElementById('admin-rev-name').value = r.name;
+        document.getElementById('admin-rev-text').value = r.review_text;
+        document.getElementById('admin-rev-rating').value = r.rating;
+        document.getElementById('admin-rev-publish').checked = r.published;
+        
+        document.querySelectorAll('#admin-rev-stars i').forEach(s => {
+            if (parseInt(s.getAttribute('data-val')) <= r.rating) {
+                s.classList.add('fa-solid', 'text-yellow-500');
+                s.classList.remove('fa-regular', 'text-gray-300', 'dark:text-gray-600');
+            } else {
+                s.classList.remove('fa-solid', 'text-yellow-500');
+                s.classList.add('fa-regular', 'text-gray-300', 'dark:text-gray-600');
+            }
         });
         openModal('admin-review-modal', 'admin-review-box');
     }
@@ -788,26 +814,45 @@
         btn.disabled = true;
 
         try {
+            const reviewId = document.getElementById('admin-rev-id').value;
+            const isPublished = document.getElementById('admin-rev-publish').checked;
+            
             const payload = {
                 name: document.getElementById('admin-rev-name').value,
                 rating: parseInt(document.getElementById('admin-rev-rating').value),
                 review_text: document.getElementById('admin-rev-text').value,
-                published: false // Must insert as false initially due to RLS
             };
 
-            const { data: newReview, error: insertError } = await api.client.from('reviews').insert(payload).select().single();
-            if (insertError) throw insertError;
+            if (reviewId) {
+                // Edit Mode
+                payload.published = isPublished;
+                if (typeof api.adminUpdateReview === 'function') {
+                    await api.adminUpdateReview(reviewId, payload);
+                } else {
+                    const { error } = await api.client.from('reviews').update(payload).eq('id', reviewId);
+                    if (error) throw error;
+                }
+                showToast("Review updated successfully.");
+            } else {
+                // Insert Mode
+                payload.published = false; 
+                const { data: newReview, error: insertError } = await api.client.from('reviews').insert(payload).select().single();
+                if (insertError) throw insertError;
 
-            // If checked, publish immediately using RPC
-            if (document.getElementById('admin-rev-publish').checked && newReview?.id) {
-                await api.adminUpdateReview(newReview.id, { published: true });
+                if (isPublished && newReview?.id) {
+                    if (typeof api.adminUpdateReview === 'function') {
+                        await api.adminUpdateReview(newReview.id, { published: true });
+                    } else {
+                        await api.client.from('reviews').update({ published: true }).eq('id', newReview.id);
+                    }
+                }
+                showToast("Review added successfully.");
             }
 
-            showToast("Review added successfully.");
             closeModal('admin-review-modal', 'admin-review-box');
             loadData();
         } catch (err) {
-            showToast("Failed to add review.", "error");
+            showToast("Failed to save review.", "error");
             console.error(err);
         } finally {
             btn.innerHTML = 'Save Review';
@@ -817,14 +862,18 @@
 
     window.toggleReview = async (id, state) => {
         try {
-            await api.client.from('reviews').update({published: state}).eq('id', id);
+            if (typeof api.adminUpdateReview === 'function') {
+                await api.adminUpdateReview(id, { published: state });
+            } else {
+                const { error } = await api.client.from('reviews').update({published: state}).eq('id', id);
+                if (error) throw error;
+            }
             showToast(state ? "Review Published" : "Review Hidden");
             loadData();
         } catch(e) { showToast("Failed to update review.", "error"); }
     }
 
-    window.deleteReview = (id) => {
-        if(currentAdminRole !== 'admin') return;
+    window.deleteReview = (id) => {     if(currentAdminRole !== 'admin') return;
         document.getElementById('confirm-btn').onclick = async () => {
             try {
                 await api.adminDeleteReview(id);
