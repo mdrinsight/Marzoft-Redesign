@@ -4,26 +4,32 @@
     'use strict';
 
     const SUPABASE_URL = 'https://thkmhncbievuqlcbtzyj.supabase.co';
-    // PASTE YOUR REAL ANON KEY BELOW (It should start with eyJ...)
-    const SUPABASE_ANON_KEY = 'sb_publishable_8IKur53fQm-piPGMD45dDQ_MqEA8hQd';
-    
-    const configured = /^https:\/\/.+\.supabase\.co$/i.test(SUPABASE_URL) && !SUPABASE_ANON_KEY.startsWith('PASTE_');
+    const SUPABASE_ANON_KEY = 'sb_publishable_8IKur53fQm-piPGMD45dDQ_MqEA8hQd'; // <-- PASTE YOUR LONG eyJ... KEY HERE
 
     const unavailable = (message = 'Supabase is not configured yet.') => ({ data: null, error: new Error(message) });
 
     let client = null;
-    if (configured && window.supabase?.createClient) {
+    if (window.supabase) {
         client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-            auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
+            auth: { 
+                persistSession: true, 
+                autoRefreshToken: true, 
+                detectSessionInUrl: true,
+                storageKey: 'marzoft-auth-token' // Forces reliable local storage
+            }
         });
+    } else {
+        console.error("Supabase library failed to load from the CDN.");
     }
 
     const needClient = () => client ? null : unavailable();
+    
     const getUser = async () => {
         const missing = needClient();
         if (missing) return missing;
         return client.auth.getUser();
     };
+
     const requireUser = async () => {
         const result = await getUser();
         if (result.error) throw result.error;
@@ -31,6 +37,7 @@
         if (!user) throw new Error('Please sign in before continuing.');
         return user;
     };
+
     const rpc = async (name, params = {}) => {
         const missing = needClient();
         if (missing) return missing;
@@ -108,6 +115,7 @@
         adminDeleteReview(id) { return rpc('admin_delete_review', { p_review_id: id }); },
         adminSetSetting(key, value) { return rpc('admin_set_setting', { p_key: key, p_value: value }); },
         adminUpdateRole(userId, newRole) { return rpc('admin_update_role', { p_user_id: userId, p_role: newRole }); },
+        adminUpdateStaff(userId, newRole, jobTitle) { return rpc('admin_update_staff', { p_user_id: userId, p_role: newRole, p_job_title: jobTitle }); },
         
         isAdmin() { return rpc('is_admin'); },
         isStaffOrAdmin() { return rpc('is_staff_or_admin'); }

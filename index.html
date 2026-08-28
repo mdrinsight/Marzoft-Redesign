@@ -4482,14 +4482,22 @@
             };
 
             const waitForRedirectUser = async (client) => {
-                for (let attempt = 0; attempt < 8; attempt += 1) {
-                    const sessionResult = await client.auth.getSession();
-                    if (sessionResult?.error && attempt === 7) throw sessionResult.error;
-                    const user = sessionResult?.data?.session?.user || null;
-                    if (user) return user;
-                    await new Promise((resolve) => window.setTimeout(resolve, 180 + attempt * 45));
-                }
-                return null;
+                let sessionResult = await client.auth.getSession();
+                if (sessionResult?.data?.session?.user) return sessionResult.data.session.user;
+                return new Promise((resolve, reject) => {
+                    const { data: { subscription } } = client.auth.onAuthStateChange((event, session) => {
+                        if (session?.user) {
+                            subscription.unsubscribe();
+                            resolve(session.user);
+                        }
+                    });
+                    setTimeout(async () => {
+                        subscription.unsubscribe();
+                        const finalRes = await client.auth.getSession();
+                        if (finalRes?.error) reject(finalRes.error);
+                        else resolve(finalRes?.data?.session?.user || null);
+                    }, 4000);
+                });
             };
 
             const requestPayload = (user) => ({
@@ -4533,10 +4541,10 @@
                 setStatus('', 'error', false);
                 if (authEntry === 'project') writeDraft();
                 const { facade, client } = resolveBackend();
-                const redirect = new URL(window.location.href);
+const redirect = new URL(window.location.href);
+                redirect.hash = ''; // Clear hash so Supabase token parser doesn't break
                 redirect.searchParams.set('project_auth', 'google');
                 redirect.searchParams.set('project_intent', authEntry);
-                redirect.hash = 'booking';
                 rememberAuthIntent(authEntry);
                 setLoading(true);
 
@@ -4576,9 +4584,9 @@
                     metadata: { full_name: draft.name || '' },
                     redirectTo: (() => {
                         const redirect = new URL(window.location.href);
+                        redirect.hash = ''; // Clear hash so Supabase token parser doesn't break
                         redirect.searchParams.set('project_auth', 'email');
                         redirect.searchParams.set('project_intent', authEntry);
-                        redirect.hash = 'booking';
                         return redirect.toString();
                     })()
                 };
@@ -5094,22 +5102,30 @@
             };
 
             const waitForRedirectUser = async (client) => {
-                for (let attempt = 0; attempt < 8; attempt += 1) {
-                    const result = await client.auth.getSession();
-                    if (result?.error && attempt === 7) throw result.error;
-                    const user = result?.data?.session?.user || null;
-                    if (user) return user;
-                    await new Promise((resolve) => window.setTimeout(resolve, 180 + attempt * 45));
-                }
-                return null;
+                let result = await client.auth.getSession();
+                if (result?.data?.session?.user) return result.data.session.user;
+                return new Promise((resolve, reject) => {
+                    const { data: { subscription } } = client.auth.onAuthStateChange((event, session) => {
+                        if (session?.user) {
+                            subscription.unsubscribe();
+                            resolve(session.user);
+                        }
+                    });
+                    setTimeout(async () => {
+                        subscription.unsubscribe();
+                        const finalRes = await client.auth.getSession();
+                        if (finalRes?.error) reject(finalRes.error);
+                        else resolve(finalRes?.data?.session?.user || null);
+                    }, 4000);
+                });
             };
 
             const dashboard = () => { window.location.href = 'client-dashboard.html'; };
 
             const authRedirectUrl = (provider) => {
                 const url = new URL(window.location.href);
+                url.hash = ''; // Clear hash so Supabase token parser doesn't break
                 url.searchParams.set('portal_auth', provider);
-                url.hash = 'client-login';
                 return url.toString();
             };
 
@@ -5862,7 +5878,7 @@
                 if (isOpen && !widget.contains(event.target)) close();
             });
             window.addEventListener('marzoft:close-whatsapp-composer', close);
-            (async () => {
+       (async () => {
                 try {
                     const api = window.marzoftBackend || window.MarzoftSupabase || window.AdminAPI;
                     const config = typeof api?.getConfig === 'function' ? await api.getConfig() : null;
@@ -5871,6 +5887,135 @@
                 } catch (_) { /* local preview uses the fallback number */ }
             })();
             updateSend();
+        })();
+
+        // 13. Global Auth State UI Manager - Personalized Greeting & Dashboard Routing
+        (async () => {
+            const api = window.marzoftBackend || window.MarzoftSupabase || window.marzoftSupabase;
+            if (!api || !api.client) return;
+
+            try {
+                const { data: { session } } = await api.client.auth.getSession();
+                if (!session?.user) return; // Not logged in
+const user = session.user;
+                const fullName = user.user_metadata?.full_name || user.email?.split('@')[0] || 'there';
+
+                // 1. Update Login Buttons to "Dashboard"
+                document.querySelectorAll('[data-auth-portal-open]').forEach(btn => {
+                    const hasIcon = btn.querySelector('i');
+                    if (hasIcon) {
+                        btn.innerHTML = `<i><i class="fa-solid fa-user" style="font-size: inherit;"></i></i> Dashboard`;
+                    } else {
+                        btn.innerHTML = `<i class="fa-solid fa-user" style="margin-right: 6px;"></i> Dashboard`;
+                    }
+                    
+                    // Prevent portal from opening, redirect to dashboard instead
+                    btn.removeAttribute('data-auth-portal-open');
+                    
+                    // Clone the node to strip all existing JS event listeners
+                    const newBtn = btn.cloneNode(true);
+                    btn.parentNode.replaceChild(newBtn, btn);
+                    
+                    newBtn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        window.location.href = 'client-dashboard.html';
+                    });
+                });
+
+              // 2. Welcome Back Overlay - High Aesthetic Cinematic Reveal
+                if (!sessionStorage.getItem('marzoft_greeted')) {
+                    sessionStorage.setItem('marzoft_greeted', 'true');
+                    
+                    const overlay = document.createElement('div');
+                    overlay.style.cssText = `
+                        position: fixed; inset: 0; z-index: 999999;
+                        background: rgba(255, 255, 255, 0.4);
+                        backdrop-filter: blur(40px) saturate(150%);
+                        -webkit-backdrop-filter: blur(40px) saturate(150%);
+                        display: flex; flex-direction: column; align-items: center; justify-content: center;
+                        opacity: 0; transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1);
+                        pointer-events: none; overflow: hidden;
+                    `;
+
+                    // Inject dynamic CSS animations for the ultimate smooth feel
+                    const style = document.createElement('style');
+                    style.textContent = `
+                        @keyframes mzGlowFloat1 { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(8vw, -8vh) scale(1.2); } }
+                        @keyframes mzGlowFloat2 { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(-8vw, 8vh) scale(1.1); } }
+                        @keyframes mzTextRise { 
+                            0% { transform: translateY(50px) scale(0.95); opacity: 0; filter: blur(12px); clip-path: inset(0 0 100% 0); } 
+                            100% { transform: translateY(0) scale(1); opacity: 1; filter: blur(0); clip-path: inset(0 0 -20% 0); } 
+                        }
+                    `;
+                    overlay.appendChild(style);
+
+                    // Dynamic background glowing orbs
+                    const orb1 = document.createElement('div');
+                    orb1.style.cssText = `position: absolute; width: 60vw; height: 60vw; background: radial-gradient(circle, rgba(37,99,235,0.15), transparent 70%); top: -20%; left: -10%; filter: blur(60px); animation: mzGlowFloat1 5s ease-in-out infinite alternate; z-index: 1;`;
+                    
+                    const orb2 = document.createElement('div');
+                    orb2.style.cssText = `position: absolute; width: 60vw; height: 60vw; background: radial-gradient(circle, rgba(124,58,237,0.12), transparent 70%); bottom: -20%; right: -10%; filter: blur(60px); animation: mzGlowFloat2 6s ease-in-out infinite alternate-reverse; z-index: 1;`;
+
+                    const textWrapper = document.createElement('div');
+                    textWrapper.style.cssText = `position: relative; z-index: 10; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; width: 100%;`;
+
+                    // The Kicker
+                    const eyebrow = document.createElement('div');
+                    eyebrow.style.cssText = `font-family: var(--font-sans, sans-serif); font-size: clamp(0.65rem, 2vw, 0.8rem); font-weight: 800; letter-spacing: 0.3em; text-transform: uppercase; color: #526079; animation: mzTextRise 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both;`;
+                    eyebrow.innerText = "THE STAGE IS YOURS,";
+
+                    // The Massive Aesthetic Name
+                    const nameDisplay = document.createElement('div');
+                    nameDisplay.style.cssText = `
+                        font-family: 'Instrument Serif', Georgia, serif; 
+                        font-style: italic; font-weight: 400; 
+                        font-size: clamp(4.5rem, 15vw, 11rem); 
+                        line-height: 0.95; 
+                        color: transparent; 
+                        background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 40%, #7c3aed 100%); 
+                        -webkit-background-clip: text; 
+                        background-clip: text; 
+                        padding-right: 0.05em; 
+                        animation: mzTextRise 1.3s cubic-bezier(0.16, 1, 0.3, 1) 0.25s both;
+                        max-width: 95vw;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        white-space: nowrap;
+                    `;
+                    nameDisplay.innerText = fullName;
+
+                    // The Subtext
+                    const subtext = document.createElement('div');
+                    subtext.style.cssText = `font-family: var(--font-sans, sans-serif); font-size: clamp(0.95rem, 2.5vw, 1.2rem); font-weight: 500; color: #0B1020; margin-top: 10px; animation: mzTextRise 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.4s both;`;
+                    subtext.innerHTML = `Let’s build something <b>unforgettable.</b>`;
+
+                    textWrapper.appendChild(eyebrow);
+                    textWrapper.appendChild(nameDisplay);
+                    textWrapper.appendChild(subtext);
+
+                    overlay.appendChild(orb1);
+                    overlay.appendChild(orb2);
+                    overlay.appendChild(textWrapper);
+                    document.body.appendChild(overlay);
+                    
+                    // Cinematic Animate In
+                    requestAnimationFrame(() => {
+                        overlay.style.opacity = '1';
+                    });
+                    
+                    // Hold and Cinematic Animate Out
+                    setTimeout(() => {
+                        overlay.style.opacity = '0';
+                        textWrapper.style.transform = 'translateY(-40px) scale(1.05)';
+                        textWrapper.style.filter = 'blur(15px)';
+                        textWrapper.style.opacity = '0';
+                        setTimeout(() => overlay.remove(), 1000);
+                    }, 3400); // Gives them a nice long moment to appreciate it
+                }
+            } catch (err) {
+                console.error("Auth UI Sync Error:", err);
+            }
         })();
 
     </script>

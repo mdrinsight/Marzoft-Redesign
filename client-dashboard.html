@@ -156,6 +156,25 @@
         box-shadow: 0 6px 15px rgba(0,0,0,0.05);
     }
 
+    /* Back to Website Link */
+    .btn-back {
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: var(--text-muted);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-right: 12px;
+        transition: color 0.3s var(--ease);
+    }
+    .btn-back:hover {
+        color: var(--blue-primary);
+    }
+    @media (max-width: 600px) {
+        .btn-back span { display: none; }
+        .btn-back { margin-right: 4px; font-size: 1rem; }
+    }
+
     /* Dashboard Layout - Tightened spacing for 100vh fit */
     .dashboard-main {
         flex: 1; /* Pushes footer to bottom */
@@ -479,9 +498,13 @@
             MARZOFT<span class="dot"></span>
         </a>
         <div class="nav-actions">
+            <a href="index.html" class="btn-back"><i class="fa-solid fa-arrow-left"></i> <span>Back to website</span></a>
             <div class="nav-profile" id="userProfileBadge" style="display: none;">
                 <i id="userInitial">M</i>
                 <span class="hidden-mobile" id="userName">Client</span>
+                <button id="btnEditProfile" aria-label="Edit Profile" style="color: var(--text-light); margin-left: 2px; font-size: 0.8rem; transition: color 0.3s; padding: 4px;">
+                    <i class="fa-solid fa-pen" style="background: none; width: auto; height: auto; color: inherit;"></i>
+                </button>
             </div>
             <button class="btn-logout" id="btnSignOut">Sign out</button>
         </div>
@@ -528,6 +551,20 @@
         © 2026 Marzoft Technologies. Private Client Portal.
     </div>
 </footer>
+<!-- Edit Profile Modal -->
+<div id="editProfileModal" style="display:none; position: fixed; inset: 0; z-index: 2000; background: rgba(11, 16, 32, 0.4); backdrop-filter: blur(8px); align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s ease;">
+    <div class="modal-box" style="background: #fff; width: min(400px, 90%); border-radius: 24px; padding: 32px; box-shadow: 0 25px 50px rgba(0,0,0,0.2); transform: translateY(20px); transition: transform 0.4s ease;">
+        <h3 style="font-family: var(--font-display); font-size: 1.5rem; font-weight: 800; margin-bottom: 8px;">Edit Profile</h3>
+        <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 24px;">Update how your name appears in the workspace.</p>
+        
+        <input type="text" id="editNameInput" style="width: 100%; padding: 14px 16px; border: 1px solid var(--border-light); border-radius: 12px; font-family: var(--font-sans); font-size: 0.95rem; outline: none; margin-bottom: 24px; color: var(--text-navy); font-weight: 600;" placeholder="Your full name">
+        
+        <div style="display: flex; gap: 12px;">
+            <button id="btnCancelEdit" style="flex: 1; padding: 12px; border: 1px solid var(--border-light); border-radius: 12px; font-weight: 700; color: var(--text-navy); transition: background 0.3s ease;">Cancel</button>
+            <button id="btnSaveEdit" style="flex: 2; padding: 12px; background: var(--blue-primary); color: #fff; border-radius: 12px; font-weight: 700; box-shadow: 0 8px 20px rgba(37,99,235,0.25); transition: background 0.3s ease, transform 0.3s ease;">Save Changes</button>
+        </div>
+    </div>
+</div>
 
 <!-- Supabase & Backend Scripts -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
@@ -573,6 +610,60 @@
         btnSignOut.addEventListener('click', async () => {
             await api.signOut();
             window.location.href = 'index.html';
+        });
+
+        // 5. Edit Profile Logic
+        const btnEditProfile = document.getElementById('btnEditProfile');
+        const editProfileModal = document.getElementById('editProfileModal');
+        const editNameInput = document.getElementById('editNameInput');
+        const btnCancelEdit = document.getElementById('btnCancelEdit');
+        const btnSaveEdit = document.getElementById('btnSaveEdit');
+
+        const closeEditModal = () => {
+            editProfileModal.style.opacity = '0';
+            editProfileModal.querySelector('.modal-box').style.transform = 'translateY(20px)';
+            setTimeout(() => editProfileModal.style.display = 'none', 300);
+        };
+
+        btnEditProfile.addEventListener('click', () => {
+            editNameInput.value = userNameDisplay.textContent;
+            editProfileModal.style.display = 'flex';
+            void editProfileModal.offsetWidth; // trigger reflow
+            editProfileModal.style.opacity = '1';
+            editProfileModal.querySelector('.modal-box').style.transform = 'translateY(0)';
+        });
+
+        btnCancelEdit.addEventListener('click', closeEditModal);
+        
+        btnCancelEdit.addEventListener('mouseover', () => btnCancelEdit.style.background = '#F8FAFC');
+        btnCancelEdit.addEventListener('mouseout', () => btnCancelEdit.style.background = 'transparent');
+
+        btnSaveEdit.addEventListener('click', async () => {
+            const newName = editNameInput.value.trim();
+            if (!newName) return;
+            
+            btnSaveEdit.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i>';
+            btnSaveEdit.style.pointerEvents = 'none';
+
+            try {
+                const { error } = await api.client.auth.updateUser({
+                    data: { full_name: newName }
+                });
+
+                if (error) throw error;
+
+                // Update UI instantly
+                userNameDisplay.textContent = newName;
+                userInitialDisplay.textContent = newName.charAt(0).toUpperCase();
+                closeEditModal();
+
+            } catch (err) {
+                console.error("Update Error:", err);
+                alert("Could not update name. Please try again.");
+            } finally {
+                btnSaveEdit.innerHTML = 'Save Changes';
+                btnSaveEdit.style.pointerEvents = 'auto';
+            }
         });
 
         // Status Badge Formatting Helper
