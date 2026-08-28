@@ -4,7 +4,9 @@
     'use strict';
 
     const SUPABASE_URL = 'https://thkmhncbievuqlcbtzyj.supabase.co';
+    // PASTE YOUR REAL ANON KEY BELOW (It should start with eyJ...)
     const SUPABASE_ANON_KEY = 'sb_publishable_8IKur53fQm-piPGMD45dDQ_MqEA8hQd';
+    
     const configured = /^https:\/\/.+\.supabase\.co$/i.test(SUPABASE_URL) && !SUPABASE_ANON_KEY.startsWith('PASTE_');
 
     const unavailable = (message = 'Supabase is not configured yet.') => ({ data: null, error: new Error(message) });
