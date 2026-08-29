@@ -16,7 +16,16 @@
     <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Caveat:wght@600;700&family=DM+Serif+Display:ital@0;1&family=Instrument+Serif:ital@0;1&family=Newsreader:ital,opsz,wght@1,6..72,400;1,6..72,500;1,6..72,600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Onest:wght@500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Instant Dark Mode Persistence (Prevents white flash on load) -->
+    <script>
+        if (localStorage.getItem('mz_theme') === 'dark' || (!('mz_theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    </script>
 
     <style>
         /* ==========================================================================
@@ -67,12 +76,493 @@
             --my: 0px;
         }
 
+ /* ==========================================================================
+           MARZOFT AUDITED MASTER DARK SYSTEM (ZERO INVISIBLE TEXTS • 100% COHESIVE)
+           ========================================================================== */
+        
+        /* 1. Theme Switcher Orb */
+        .theme-toggle-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            background: #FFFFFF;
+            color: #0F172A;
+            display: grid;
+            place-items: center;
+            font-size: 0.9rem;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            cursor: pointer;
+        }
+        .theme-toggle-btn:hover {
+            transform: scale(1.08);
+            border-color: #2563EB;
+            color: #2563EB;
+        }
+        .dark-icon-sun { display: none; }
+        .dark-icon-moon { display: block; }
+
+        /* 2. Core Tokens */
+        html.dark {
+            --bg-canvas: #060A18;
+            --bg-offwhite: #0A0F24;
+            --text-navy: #FFFFFF;
+            --text-muted: #94A3B8;
+            --text-light: #64748B;
+            --blue-primary: #3B82F6;
+            --blue-hover: #60A5FA;
+            --blue-soft: rgba(59, 130, 246, 0.15);
+            --blue-sky: rgba(59, 130, 246, 0.25);
+            --border-light: rgba(255, 255, 255, 0.08);
+            --border-subtle: rgba(255, 255, 255, 0.04);
+            --shadow-subtle: 0 8px 30px rgba(0, 0, 0, 0.5);
+            --shadow-card: 0 20px 50px rgba(0, 0, 0, 0.6);
+        }
+
+        html.dark body {
+            background-color: #060A18 !important;
+            color: #FFFFFF !important;
+        }
+
+        html.dark .theme-toggle-btn {
+            background: rgba(14, 22, 52, 0.9);
+            border-color: rgba(96, 165, 250, 0.3);
+            color: #F8FAFC;
+            box-shadow: 0 0 15px rgba(37, 99, 235, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+        }
+        html.dark .theme-toggle-btn:hover {
+            border-color: #60A5FA;
+            color: #60A5FA;
+            transform: scale(1.1);
+        }
+        html.dark .dark-icon-sun { display: block; color: #FBBF24; filter: drop-shadow(0 0 6px rgba(251, 191, 36, 0.6)); }
+        html.dark .dark-icon-moon { display: none; }
+
+        /* 3. Navigation Bar (Frosted Midnight Capsule with White Brand) */
+        html.dark .past-nav-glass {
+            background: linear-gradient(105deg, rgba(8, 14, 36, 0.92), rgba(12, 22, 54, 0.88)) !important;
+            border: 1px solid rgba(255, 255, 255, 0.14) !important;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
+            backdrop-filter: blur(28px) saturate(180%) !important;
+        }
+        html.dark .past-nav-brand {
+            color: #FFFFFF !important;
+        }
+        html.dark .past-nav-brand i {
+            background: #3B82F6 !important;
+            box-shadow: 0 0 12px #3B82F6, 0 0 24px rgba(59, 130, 246, 0.6) !important;
+        }
+        html.dark .past-nav-links a,
+        html.dark .past-nav-login {
+            color: #94A3B8 !important;
+        }
+        html.dark .past-nav-links a:hover, 
+        html.dark .past-nav-links a.is-current,
+        html.dark .past-nav-login:hover {
+            color: #FFFFFF !important;
+        }
+        html.dark .past-nav-links a::after {
+            background: #3B82F6 !important;
+            box-shadow: 0 0 10px #3B82F6;
+        }
+        html.dark .past-nav-project {
+            background: linear-gradient(135deg, #2563EB, #1D4ED8) !important;
+            box-shadow: 0 10px 25px rgba(37, 99, 235, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.25) !important;
+        }
+
+        /* 4. Global Electric Blue Keyword Accents */
+        html.dark .split-title .split-blue,
+        html.dark .hero-headline .blue-text,
+        html.dark .section-headline span,
+        html.dark .final-cta-text-col h2 em,
+        html.dark .faq-intro h2 em,
+        html.dark .approach-intro h2 span {
+            color: #3B82F6 !important;
+            background: none !important;
+            -webkit-text-fill-color: #3B82F6 !important;
+            display: inline-block;
+        }
+
+        /* 5. Hero Section (Fixes Black Invisible Text in Hero) */
+        html.dark .studio-split-hero {
+            background: 
+                radial-gradient(circle at 85% 15%, rgba(37, 99, 235, 0.22) 0%, transparent 50%),
+                radial-gradient(circle at 10% 85%, rgba(124, 58, 237, 0.12) 0%, transparent 45%),
+                #060A18 !important;
+        }
+        html.dark .studio-split-hero::before { display: none !important; }
+        html.dark .split-title,
+        html.dark .split-title span {
+            color: #FFFFFF !important;
+        }
+        html.dark .split-title .split-accent {
+            color: #E2E8F0 !important;
+        }
+        html.dark .split-copy-text {
+            color: #94A3B8 !important;
+        }
+        html.dark .split-start {
+            background: linear-gradient(135deg, #2563EB, #1D4ED8) !important;
+            box-shadow: 0 14px 30px rgba(37, 99, 235, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.25) !important;
+        }
+        html.dark .split-work {
+            color: #E2E8F0 !important;
+        }
+        html.dark .split-work:hover {
+            color: #60A5FA !important;
+        }
+        html.dark .split-proof {
+            color: #64748B !important;
+        }
+        html.dark .split-proof b {
+            color: #F8FAFC !important;
+        }
+        html.dark .split-proof i {
+            color: #3B82F6 !important;
+        }
+        /* Right Hero Card: Glowing Royal Sapphire */
+        html.dark .split-panel {
+            background: linear-gradient(135deg, #09173D 0%, #122B6A 50%, #1E4ED8 100%) !important;
+            border: 1px solid rgba(96, 165, 250, 0.3) !important;
+            box-shadow: 0 35px 80px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+        }
+        html.dark .split-panel-title, 
+        html.dark .split-point strong {
+            color: #FFFFFF !important;
+        }
+        html.dark .split-panel-title em {
+            color: #93C5FD !important;
+        }
+        html.dark .split-point p {
+            color: #D1D5DB !important;
+        }
+        html.dark .split-panel-kicker {
+            color: #93C5FD !important;
+        }
+        html.dark .split-panel-mark {
+            background: rgba(255, 255, 255, 0.15) !important;
+            color: #FFFFFF !important;
+        }
+
+        /* 6. Problem Section */
+        html.dark .journey-section {
+            background: #060A18 !important;
+            border-top: 1px solid rgba(255, 255, 255, 0.06) !important;
+        }
+        html.dark .journey-connecting-line {
+            background: repeating-linear-gradient(to right, #1E293B 0, #1E293B 6px, transparent 6px, transparent 12px) !important;
+        }
+        html.dark .journey-step-card .journey-icon-circle {
+            background: rgba(14, 21, 46, 0.85) !important;
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+            color: #F8FAFC !important;
+        }
+        html.dark .step-blue .journey-icon-circle { border-color: rgba(59, 130, 246, 0.4) !important; color: #60A5FA !important; }
+        html.dark .step-pink .journey-icon-circle { border-color: rgba(236, 72, 153, 0.4) !important; color: #F472B6 !important; }
+        html.dark .step-orange .journey-icon-circle { border-color: rgba(249, 115, 22, 0.4) !important; color: #FB923C !important; }
+        html.dark .step-green .journey-icon-circle { border-color: rgba(34, 197, 94, 0.4) !important; color: #4ADE80 !important; }
+        html.dark .step-dark .journey-icon-circle { background: #2563EB !important; border-color: #3B82F6 !important; color: #FFFFFF !important; box-shadow: 0 0 25px rgba(37, 99, 235, 0.4) !important; }
+        html.dark .journey-step-title {
+            color: #FFFFFF !important;
+        }
+        html.dark .journey-step-desc {
+            color: #94A3B8 !important;
+        }
+        html.dark .journey-takeaway-card {
+            background: rgba(14, 21, 46, 0.9) !important;
+            border: 1px solid rgba(59, 130, 246, 0.35) !important;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6) !important;
+        }
+        html.dark .journey-takeaway-text {
+            color: #F8FAFC !important;
+        }
+
+        /* 7. Process Section */
+        html.dark .process-section {
+            background: #0A0F24 !important;
+            border-top: 1px solid rgba(255, 255, 255, 0.06) !important;
+        }
+        html.dark .process-step-item {
+            background: rgba(14, 21, 46, 0.75) !important;
+            border: 1px solid rgba(255, 255, 255, 0.08) !important;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.06) !important;
+            backdrop-filter: blur(16px) !important;
+        }
+        html.dark .process-step-item:hover {
+            border-color: rgba(96, 165, 250, 0.4) !important;
+            box-shadow: 0 20px 45px rgba(0, 0, 0, 0.5), 0 0 25px rgba(37, 99, 235, 0.25) !important;
+            transform: translateY(-5px) !important;
+        }
+        html.dark .process-step-name {
+            color: #FFFFFF !important;
+        }
+        html.dark .process-step-info {
+            color: #94A3B8 !important;
+        }
+        html.dark .box-idea { background: rgba(245, 158, 11, 0.12) !important; color: #FBBF24 !important; border: 1px solid rgba(245, 158, 11, 0.25); }
+        html.dark .box-design { background: rgba(236, 72, 153, 0.12) !important; color: #F472B6 !important; border: 1px solid rgba(236, 72, 153, 0.25); }
+        html.dark .box-code { background: rgba(59, 130, 246, 0.12) !important; color: #60A5FA !important; border: 1px solid rgba(59, 130, 246, 0.25); }
+        html.dark .box-test { background: rgba(34, 197, 94, 0.12) !important; color: #4ADE80 !important; border: 1px solid rgba(34, 197, 94, 0.25); }
+        html.dark .box-launch { background: rgba(168, 85, 247, 0.12) !important; color: #C084FC !important; border: 1px solid rgba(168, 85, 247, 0.25); }
+
+        /* 8. Approach Section */
+        html.dark .approach-section {
+            background: #060A18 !important;
+            border-top: 1px solid rgba(255, 255, 255, 0.06) !important;
+        }
+        html.dark .approach-intro h2 {
+            color: #FFFFFF !important;
+        }
+        html.dark .approach-intro p {
+            color: #94A3B8 !important;
+        }
+        html.dark .approach-statement {
+            background: radial-gradient(circle at 105% 0, rgba(37, 99, 235, 0.35) 0, transparent 45%),
+                        linear-gradient(135deg, #09173D 0%, #122B6A 100%) !important;
+            border: 1px solid rgba(96, 165, 250, 0.25) !important;
+            box-shadow: 0 35px 80px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
+        }
+
+        /* 9. Reviews Section (Fixes Black Invisible "Client testimonials" Title) */
+        html.dark .past-reviews-section {
+            background: #0A0F24 !important;
+            border-top: 1px solid rgba(255, 255, 255, 0.06) !important;
+        }
+        html.dark .past-reviews-heading h2 {
+            color: #FFFFFF !important;
+        }
+        html.dark .past-reviews-heading p {
+            color: #60A5FA !important;
+        }
+        html.dark .past-reviews-heading small {
+            color: #94A3B8 !important;
+        }
+        /* Inactive Review Cards */
+        html.dark .past-reviews-section .review-card,
+        html.dark .past-reviews-section .review-empty-card {
+            background: rgba(14, 21, 46, 0.65) !important;
+            border: 1px solid rgba(255, 255, 255, 0.08) !important;
+            color: #F8FAFC !important;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.06) !important;
+            backdrop-filter: blur(14px) !important;
+        }
+        /* Active Review Card */
+        html.dark .past-reviews-section .review-card.is-active {
+            background: linear-gradient(145deg, #0C1738 0%, #112354 100%) !important;
+            border: 1px solid rgba(96, 165, 250, 0.45) !important;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6), 0 0 35px rgba(37, 99, 235, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
+            opacity: 1 !important;
+        }
+        html.dark .past-reviews-section .review-card blockquote {
+            color: #F8FAFC !important;
+        }
+        html.dark .past-reviews-section .review-person-copy strong {
+            color: #FFFFFF !important;
+        }
+        html.dark .past-reviews-section .review-person-copy span {
+            color: #94A3B8 !important;
+        }
+        html.dark .past-reviews-section .review-number {
+            background: rgba(37, 99, 235, 0.18) !important;
+            border-color: rgba(96, 165, 250, 0.3) !important;
+            color: #60A5FA !important;
+        }
+        html.dark .past-review-arrow {
+            background: #0E152E !important;
+            border: 1px solid rgba(255, 255, 255, 0.12) !important;
+            color: #FFFFFF !important;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4) !important;
+        }
+        html.dark .past-review-arrow:hover:not(:disabled) {
+            background: #2563EB !important;
+            border-color: #2563EB !important;
+            color: #FFFFFF !important;
+        }
+
+        /* 10. FAQ Section (Fixes Invisible Plus Icons & White Note Card) */
+        html.dark .faq-section {
+            background: #060A18 !important;
+            border-top: 1px solid rgba(255, 255, 255, 0.06) !important;
+        }
+        html.dark .faq-intro h2 {
+            color: #FFFFFF !important;
+        }
+        html.dark .faq-intro > p {
+            color: #94A3B8 !important;
+        }
+        html.dark .faq-intro-note {
+            background: rgba(14, 21, 46, 0.85) !important;
+            border: 1px solid rgba(255, 255, 255, 0.08) !important;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4) !important;
+        }
+        html.dark .faq-intro-note p {
+            color: #94A3B8 !important;
+        }
+        html.dark .faq-intro-note b {
+            color: #FFFFFF !important;
+        }
+        html.dark .faq-accordion-list {
+            background: rgba(14, 21, 46, 0.75) !important;
+            border: 1px solid rgba(255, 255, 255, 0.08) !important;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.06) !important;
+            backdrop-filter: blur(16px) !important;
+        }
+        html.dark .faq-item {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
+        }
+        html.dark .faq-header {
+            color: #FFFFFF !important;
+        }
+        html.dark .faq-icon {
+            background: #1A233D !important;
+            border: 1px solid rgba(255, 255, 255, 0.12) !important;
+            color: #FFFFFF !important;
+        }
+        html.dark .faq-item.active .faq-icon {
+            background: #2563EB !important;
+            border-color: #2563EB !important;
+            color: #FFFFFF !important;
+            box-shadow: 0 0 15px rgba(37, 99, 235, 0.4) !important;
+        }
+        html.dark .faq-body {
+            color: #94A3B8 !important;
+        }
+
+        /* 11. Final CTA & Booking Card (High-Contrast Porcelain Card with Dark Text) */
+        html.dark .final-cta-section {
+            background: #060A18 !important;
+        }
+        html.dark .final-action-card,
+        html.dark .project-flow-card {
+            background: #FFFFFF !important;
+            border: 1px solid rgba(255, 255, 255, 0.6) !important;
+            box-shadow: 0 35px 90px rgba(0, 0, 0, 0.85), 0 0 60px rgba(37, 99, 235, 0.2) !important;
+            color: #0B1020 !important;
+        }
+        html.dark .final-action-card .final-card-title,
+        html.dark .project-flow-card .final-card-title {
+            color: #0B1020 !important;
+            text-shadow: none !important;
+        }
+        html.dark .final-action-card .final-card-desc,
+        html.dark .project-flow-card .final-card-desc {
+            color: #526079 !important;
+        }
+        html.dark .final-card-eyebrow {
+            color: #2563EB !important;
+        }
+        html.dark .project-intro-hint {
+            color: #94A3B8 !important;
+        }
+        html.dark .project-flow-card .final-card-btn,
+        html.dark .project-intro-cta {
+            background: #0B1020 !important;
+            color: #FFFFFF !important;
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.3) !important;
+        }
+        html.dark .project-flow-card .final-card-btn:hover,
+        html.dark .project-intro-cta:hover {
+            background: #2563EB !important;
+            color: #FFFFFF !important;
+        }
+        html.dark .project-flow-progress {
+            background: rgba(255, 255, 255, 0.95) !important;
+            border-bottom: 1px solid #E2E8F0 !important;
+        }
+        html.dark .project-progress-label, 
+        html.dark .project-progress-count {
+            color: #64748B !important;
+        }
+        html.dark .project-progress-track {
+            background: #E2E8F0 !important;
+        }
+        html.dark .project-panel-heading h3 {
+            color: #0B1020 !important;
+        }
+        html.dark .project-panel-heading p {
+            color: #526079 !important;
+        }
+        html.dark .project-choice {
+            background: #F8FAFC !important;
+            border-color: #E2E8F0 !important;
+            color: #0B1020 !important;
+        }
+        html.dark .project-choice:hover {
+            border-color: #93C5FD !important;
+            background: #FFFFFF !important;
+        }
+        html.dark .project-choice.is-selected {
+            background: #EFF6FF !important;
+            border-color: #2563EB !important;
+            color: #2563EB !important;
+        }
+        html.dark .project-goal {
+            background: #F8FAFC !important;
+            border-color: #E2E8F0 !important;
+            color: #526079 !important;
+        }
+        html.dark .project-goal.is-selected {
+            background: #2563EB !important;
+            color: #FFFFFF !important;
+            border-color: #2563EB !important;
+        }
+        html.dark .project-field input, 
+        html.dark .project-field textarea, 
+        html.dark .project-field select {
+            background: #F8FAFC !important;
+            border-color: #E2E8F0 !important;
+            color: #0B1020 !important;
+        }
+        html.dark .project-next {
+            background: #0B1020 !important;
+            color: #FFFFFF !important;
+        }
+
+        /* 12. Badges, Eyebrows & Modals (Fixes White Eyebrow Blobs) */
+        html.dark .eyebrow-pill {
+            background: rgba(14, 21, 46, 0.85) !important;
+            border: 1px solid rgba(59, 130, 246, 0.3) !important;
+            color: #60A5FA !important;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4) !important;
+        }
+        html.dark .section-headline {
+            color: #FFFFFF !important;
+        }
+        html.dark .mobile-drawer {
+            background: #060A18 !important;
+            color: #FFFFFF !important;
+        }
+        html.dark .mobile-drawer .mobile-menu-list a {
+            color: #FFFFFF !important;
+        }
+        html.dark .past-review-modal-shell {
+            background: #0E152E !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            color: #FFFFFF !important;
+        }
+        html.dark .past-review-modal h2 {
+            color: #FFFFFF !important;
+        }
+        html.dark .past-floating-field input, 
+        html.dark .past-floating-field textarea {
+            background: #060A18 !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            color: #FFFFFF !important;
+        }
+        html.dark .past-floating-field > span {
+            color: #94A3B8 !important;
+        }
+        html.dark .past-review-cancel {
+            background: #141C38 !important;
+            border-color: rgba(255, 255, 255, 0.1) !important;
+            color: #FFFFFF !important;
+        }
         *, *::before, *::after {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
         }
-
         html, body {
             margin: 0;
             padding: 0;
@@ -2991,7 +3481,12 @@
                     <a href="#process">Process</a>
                     <a href="#reviews">Reviews</a>
                 </div>
-                <div class="past-nav-actions">
+               <div class="past-nav-actions">
+                    <!-- Theme Switcher Button -->
+                    <button type="button" class="theme-toggle-btn" id="themeToggle" aria-label="Toggle Theme">
+                        <i class="fa-solid fa-moon dark-icon-moon"></i>
+                        <i class="fa-solid fa-sun dark-icon-sun"></i>
+                    </button>
                     <button type="button" class="past-nav-login" data-auth-portal-open>Client login</button>
                     <a href="#booking" class="past-nav-project" data-nav-project><span>Have a project?</span><i aria-hidden="true">↗</i></a>
                     <button class="past-menu-toggle" id="menuToggle" type="button" aria-label="Open Navigation Menu" aria-expanded="false"><span></span><span></span></button>
@@ -6071,10 +6566,20 @@ const redirect = new URL(window.location.href);
                         setTimeout(() => overlay.remove(), 800);
                     }, 2400); 
                 }
-            } catch (err) {
+          } catch (err) {
                 console.error("Auth UI Sync Error:", err);
             }
         })();
+
+        // ======================================================================
+        // THEME SWITCHER ENGINE (LIGHT / DARK)
+        // ======================================================================
+        window.toggleTheme = () => {
+            document.documentElement.classList.toggle('dark');
+            const isDark = document.documentElement.classList.contains('dark');
+            localStorage.setItem('mz_theme', isDark ? 'dark' : 'light');
+        };
+        document.getElementById('themeToggle')?.addEventListener('click', window.toggleTheme);
     </script>
 </body>
 </html>
