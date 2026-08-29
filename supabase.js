@@ -115,8 +115,9 @@
         adminDeleteReview(id) { return rpc('admin_delete_review', { p_review_id: id }); },
         adminSetSetting(key, value) { return rpc('admin_set_setting', { p_key: key, p_value: value }); },
         adminUpdateRole(userId, newRole) { return rpc('admin_update_role', { p_user_id: userId, p_role: newRole }); },
-        adminUpdateStaff(userId, newRole, jobTitle) { return rpc('admin_update_staff', { p_user_id: userId, p_role: newRole, p_job_title: jobTitle }); },
-        
+getPublicSetting(key) { return rpc('get_public_setting', { p_key: key }); },
+        setAdminPassword(password) { return rpc('set_admin_password', { new_password: password }); },
+        verifyAdminPassword(password) { return rpc('verify_admin_password', { typed_password: password }); },
         isAdmin() { return rpc('is_admin'); },
         isStaffOrAdmin() { return rpc('is_staff_or_admin'); }
     };

@@ -2756,7 +2756,7 @@
         .whatsapp-composer { position:fixed; z-index:3500; inset:0; display:grid; padding:18px; place-items:center; opacity:0; visibility:hidden; pointer-events:none; transition:opacity .4s ease,visibility .4s ease; }
         .whatsapp-composer.is-open { opacity:1; visibility:visible; pointer-events:auto; }
         .whatsapp-composer-backdrop { position:absolute; inset:0; width:100%; height:100%; border:0; background:rgba(6,13,32,.66); backdrop-filter:blur(24px) saturate(116%); -webkit-backdrop-filter:blur(24px) saturate(116%); }
-        .whatsapp-composer-shell { position:relative; width:min(720px,100%); max-height:calc(100dvh - 36px); padding:28px clamp(25px,5vw,52px) 35px; overflow:auto; color:#101a32; border:1px solid rgba(255,255,255,.65); border-radius:38px; background:linear-gradient(155deg,#fff 0%,#fafcff 67%,#eef4ff 100%); box-shadow:0 55px 160px rgba(4,10,29,.48); opacity:0; transform:translateY(34px) scale(.965); transition:opacity .4s ease,transform .85s cubic-bezier(.16,1,.3,1); isolation:isolate; }
+       .whatsapp-composer-shell { position:relative; width:min(440px,100%); max-height:calc(100dvh - 36px); padding:28px clamp(25px,5vw,52px) 35px; overflow:auto; color:#101a32; border:1px solid rgba(255,255,255,.65); border-radius:38px; background:linear-gradient(155deg,#fff 0%,#fafcff 67%,#eef4ff 100%); box-shadow:0 55px 160px rgba(4,10,29,.48); opacity:0; transform:translateY(34px) scale(.965); transition:opacity .4s ease,transform .85s cubic-bezier(.16,1,.3,1); isolation:isolate; }
         .whatsapp-composer.is-open .whatsapp-composer-shell { opacity:1; transform:none; }
         .whatsapp-composer-ambient { position:absolute; z-index:-1; inset:0; overflow:hidden; pointer-events:none; }.whatsapp-composer-ambient::before { content:""; position:absolute; width:480px; height:480px; right:-290px; top:-270px; border:1px solid rgba(45,99,232,.12); border-radius:50%; box-shadow:0 0 0 58px rgba(45,99,232,.026),0 0 0 122px rgba(45,99,232,.015); }.whatsapp-composer-ambient i { position:absolute; width:290px; height:290px; left:-150px; bottom:-180px; border-radius:50%; background:radial-gradient(circle,rgba(42,211,120,.12),transparent 67%); filter:blur(8px); }.whatsapp-composer-ambient b { position:absolute; width:240px; height:240px; right:-70px; bottom:-110px; border-radius:50%; background:radial-gradient(circle,rgba(75,112,239,.17),transparent 70%); filter:blur(9px); }.whatsapp-composer-ambient span { position:absolute; right:2%; bottom:-.22em; color:rgba(42,99,231,.025); font:800 15rem/.8 'Bricolage Grotesque',sans-serif; }
         .whatsapp-composer-topbar { display:flex; align-items:center; justify-content:space-between; color:#7b879d; font-size:.51rem; font-weight:850; letter-spacing:.12em; }.whatsapp-composer-topbar > span { display:flex; align-items:center; gap:9px; }.whatsapp-composer-topbar > span i { width:8px; height:8px; border-radius:50%; background:#25d366; box-shadow:0 0 0 7px rgba(37,211,102,.1); }
@@ -2968,7 +2968,7 @@
 
         .past-review-arrow{width:44px;height:44px;font-size:1.2rem}.past-review-arrow-prev{left:5px}.past-review-arrow-next{right:5px}.past-reviews-meta{margin-top:0;font-size:.5rem}.past-reviews-progress{margin-top:12px}.past-add-review{min-height:50px;margin-top:18px;padding:0 21px;font-size:.62rem}
         .review-modal.past-review-modal{padding:18px}.past-review-modal .past-review-modal-shell{position:relative!important;width:min(500px,calc(100% - 28px))!important;height:auto!important;max-height:min(620px,calc(100dvh - 32px))!important;overflow:auto;border-radius:26px!important}.past-review-modal .review-modal-close{position:absolute!important;left:auto!important;right:14px!important;top:14px!important;z-index:10;width:36px;height:36px}.past-review-modal-content{padding:32px 34px 28px}.past-review-modal h2{padding-right:42px;font-size:clamp(2rem,3vw,2.65rem)}.past-review-modal-content>p{margin:9px 0 19px;font-size:.78rem}.past-review-brand-mark{width:18px;height:18px;border-radius:6px;font-size:.62rem}.past-review-modal .review-stars-input{margin:0 0 17px}.past-review-modal .review-stars-input label{width:38px;height:38px;font-size:1.65rem}.past-floating-field{margin-bottom:12px}.past-floating-field input,.past-floating-field textarea{padding:19px 15px 6px;border-radius:14px;font-size:.82rem}.past-floating-field input{height:52px}.past-floating-field textarea{min-height:90px;max-height:105px}.past-floating-field>span{top:19px;left:15px;font-size:.78rem}.past-floating-field small{right:12px;bottom:9px;font-size:.58rem}.past-review-modal .review-form-actions{gap:10px;margin-top:16px}.past-review-modal .review-form-actions button{min-height:48px;border-radius:14px;font-size:.59rem}.past-review-modal .review-status{min-height:14px;margin-top:8px}
-        .past-wa-box{display:flex;width:min(305px,calc(100vw - 28px));height:min(470px,calc(100dvh - 116px));flex-direction:column;border-radius:22px}.past-wa-head{flex:0 0 auto;padding:14px}.past-wa-messages{min-height:0;max-height:none;flex:1 1 auto;gap:9px;padding:14px}.past-wa-message{max-width:88%;padding:9px 10px;font-size:.7rem}.past-wa-compose{flex:0 0 auto;gap:7px;padding:10px}.past-wa-compose textarea{min-height:70px;max-height:86px;padding:10px 11px;border-radius:13px}.past-wa-send{width:41px;height:41px;border-radius:12px}.past-wa-open{width:56px;height:56px;font-size:1.6rem}
+        .past-wa-box{display:flex;width:min(305px,calc(100vw - 28px));height:min(470px,calc(100dvh - 116px));flex-direction:column;border-radius:22px}.past-wa-head{flex:0 0 auto;padding:14px}.past-wa-messages{min-height:0;max-height:none;flex:1 1 auto;gap:9px;padding:14px}.past-wa-message{max-width:88%;padding:9px 10px;font-size:.7rem}.past-wa-compose{flex:0 0 auto;gap:7px;padding:10px}.past-wa-compose textarea{min-height:41px;max-height:86px;padding:11px 13px;border-radius:12px}.past-wa-send{width:41px;height:41px;border-radius:12px}.past-wa-open{width:56px;height:56px;font-size:1.6rem}
         @media(max-width:900px){.container{width:calc(100% - 36px)}.journey-section,.process-section,.approach-section,.faq-section,.final-cta-section{min-height:auto}.studio-split-grid,.approach-reframe,.faq-reframe,.final-cta-grid{grid-template-columns:1fr}.studio-split-copy{max-width:620px}.split-panel{max-width:680px}.faq-accordion-list{max-width:none}.past-nav-links{margin-left:0}.past-reviews-section .review-card{min-height:250px}.past-review-arrow{display:none}}
         @media(max-width:768px){html{font-size:14.5px}.studio-split-hero{min-height:auto;padding:84px 0 52px}.studio-split-grid{gap:34px}.split-panel{min-height:420px}.section-padding{padding-block:64px}.past-reviews-section{padding:64px 0!important}.past-reviews-section .review-card{width:min(84vw,315px);min-height:245px}.past-review-modal .past-review-modal-shell{width:calc(100% - 20px)!important;max-height:calc(100dvh - 20px)!important}.past-review-modal-content{padding:28px 22px 22px}.past-wa-box{width:min(300px,calc(100vw - 20px));height:min(455px,calc(100dvh - 96px))}}
         @media(max-width:500px){.container{width:calc(100% - 28px)}.past-reviews-heading h2{font-size:2.55rem}.past-reviews-heading small{font-size:.79rem}.past-reviews-section .review-card,.past-reviews-section .review-empty-card{width:min(82vw,300px)}.review-modal.past-review-modal{padding:8px}.past-review-modal .past-review-modal-shell{width:calc(100% - 12px)!important;max-height:calc(100dvh - 16px)!important;border-radius:22px!important}.past-review-modal .review-modal-close{top:10px!important;right:10px!important}.past-review-modal-content{padding:26px 18px 18px}.past-review-modal h2{font-size:1.8rem}.past-review-modal .review-form-actions{gap:8px}.past-wa-box{width:calc(100vw - 20px);height:calc(100dvh - 100px)}.past-wa-widget{right:10px;bottom:14px}}
@@ -3112,7 +3112,7 @@
     <div class="past-wa-widget" id="dd-chat-widget">
         <div class="past-wa-box" id="dd-chat-box" aria-hidden="true">
             <div class="past-wa-head">
-                <div class="past-wa-identity"><span class="past-wa-avatar"><i class="fa-brands fa-whatsapp" aria-hidden="true"></i></span><div><strong>Marzoft</strong><small><i aria-hidden="true"></i> Online</small></div></div>
+                <div class="past-wa-identity"><span class="past-wa-avatar"><i class="fa-brands fa-whatsapp" aria-hidden="true"></i></span><div><strong>Marzoft</strong><small>Online</small></div></div>
                 <button type="button" class="past-wa-close" id="dd-chat-close-btn" aria-label="Close WhatsApp chat"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
             </div>
             <div class="past-wa-messages" id="dd-chat-messages" aria-live="polite"></div>
@@ -4899,7 +4899,7 @@ const redirect = new URL(window.location.href);
             });
             // The existing project hand-off continues to open the current request flow.
 
-            const openAdmin = () => { window.location.href = 'admindashboard.html'; };
+         const openAdmin = () => { window.location.href = 'adminlogin.html'; };
           logo?.addEventListener('click', (event) => {
                 event.preventDefault();
                 tapCount += 1;
@@ -4922,13 +4922,14 @@ const redirect = new URL(window.location.href);
                 typedWord = `${typedWord}${event.key.toLowerCase()}`.slice(-secretWord.length);
                 if (typedWord === secretWord) openAdmin();
             });
-            (async () => {
+        (async () => {
                 try {
-                    const api = window.marzoftBackend || window.MarzoftSupabase || window.AdminAPI;
-                    const config = typeof api?.getConfig === 'function' ? await api.getConfig() : null;
-                    const supplied = config?.security?.secretWord || config?.settings?.secretWord;
-                    if (typeof supplied === 'string' && supplied.trim()) secretWord = supplied.trim().toLowerCase();
-                } catch (_) { /* the private fallback remains available offline */ }
+                    const api = window.marzoftBackend || window.MarzoftSupabase;
+                    if (api && api.client) {
+                        const { data, error } = await api.getPublicSetting('secret_word');
+                        if (!error && data) secretWord = data.replace(/['"]/g, '').toLowerCase();
+                    }
+                } catch (_) {}
             })();
             const onScroll = () => {
                 const currentY = window.scrollY;
@@ -5780,19 +5781,19 @@ const redirect = new URL(window.location.href);
             }));
             message.addEventListener('input', updateMessageState);
 
-            form.addEventListener('submit', (event) => {
+           form.addEventListener('submit', (event) => {
                 event.preventDefault();
                 const text = message.value.trim();
                 if (!text) { message.focus(); return; }
                 const preparedMessage = /^hi\s+marzoft\b/i.test(text) ? text : `Hi Marzoft — ${text}`;
                 const url = `https://wa.me/${currentPhone}?text=${encodeURIComponent(preparedMessage)}`;
-                const link = document.createElement('a');
-                link.href = url;
-                link.target = '_blank';
-                link.rel = 'noopener noreferrer';
-                document.body.append(link);
-                link.click();
-                link.remove();
+                
+                // Directly open the WhatsApp link in a new tab
+                window.open(url, '_blank', 'noopener,noreferrer');
+                
+                // Clear the input and close the composer after a short delay
+                message.value = '';
+                updateMessageState();
                 window.setTimeout(() => closeComposer(false), reducedMotion ? 0 : 240);
             });
 
@@ -5837,12 +5838,14 @@ const redirect = new URL(window.location.href);
             const updateSend = () => {
                 const text = input.value.trim();
                 send.classList.toggle('is-disabled', !text);
-                send.href = text ? `https://wa.me/${phone}?text=${encodeURIComponent(/^hi\s+marzoft\b/i.test(text) ? text : `Hi Marzoft — ${text}`)}` : '#';
+              send.href = text ? `https://wa.me/${currentPhone}?text=${encodeURIComponent(/^hi\s+marzoft\b/i.test(text) ? text : `Hi Marzoft — ${text}`)}` : '#';
             };
-            const greet = () => {
+           const greet = () => {
                 if (greeted) return;
                 greeted = true;
-                const notes = ['Hi! I’m the Marzoft team’s digital concierge.', 'Tell us what you’re planning — we’ll point you in the right direction.'];
+                const notes = (window.dynamicWaNotes && window.dynamicWaNotes.length > 0) 
+                    ? window.dynamicWaNotes 
+                    : ['Hi! I’m the Marzoft team’s digital concierge.', 'Tell us what you’re planning — we’ll point you in the right direction.'];
                 notes.forEach((note, index) => window.setTimeout(() => addMessage(note), reducedMotion ? 0 : 420 + index * 610));
             };
             const open = (prefill = '') => {
@@ -5865,12 +5868,15 @@ const redirect = new URL(window.location.href);
             input.addEventListener('keydown', (event) => {
                 if (event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); if (!send.classList.contains('is-disabled')) send.click(); }
             });
-            send.addEventListener('click', (event) => {
-                if (send.classList.contains('is-disabled')) { event.preventDefault(); input.focus(); return; }
-                addMessage(input.value.trim(), true);
-                input.value = '';
-                updateSend();
-                window.setTimeout(close, reducedMotion ? 0 : 350);
+          send.addEventListener('click', (event) => {
+                if (send.classList.contains('is-disabled')) {
+                    event.preventDefault(); // Prevent navigating to a blank "#" link
+                    input.focus();
+                    return;
+                }
+                // The <a> tag's href is already set correctly by updateSend().
+                // We just let the browser follow the link, then close our modal.
+                window.setTimeout(close, 350);
             });
             document.addEventListener('click', (event) => {
                 const trigger = event.target.closest('[data-whatsapp-compose],a[href*="wa.me/"]');
@@ -5885,13 +5891,32 @@ const redirect = new URL(window.location.href);
                 if (isOpen && !widget.contains(event.target)) close();
             });
             window.addEventListener('marzoft:close-whatsapp-composer', close);
-       (async () => {
+   (async () => {
                 try {
                     const api = window.marzoftBackend || window.MarzoftSupabase || window.AdminAPI;
-                    const config = typeof api?.getConfig === 'function' ? await api.getConfig() : null;
-                    const configuredPhone = config?.settings?.waNumber || config?.settings?.whatsappNumber || config?.whatsappNumber;
-                    if (configuredPhone) { phone = String(configuredPhone).replace(/\D/g, '') || defaultPhone; updateSend(); }
-                } catch (_) { /* local preview uses the fallback number */ }
+                    if (api && api.client) {
+                        const { data } = await api.client.from('site_settings').select('key, value').in('key', ['whatsapp_number', 'whatsapp_greeting']);
+                        if (data) {
+                            const numSetting = data.find(s => s.key === 'whatsapp_number');
+                            const msgSetting = data.find(s => s.key === 'whatsapp_greeting');
+                            
+                          if (numSetting && numSetting.value) {
+                                currentPhone = String(numSetting.value).replace(/\D/g, '') || defaultPhone;
+                            }
+                            
+                            if (msgSetting && msgSetting.value) {
+                                try {
+                                    let parsed = typeof msgSetting.value === 'string' ? JSON.parse(msgSetting.value) : msgSetting.value;
+                                    // Guarantee it is always an array
+                                    window.dynamicWaNotes = Array.isArray(parsed) ? parsed : [parsed];
+                                } catch (e) {
+                                    window.dynamicWaNotes = [msgSetting.value];
+                                }
+                            }
+                        }
+                    }
+                    updateSend();
+                } catch (_) { /* fallback logic */ }
             })();
             updateSend();
         })();

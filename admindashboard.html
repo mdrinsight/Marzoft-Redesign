@@ -90,6 +90,12 @@
 </head>
 <body class="h-screen w-screen overflow-hidden flex relative">
 
+  <!-- SECURITY LOADER (Prevents dashboard flash for unauthorized users) -->
+  <div id="initial-loader" class="absolute inset-0 z-[9999] flex flex-col items-center justify-center bg-[var(--bg-main)] transition-opacity duration-300">
+    <i class="fa-solid fa-shield-halved text-mz-blue text-4xl mb-4 animate-pulse"></i>
+    <h2 class="font-display font-bold text-xl tracking-tight">Verifying Secure Access...</h2>
+  </div>
+
   <!-- SIDEBAR -->
   <aside class="w-64 h-full flex flex-col absolute md:relative -translate-x-full md:translate-x-0 transition-transform z-50 border-r border-[var(--border-color)]" style="background-color: var(--bg-panel) !important;" id="sidebar">
     <div class="p-6 flex justify-between items-center border-b border-[var(--border-color)]">
@@ -357,7 +363,7 @@
               <h4 class="font-bold text-sm mb-1">Admin Password</h4>
               <p class="text-xs text-[var(--text-muted)] mb-4">Change the password you use to log into this dashboard.</p>
               <div class="flex gap-2 mt-1">
-                <input type="password" id="set-sec-pwd" class="admin-input flex-1" placeholder="New password (min 8 chars)" autocomplete="new-password">
+              <input type="text" id="set-sec-pwd" class="admin-input flex-1" placeholder="Type new gateway password..." autocomplete="off">
                 <button onclick="saveAdminPassword()" class="px-6 py-2 bg-red-500 text-white font-bold rounded-xl hover:bg-red-600 transition-colors shadow-md text-sm">Update</button>
               </div>
             </div>
@@ -515,10 +521,14 @@
       if (b) { b.classList.remove('scale-95'); b.classList.add('scale-100'); }
     };
     
-    window.closeModal = (mId, bId) => {
-      const m = document.getElementById(mId), b = document.getElementById(bId);
-      if (m) { m.classList.remove('opacity-100'); setTimeout(() => m.classList.add('pointer-events-none'), 300); }
-      if (b) { b.classList.remove('scale-100'); b.classList.add('scale-95'); }
+   window.closeModal = (mId) => {
+        const m = document.getElementById(mId);
+        if (m) {
+            m.classList.remove('is-active');
+            m.classList.add('opacity-0', 'pointer-events-none');
+            const b = m.querySelector('.modal-box');
+            if(b) b.classList.remove('scale-100', 'translate-y-0');
+        }
     };
 
     window.switchSection = function(id) {
@@ -563,9 +573,8 @@
             const { data: profile } = await api.client.from('profiles').select('role').eq('id', user.id).single();
             currentAdminRole = profile?.role || 'client';
 
-            if (currentAdminRole !== 'admin' && currentAdminRole !== 'staff') {
-                await api.signOut();
-                window.location.href = 'adminlogin.html';
+         if (currentAdminRole !== 'admin' && currentAdminRole !== 'staff') {
+                window.location.replace('index.html');
                 return;
             }
 
@@ -585,11 +594,9 @@
 
             // Load data independently
             window.loadData();
-        } catch (e) {
+       } catch (e) {
             console.error("Init Error:", e);
-            clearTimeout(fallbackTimer);
-            hideLoader();
-            window.location.href = 'adminlogin.html';
+            window.location.replace('index.html');
         }
     };
 
@@ -716,10 +723,10 @@
                     ? `<input type="text" id="job-${c.id}" value="${c.job_title||''}" placeholder="e.g. Designer" class="admin-input py-2 px-3 text-xs">` 
                     : `<span class="text-xs font-semibold">${c.job_title || 'No Title'}</span>`);
             
-            const actionBtn = isMasterAdmin 
-                ? '<span class="text-[10px] font-bold tracking-widest text-[var(--text-muted)]uppercase inline-block">IMMUTABLE</span>' 
+          const actionBtn = isMasterAdmin 
+                ? '<span class="text-[10px] font-bold tracking-widest text-[var(--text-muted)] uppercase inline-block">IMMUTABLE</span>' 
                 : (currentAdminRole === 'admin' 
-                    ? `<button class="btn-action" onclick="saveTeamMember('${c.id}')"><i class="fa-solid fa-check text-green-500"></i></button><button class="btn-action btn-danger" onclick="demoteToClient('${c.id}')"><i class="fa-solid fa-user-minus"></i></button>` 
+                    ? `<button class="btn-action" onclick="saveTeamMember('${c.id}')"><i class="fa-solid fa-check text-green-500"></i></button><button class="btn-action btn-danger" style="margin-right: 0;" onclick="demoteToClient('${c.id}')"><i class="fa-solid fa-user-minus"></i></button>` 
                     : '-');
 
             return `<tr class="${isMasterAdmin ? 'master-admin-row' : ''}"><td><strong class="text-sm">${c.full_name || 'Master Admin'}</strong><br><span class="text-xs text-[var(--text-muted)]">${c.email}</span></td><td>${roleHtml}</td><td>${jobDisplay}</td><td>${actionBtn}</td></tr>`;
@@ -758,22 +765,33 @@
         `).join('');
     }
 
-    function populateSettings(settings) {
+        function populateSettings(settings) {
         if (!Array.isArray(settings)) return;
         const waNum = settings.find(s => s.key === 'whatsapp_number' || s.key === 'waNumber')?.value || '';
         let waMsgs = settings.find(s => s.key === 'whatsapp_greeting' || s.key === 'waMessages')?.value || [];
-        if (typeof waMsgs === 'string') waMsgs = [waMsgs];
+        
+        try { if (typeof waMsgs === 'string') waMsgs = JSON.parse(waMsgs); } catch(e) {}
+        if (!Array.isArray(waMsgs)) waMsgs = waMsgs ? [waMsgs] : [];
+
         const secWord = settings.find(s => s.key === 'secret_word')?.value || 'adminx';
         const alertEmail = settings.find(s => s.key === 'admin_alert_email')?.value || 'rmaaz1612@gmail.com';
 
         const setVal = (id, v) => { const el = document.getElementById(id); if (el) el.value = v; };
         const setTxt = (id, v) => { const el = document.getElementById(id); if (el) el.innerText = v; };
 
-        setVal('wa-number', String(waNum).replace(/['"]/g, ''));
+        let numStr = String(waNum).replace(/['"]/g, '');
+        if (numStr.startsWith('91') && numStr.length > 10) {
+            setVal('wa-code', '91');
+            setVal('wa-number', numStr.substring(2));
+        } else {
+            setVal('wa-code', '');
+            setVal('wa-number', numStr);
+        }
+
         setTxt('current-sec-word', String(secWord).replace(/['"]/g, ''));
         setVal('set-alert-email', String(alertEmail).replace(/['"]/g, ''));
         
-        waMessagesArray = Array.isArray(waMsgs) ? waMsgs : [];
+        waMessagesArray = waMsgs;
         if (window.renderWaMessages) window.renderWaMessages();
     }
 
@@ -883,6 +901,136 @@
         catch(e) { showToast("Delete failed.", "error"); }
     };
 
+    // --- WHATSAPP SETTINGS CONTROLLERS ---
+    window.renderWaMessages = function() {
+        const list = document.getElementById('wa-messages-list');
+        const preview = document.getElementById('wa-preview-messages');
+        if (!list || !preview) return;
+        
+        if (!Array.isArray(waMessagesArray)) waMessagesArray = [];
+        
+        let listHtml = '';
+        let previewHtml = '';
+        
+        if (waMessagesArray.length === 0) {
+            listHtml = '<p class="text-xs text-[var(--text-muted)] p-2">No messages configured. Click + Add Line.</p>';
+        } else {
+            waMessagesArray.forEach((msg, idx) => {
+                const safeMsg = String(msg || '').replace(/"/g, '&quot;');
+                listHtml += `
+                    <div class="flex gap-2 items-start mb-2">
+                        <input type="text" class="admin-input flex-1 wa-msg-input" value="${safeMsg}" oninput="window.syncWaMessages()">
+                        <button type="button" class="btn-action btn-danger shrink-0" style="margin-right: 0;" onclick="window.removeWaMessage(${idx})">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                `;
+                if (safeMsg.trim()) {
+                    previewHtml += `
+                        <div class="bg-white text-gray-800 p-2 rounded-lg rounded-tl-none max-w-[85%] text-xs shadow-sm self-start mb-1">
+                            ${safeMsg}
+                        </div>
+                    `;
+                }
+            });
+        }
+        
+        list.innerHTML = listHtml;
+        preview.innerHTML = previewHtml;
+    };
+
+    window.syncWaMessages = function() {
+        const inputs = document.querySelectorAll('.wa-msg-input');
+        waMessagesArray = Array.from(inputs).map(input => input.value);
+        
+        const preview = document.getElementById('wa-preview-messages');
+        if (preview) {
+            preview.innerHTML = waMessagesArray.map(msg => {
+                const safeMsg = String(msg || '');
+                return safeMsg.trim() ? `<div class="bg-white text-gray-800 p-2 rounded-lg rounded-tl-none max-w-[85%] text-xs shadow-sm self-start mb-1">${safeMsg}</div>` : '';
+            }).join('');
+        }
+    };
+
+    window.addWaMessage = function() {
+        if (!Array.isArray(waMessagesArray)) waMessagesArray = [];
+        window.syncWaMessages();
+        waMessagesArray.push('');
+        window.renderWaMessages();
+    };
+
+    window.removeWaMessage = function(idx) {
+        if (!Array.isArray(waMessagesArray)) return;
+        window.syncWaMessages();
+        waMessagesArray.splice(idx, 1);
+        window.renderWaMessages();
+    };
+
+  window.saveWhatsApp = async function() {
+        window.syncWaMessages();
+        const code = document.getElementById('wa-code').value.trim() || '91';
+        const num = document.getElementById('wa-number').value.trim();
+        const fullNum = code + num;
+        const validMsgs = waMessagesArray.filter(m => m && m.trim() !== '');
+        
+        try {
+            // Save Phone Number via Secure RPC
+            const { error: err1 } = await api.adminSetSetting('whatsapp_number', fullNum);
+            if (err1) throw err1;
+
+            // Save Bot Messages via Secure RPC
+            const { error: err2 } = await api.adminSetSetting('whatsapp_greeting', JSON.stringify(validMsgs));
+            if (err2) throw err2;
+
+            showToast("WhatsApp configuration saved!");
+            waMessagesArray = validMsgs; 
+            window.renderWaMessages();
+        } catch(e) {
+            console.error("WhatsApp Save Error:", e);
+            showToast("Failed to save. Check console for details.", "error");
+        }
+    };
+// --- SECURITY SETTINGS SAVERS ---
+ window.saveAdminPassword = async () => {
+        const pwd = document.getElementById('set-sec-pwd').value.trim();
+        if (!pwd) return showToast("Password cannot be empty.", "error");
+        try {
+            const { error } = await api.client.rpc('set_admin_password', { new_password: pwd });
+            if (error) throw error;
+
+            showToast("Admin Password Securely Updated!");
+            document.getElementById('set-sec-pwd').value = '';
+        } catch(e) {
+            console.error("Password update failed:", e);
+            showToast("Failed to update password: " + (e.message || "Error"), "error");
+        }
+    };
+
+    window.saveSecretWord = async () => {
+        const word = document.getElementById('set-sec-word').value.trim().toLowerCase();
+        if (!word) return showToast("Enter a word.", "error");
+        try {
+            const { error } = await api.adminSetSetting('secret_word', word);
+            if (error) throw error;
+            showToast("Secret Word Updated!");
+            document.getElementById('current-sec-word').innerText = word;
+            document.getElementById('set-sec-word').value = '';
+        } catch(e) {
+            showToast("Failed to update word.", "error");
+        }
+    };
+
+    window.saveAlertEmail = async () => {
+        const email = document.getElementById('set-alert-email').value.trim();
+        if (!email || !email.includes('@')) return showToast("Invalid email.", "error");
+        try {
+            const { error } = await api.adminSetSetting('admin_alert_email', email);
+            if (error) throw error;
+            showToast("Alert Email Updated!");
+        } catch(e) {
+            showToast("Failed to update email.", "error");
+        }
+    };
   </script>
 </body>
 </html>
