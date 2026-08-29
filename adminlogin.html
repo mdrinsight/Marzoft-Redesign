@@ -313,8 +313,8 @@
             const cancelBtn = document.getElementById('cancel-btn');
             const errorBox = document.getElementById('error-box');
 
-            // --- HARDCODED ADMIN EMAIL ---
-            const ADMIN_EMAIL = 'admin@marzoft.com'; 
+            // --- MASTER ADMIN EMAIL ---
+            const ADMIN_EMAIL = 'rmaaz1612@gmail.com';
 
             let tapCount = 0;
             let tapTimer;
@@ -354,7 +354,7 @@
                 errorBox.textContent = '';
             };
 
-            // Triple-Tap Trigger
+          // Triple-Tap Trigger
             trigger.addEventListener('click', () => {
                 tapCount++;
                 clearTimeout(tapTimer);
@@ -362,7 +362,8 @@
                     showModal();
                     tapCount = 0;
                 }
-                tapTimer = setTimeout(() => tapCount = 0, 800);
+                // Increased to 1200ms for a very relaxed tapping experience
+                tapTimer = setTimeout(() => tapCount = 0, 1200);
             });
 
             // Keyboard Trigger
@@ -384,7 +385,7 @@
 
             cancelBtn.addEventListener('click', hideModal);
 
-            // Authentication
+         // Authentication with Live Security Logging
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 hideError();
@@ -398,19 +399,51 @@
                 try {
                     if (!api || !api.client) throw new Error("Database connection unavailable.");
 
-                    // 1. Sign In using hidden email
+                   // 1. Sign In using hidden email
                     const { error: signInError } = await api.signInWithEmail({ email: ADMIN_EMAIL, password });
-                    if (signInError) throw new Error("Invalid password.");
+                    
+                    if (signInError) {
+                        // LOG THE FAILED ATTEMPT TO DATABASE
+                        try {
+                            await api.client.rpc('log_admin_access', {
+                                p_email: ADMIN_EMAIL,
+                                p_event_type: 'FAILED_LOGIN_ATTEMPT',
+                                p_status: 'BLOCKED',
+                                p_details: signInError.message
+                            });
+                        } catch(logErr){}
+                        
+                        // Show the REAL error from Supabase (e.g., "Invalid login credentials", "Email not confirmed")
+                        throw new Error(signInError.message);
+                    }
 
                     // 2. Verify Admin Role
                     const { data: isAdmin, error: roleError } = await api.isAdmin();
                     
                     if (roleError || !isAdmin) {
+                        try {
+                            await api.client.rpc('log_admin_access', {
+                                p_email: ADMIN_EMAIL,
+                                p_event_type: 'UNAUTHORIZED_ROLE_BLOCKED',
+                                p_status: 'BLOCKED',
+                                p_details: 'Password correct, but user account is not marked as admin/staff.'
+                            });
+                        } catch(logErr){}
+                        
                         await api.signOut();
                         throw new Error("Unauthorized access.");
                     }
 
-                    // 3. Success
+                    // 3. Log Success
+                    try {
+                        await api.client.rpc('log_admin_access', {
+                            p_email: ADMIN_EMAIL,
+                            p_event_type: 'ADMIN_GATEWAY_SUCCESS',
+                            p_status: 'AUTHORIZED',
+                            p_details: 'Master admin successfully authenticated.'
+                        });
+                    } catch(logErr){}
+
                     submitBtn.innerHTML = '<i class="fa-solid fa-check"></i>';
                     submitBtn.style.background = '#10B981';
                     

@@ -22,6 +22,14 @@
             }
         }
     </script>
+   <script>
+        // Instant Dark Mode Persistence (Prevents white flash on load)
+        if (localStorage.getItem('mz_theme') === 'dark' || (!('mz_theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
     <script src="supabase.js"></script>
@@ -76,15 +84,11 @@
         #toast { position: fixed; bottom: 30px; right: 30px; z-index: 3000; background: #10B981; color: #fff; padding: 16px 24px; border-radius: 12px; font-weight: 700; font-size: 0.9rem; box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3); display: flex; align-items: center; gap: 12px; transform: translateY(100px); opacity: 0; transition: all 0.4s ease; }
         #toast.show { transform: translateY(0); opacity: 1; }
         #toast.error { background: #EF4444; box-shadow: 0 10px 30px rgba(239, 68, 68, 0.3); }
-        .role-select { padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: 800; text-transform: uppercase; border: 1px solid var(--border-color); background: var(--bg-main); color: var(--text-primary); outline: none; cursor: pointer; }
+      .role-select { padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: 800; text-transform: uppercase; border: 1px solid var(--border-color); background: var(--bg-main); color: var(--text-primary); outline: none; cursor: pointer; }
+        
     </style>
 </head>
 <body class="h-screen w-screen overflow-hidden flex relative">
-
-  <div id="initial-loader">
-    <div class="w-16 h-16 border-4 border-mz-blue border-t-transparent rounded-full animate-spin mb-4"></div>
-    <p class="font-display font-black text-[var(--text-primary)] tracking-widest uppercase">Securing Workspace...</p>
-  </div>
 
   <!-- SIDEBAR -->
   <aside class="w-64 h-full flex flex-col absolute md:relative -translate-x-full md:translate-x-0 transition-transform z-50 border-r border-[var(--border-color)]" style="background-color: var(--bg-panel) !important;" id="sidebar">
@@ -101,13 +105,18 @@
         <button onclick="switchSection('clients')" id="nav-clients" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all text-[var(--text-muted)] hover:bg-black/5 dark:hover:bg-white/5 nav-btn"><i class="fa-solid fa-users w-5 text-center"></i> Clients</button>
         
         <!-- TEAM TAB (Admin Only) -->
-        <button onclick="switchSection('team')" id="nav-team" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all text-[var(--text-muted)] hover:bg-black/5 dark:hover:bg-white/5 nav-btn"><i class="fa-solid fa-id-badge w-5 text-center"></i> Team</button>
+       <button onclick="switchSection('team')" id="nav-team" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all text-[var(--text-muted)] hover:bg-black/5 dark:hover:bg-white/5 nav-btn"><i class="fa-solid fa-id-badge w-5 text-center"></i> Team</button>
+        
+        <button onclick="switchSection('broadcasts')" id="nav-broadcasts" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all text-[var(--text-muted)] hover:bg-black/5 dark:hover:bg-white/5 nav-btn"><i class="fa-solid fa-bullhorn w-5 text-center"></i> Broadcasts</button>
         
         <button onclick="switchSection('reviews')" id="nav-reviews" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all text-[var(--text-muted)] hover:bg-black/5 dark:hover:bg-white/5 nav-btn"><i class="fa-solid fa-star w-5 text-center"></i> Reviews</button>
         <button onclick="switchSection('whatsapp')" id="nav-whatsapp" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all text-[var(--text-muted)] hover:bg-black/5 dark:hover:bg-white/5 nav-btn"><i class="fa-brands fa-whatsapp w-5 text-center"></i> Chat Widget</button>
         
-        <!-- Security (Admin Only) -->
-        <button onclick="switchSection('settings')" id="nav-settings" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all text-[var(--text-muted)] hover:bg-black/5 dark:hover:bg-white/5 nav-btn"><i class="fa-solid fa-shield-halved w-5 text-center"></i> Security</button>
+      <!-- Security Logs (Admin Only) -->
+        <button onclick="switchSection('audit-logs')" id="nav-audit-logs" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all text-[var(--text-muted)] hover:bg-black/5 dark:hover:bg-white/5 nav-btn"><i class="fa-solid fa-clock-rotate-left w-5 text-center"></i> Security Logs</button>
+        
+        <!-- Security Settings (Admin Only) -->
+        <button onclick="switchSection('settings')" id="nav-settings" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all text-[var(--text-muted)] hover:bg-black/5 dark:hover:bg-white/5 nav-btn"><i class="fa-solid fa-shield-halved w-5 text-center"></i> Security Settings</button>
     </nav>
     
     <div class="p-4 border-t border-[var(--border-color)]">
@@ -123,7 +132,7 @@
         <h2 id="header-title" class="font-display font-bold text-xl">Overview</h2>
       </div>
       <div class="flex items-center gap-4">
-        <button onclick="toggleTheme()" class="w-10 h-10 rounded-full inner-card flex items-center justify-center shadow-sm hover:scale-105 transition-transform"><i class="fa-solid fa-moon dark:hidden text-[var(--text-muted)]"></i><i class="fa-solid fa-sun hidden dark:block text-[var(--text-muted)]"></i></button>
+  <button onclick="toggleTheme()" class="w-10 h-10 rounded-full inner-card flex items-center justify-center shadow-sm hover:scale-105 transition-transform"><i class="fa-solid fa-moon dark:hidden text-[var(--text-muted)]"></i><i class="fa-solid fa-sun hidden dark:block text-[var(--text-muted)]"></i></button>
         <div class="w-10 h-10 rounded-full bg-mz-blue text-white flex items-center justify-center font-bold shadow-md">MZ</div>
       </div>
     </header>
@@ -222,10 +231,42 @@
           </div>
           <div class="admin-table-container">
             <table class="admin-table">
-              <thead><tr><th>Name</th><th>Email</th><th>Access Level</th><th>Job Title</th><th class="text-right">Action</th></tr></thead>
+           <thead><tr><th>Name</th><th>Access Level</th><th>Job Title</th><th class="text-right">Action</th></tr></thead>
+
               <tbody id="team-tbody"></tbody>
             </table>
           </div>
+        </div>
+      </section>
+
+      <!-- BROADCASTS SECTION -->
+      <section id="sec-broadcasts" class="admin-section">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div class="glass-panel p-6 md:p-8 hover-lift">
+                <h3 class="font-bold mb-6 font-display text-xl"><i class="fa-solid fa-paper-plane mr-2 text-mz-blue"></i> New Broadcast</h3>
+                <form id="broadcast-form" class="space-y-6">
+                    <div>
+                        <label class="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider mb-2 block">Broadcast Title</label>
+                        <input type="text" id="broadcast-title" class="admin-input" placeholder="e.g., Diwali Offer Extended!" required>
+                    </div>
+                    <div>
+                        <label class="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider mb-2 block">Message</label>
+                        <textarea id="broadcast-message" class="admin-input" rows="4" placeholder="Share an update or special offer with all your clients..." required></textarea>
+                    </div>
+                    <button type="submit" class="w-full py-3 bg-mz-blue text-white font-bold rounded-xl hover:bg-mz-blue-hover transition-colors shadow-md mt-4">Send to All Clients</button>
+                </form>
+            </div>
+            <div class="glass-panel overflow-hidden flex flex-col h-full hover-lift">
+                <div class="p-6 border-b border-[var(--border-color)]">
+                    <h3 class="font-bold font-display text-lg">Sent Broadcasts</h3>
+                </div>
+                <div class="admin-table-container flex-1">
+                    <table class="admin-table">
+                        <thead><tr><th>Date</th><th>Title</th><th class="text-right">Action</th></tr></thead>
+                        <tbody id="broadcasts-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
         </div>
       </section>
 
@@ -281,11 +322,20 @@
         </div>
       </section>
 
-      <!-- SECURITY SECTION (Hidden for Staff) -->
-      <section id="sec-settings" class="admin-section max-w-3xl mx-auto">
-        <div class="glass-panel p-6 md:p-8 hover-lift">
-          <h3 class="font-bold mb-6 text-red-500 font-display text-xl"><i class="fa-solid fa-shield-halved mr-2"></i>Security Settings</h3>
+     <!-- SECURITY SECTION (Hidden for Staff) -->
+      <section id="sec-settings" class="admin-section max-w-4xl mx-auto">
+        <div class="glass-panel p-6 md:p-8 hover-lift mb-8">
+          <h3 class="font-bold mb-6 text-red-500 font-display text-xl"><i class="fa-solid fa-shield-halved mr-2"></i>Security & Access Logs</h3>
           <div class="space-y-8">
+            <!-- Alert Email Setting -->
+            <div class="p-5 inner-card border-l-4 border-blue-500 rounded-r-xl">
+              <h4 class="font-bold text-sm mb-1">Admin Security Alert Email</h4>
+              <p class="text-xs text-[var(--text-muted)] mb-3">Security breach attempts and unauthorized logins will be targeted to this email.</p>
+              <div class="flex gap-2">
+                <input type="email" id="set-alert-email" class="admin-input flex-1" placeholder="rmaaz1612@gmail.com">
+                <button onclick="saveAlertEmail()" class="px-6 py-2 bg-blue-500 text-white font-bold rounded-xl hover:bg-blue-600 transition-colors shadow-md text-sm">Update Email</button>
+              </div>
+            </div>
             <div class="p-5 inner-card border-l-4 border-amber-500 rounded-r-xl">
               <h4 class="font-bold text-sm mb-1">Gateway Secret Word</h4>
               <p class="text-xs text-[var(--text-muted)] mb-4">The secret word typed on the website to open the hidden admin login.</p>
@@ -303,7 +353,7 @@
               </div>
             </div>
 
-            <div class="p-5 inner-card border-l-4 border-red-500 rounded-r-xl">
+          <div class="p-5 inner-card border-l-4 border-red-500 rounded-r-xl">
               <h4 class="font-bold text-sm mb-1">Admin Password</h4>
               <p class="text-xs text-[var(--text-muted)] mb-4">Change the password you use to log into this dashboard.</p>
               <div class="flex gap-2 mt-1">
@@ -313,8 +363,27 @@
             </div>
           </div>
         </div>
+
       </section>
 
+      <!-- DEDICATED SECURITY & BREACH LOGS SECTION -->
+      <section id="sec-audit-logs" class="admin-section">
+        <div class="glass-panel overflow-hidden flex flex-col h-full hover-lift">
+          <div class="p-6 border-b border-[var(--border-color)] flex justify-between items-center" style="background: var(--table-header);">
+            <div>
+              <h3 class="font-bold font-display text-lg"><i class="fa-solid fa-shield-halved mr-2 text-red-500"></i>Security & Breach Logs</h3>
+              <p class="text-xs text-[var(--text-muted)] mt-1">Real-time audit log of authorized logins, failed attempts, and blocked breach actions.</p>
+            </div>
+            <button onclick="loadAuditLogs()" class="px-4 py-2 inner-card rounded-xl text-xs font-bold hover:bg-black/5"><i class="fa-solid fa-rotate-right mr-1"></i> Refresh Logs</button>
+          </div>
+          <div class="admin-table-container">
+            <table class="admin-table">
+              <thead><tr><th>Timestamp</th><th>User / Target Email</th><th>Security Event</th><th>Access Status</th><th>Details</th></tr></thead>
+              <tbody id="audit-logs-tbody"><tr><td colspan="5" class="text-center py-4">Loading logs...</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
     </div>
   </main>
 
@@ -413,311 +482,357 @@
   <div id="toast-container" class="fixed bottom-6 right-6 z-[100] flex flex-col gap-2"></div>
 
   <script>
-    const api = window.marzoftBackend || window.MarzoftSupabase;
+    const api = window.marzoftBackend || window.MarzoftSupabase || window.marzoftSupabase;
     let allInquiries = [];
     let allReviews = [];
     let waMessagesArray = [];
     let currentAdminRole = 'admin';
 
-    // Init & Auth Check
-    document.addEventListener('DOMContentLoaded', async () => {
-      try {
-        if (!api || !api.client) throw new Error();
-        
-        const { data: { user } } = await api.client.auth.getUser();
-        if (!user) throw new Error("No user");
-
-        const { data: profile } = await api.client.from('profiles').select('role').eq('id', user.id).single();
-        currentAdminRole = profile?.role || 'client';
-
-        if (currentAdminRole !== 'admin' && currentAdminRole !== 'staff') {
-            await api.signOut();
-            window.location.href = 'adminlogin.html';
-            return;
-        }
-
-        document.getElementById('user-role-display').innerText = `ROLE: ${currentAdminRole.toUpperCase()}`;
-        if (currentAdminRole === 'staff') {
-            document.getElementById('nav-settings').style.display = 'none';
-            document.getElementById('nav-team').style.display = 'none'; 
-            document.getElementById('add-staff-container').style.display = 'none';
-        }
-        
-        document.getElementById('initial-loader').style.opacity = '0';
-        setTimeout(() => document.getElementById('initial-loader').style.display = 'none', 500);
-
-        setupAdminStars();
-        await loadData();
-
-      } catch (err) {
-        window.location.href = 'adminlogin.html';
-      }
-    });
-
-    // Navigation Logic
-    function switchSection(id) {
-      document.querySelectorAll('.nav-btn').forEach(b => {
-        b.className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all text-[var(--text-muted)] hover:bg-black/5 dark:hover:bg-white/5 nav-btn";
-      });
-      
-      const activeBtn = document.getElementById('nav-' + id);
-      if(activeBtn) {
-          activeBtn.className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all bg-blue-50 dark:bg-blue-900/30 text-mz-blue nav-btn active";
-          document.getElementById('header-title').innerText = activeBtn.innerText.trim();
-      }
-
-      document.querySelectorAll('.admin-section').forEach(sec => sec.classList.remove('active'));
-      const targetSec = document.getElementById('sec-' + id);
-      if (targetSec) targetSec.classList.add('active');
-
-      if(window.innerWidth < 768) document.getElementById('sidebar').classList.add('-translate-x-full');
-    }
-
-    function toggleSidebar() { document.getElementById('sidebar').classList.toggle('-translate-x-full'); }
-    
-    function toggleTheme() {
-      document.documentElement.classList.toggle('dark');
-      localStorage.setItem('mz_theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
-    }
-    
-    async function logout() { await api.signOut(); window.location.href = 'adminlogin.html'; }
-
-    // Modals
-    function openModal(modalId, boxId) {
-      const modal = document.getElementById(modalId);
-      modal.classList.remove('pointer-events-none');
-      modal.classList.add('opacity-100');
-      document.getElementById(boxId).classList.remove('scale-95');
-      document.getElementById(boxId).classList.add('scale-100');
-    }
-    function closeModal(modalId, boxId) {
-      const modal = document.getElementById(modalId);
-      modal.classList.remove('opacity-100');
-      document.getElementById(boxId).classList.remove('scale-100');
-      document.getElementById(boxId).classList.add('scale-95');
-      setTimeout(() => modal.classList.add('pointer-events-none'), 300);
-    }
-    function showToast(message, type = 'success') {
-      const container = document.getElementById('toast-container');
-      const bg = type === 'success' ? 'bg-green-600' : 'bg-red-500';
-      const icon = type === 'success' ? 'fa-check' : 'fa-xmark';
-      const toast = document.createElement('div');
-      toast.className = `${bg} text-white px-4 py-3 rounded-xl shadow-lg flex items-center gap-3 text-sm font-bold`;
-      toast.innerHTML = `<i class="fa-solid ${icon}"></i> ${message}`;
-      container.appendChild(toast);
-      setTimeout(() => toast.remove(), 3000);
-    }
-
-    // Load Data
-    async function loadData() {
-      try {
-        const reqPromise = api.client.from('project_requests').select('*').order('created_at', {ascending: false});
-        const revPromise = api.client.from('reviews').select('*').order('created_at', {ascending: false});
-        const profPromise = api.client.from('profiles').select('*').order('created_at', {ascending: false});
-        const setPromise = api.client.from('site_settings').select('*');
-        const analyticsPromise = typeof api.adminGetAnalytics === 'function' ? api.adminGetAnalytics() : Promise.resolve({data: null});
-
-        const [reqRes, revRes, profRes, setRes, anaRes] = await Promise.all([reqPromise, revPromise, profPromise, setPromise, analyticsPromise]);
-
-        allInquiries = reqRes.data || [];
-        allReviews = revRes.data || [];
-        const profiles = profRes.data || [];
-        const settings = setRes.data || [];
-        const analytics = anaRes.data || { views_week: 0, conversion_rate: 0 };
-
-        // Split profiles
-        const clientsOnly = profiles.filter(p => p.role === 'client');
-        const teamOnly = profiles.filter(p => p.role !== 'client');
-
-        // Stats
-        document.getElementById('stat-projects').innerText = allInquiries.length;
-        document.getElementById('stat-clients').innerText = clientsOnly.length;
-        document.getElementById('stat-reviews').innerText = allReviews.filter(r => !r.published).length;
-        
-        // Analytics
-        document.getElementById('stat-views').innerText = analytics.views_week || 0;
-        document.getElementById('stat-rate').innerText = (analytics.conversion_rate || 0) + '%';
-
-        renderInquiries(allInquiries);
-        renderRecent(allInquiries);
-        renderClients(clientsOnly);
-        renderTeam(teamOnly);
-        populateStaffDropdown(clientsOnly);
-        renderReviews(allReviews);
-        populateSettings(settings);
-
-      } catch (e) {
-        showToast("Error fetching data.", "error");
-      }
-    }
-
-    // Renderers
-    const formatDate = (iso) => new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    // --- 1. CORE FUNCTIONS & UTILS ---
+    const setStat = (id, val) => { const el = document.getElementById(id); if (el) el.innerText = val; };
+    const formatDate = (iso) => iso ? new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '-';
     const formatStatus = (s) => {
         const map = { 'new': 'New', 'in_progress': 'In Progress', 'waiting_for_client': 'Waiting', 'completed': 'Completed', 'closed': 'Closed' };
         const colors = { 'new': 'badge-blue', 'in_progress': 'badge-yellow', 'waiting_for_client': 'badge-yellow', 'completed': 'badge-green', 'closed': 'badge-gray' };
         return `<span class="badge ${colors[s] || 'badge-gray'}">${map[s] || s}</span>`;
     };
 
+    window.showToast = function(message, type = 'success') {
+      const container = document.getElementById('toast-container');
+      if (!container) return;
+      const bg = type === 'success' ? 'bg-green-600' : 'bg-red-500';
+      const icon = type === 'success' ? 'fa-check' : 'fa-xmark';
+      const toast = document.createElement('div');
+      toast.className = `${bg} text-white px-4 py-3 rounded-xl shadow-lg flex items-center gap-3 text-sm font-bold`;
+      toast.innerHTML = `<i class="fa-solid ${icon}"></i> ${message}`;
+      container.appendChild(toast);
+      setTimeout(() => toast.remove(), 3500);
+    };
+
+    window.openModal = (mId, bId) => {
+      const m = document.getElementById(mId), b = document.getElementById(bId);
+      if (m) { m.classList.remove('pointer-events-none'); m.classList.add('opacity-100'); }
+      if (b) { b.classList.remove('scale-95'); b.classList.add('scale-100'); }
+    };
+    
+    window.closeModal = (mId, bId) => {
+      const m = document.getElementById(mId), b = document.getElementById(bId);
+      if (m) { m.classList.remove('opacity-100'); setTimeout(() => m.classList.add('pointer-events-none'), 300); }
+      if (b) { b.classList.remove('scale-100'); b.classList.add('scale-95'); }
+    };
+
+    window.switchSection = function(id) {
+      document.querySelectorAll('.nav-btn').forEach(b => b.className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all text-[var(--text-muted)] hover:bg-black/5 dark:hover:bg-white/5 nav-btn");
+      const activeBtn = document.getElementById('nav-' + id);
+      if(activeBtn) {
+          activeBtn.className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all bg-blue-50 dark:bg-blue-900/30 text-mz-blue nav-btn active";
+          const headerTitle = document.getElementById('header-title');
+          if(headerTitle) headerTitle.innerText = activeBtn.innerText.trim();
+      }
+      document.querySelectorAll('.admin-section').forEach(sec => sec.classList.remove('active'));
+      const targetSec = document.getElementById('sec-' + id);
+      if (targetSec) targetSec.classList.add('active');
+      if (id === 'audit-logs' && window.loadAuditLogs) window.loadAuditLogs();
+      if(window.innerWidth < 768) document.getElementById('sidebar')?.classList.add('-translate-x-full');
+    };
+
+    window.toggleSidebar = () => document.getElementById('sidebar')?.classList.toggle('-translate-x-full');
+    window.toggleTheme = () => {
+      document.documentElement.classList.toggle('dark');
+      localStorage.setItem('mz_theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+    };
+    window.logout = async () => { await api.signOut(); window.location.href = 'index.html'; };
+
+    // --- 2. INITIALIZATION & SECURITY GATEKEEPER ---
+    const initDashboard = async () => {
+        // Guarantee loader disappears after 2 seconds even if database fails
+        const hideLoader = () => {
+            const loader = document.getElementById('initial-loader');
+            if (loader && loader.style.display !== 'none') {
+                loader.style.opacity = '0';
+                setTimeout(() => loader.style.display = 'none', 300);
+            }
+        };
+        const fallbackTimer = setTimeout(hideLoader, 2000);
+
+        try {
+            if (!api || !api.client) throw new Error("No client");
+            const { data: { user }, error: authErr } = await api.client.auth.getUser();
+            if (authErr || !user) throw new Error("Not logged in");
+
+            const { data: profile } = await api.client.from('profiles').select('role').eq('id', user.id).single();
+            currentAdminRole = profile?.role || 'client';
+
+            if (currentAdminRole !== 'admin' && currentAdminRole !== 'staff') {
+                await api.signOut();
+                window.location.href = 'adminlogin.html';
+                return;
+            }
+
+            const roleDisplay = document.getElementById('user-role-display');
+            if (roleDisplay) roleDisplay.innerText = `ROLE: ${currentAdminRole.toUpperCase()}`;
+
+            if (currentAdminRole === 'staff') {
+                ['nav-settings', 'nav-audit-logs', 'nav-team', 'add-staff-container'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.style.display = 'none';
+                });
+            }
+
+            // Hide loader safely
+            clearTimeout(fallbackTimer);
+            hideLoader();
+
+            // Load data independently
+            window.loadData();
+        } catch (e) {
+            console.error("Init Error:", e);
+            clearTimeout(fallbackTimer);
+            hideLoader();
+            window.location.href = 'adminlogin.html';
+        }
+    };
+
+    // Run immediately if DOM is already ready (fixes VSCode Live Server freeze)
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initDashboard);
+    } else {
+        initDashboard();
+    }
+
+    // --- 3. INDEPENDENT DATA FETCHING ---
+    window.loadData = function() {
+        if (!api || !api.client) return;
+
+        // Inquiries
+        api.client.from('project_requests').select('*').order('created_at', { ascending: false }).then(({data, error}) => {
+            if (!error && data) {
+                allInquiries = data;
+                setStat('stat-projects', data.length);
+                renderInquiries(data);
+                renderRecent(data);
+            } else { setStat('stat-projects', 0); renderInquiries([]); renderRecent([]); }
+        });
+
+        // Profiles
+        api.client.from('profiles').select('*').order('created_at', { ascending: false }).then(({data, error}) => {
+            if (!error && data) {
+                const clientsOnly = data.filter(p => p.role === 'client');
+                const teamOnly = data.filter(p => p.role === 'admin' || p.role === 'staff');
+                setStat('stat-clients', clientsOnly.length);
+                renderClients(clientsOnly);
+                renderTeam(teamOnly);
+            } else { setStat('stat-clients', 0); renderClients([]); renderTeam([]); }
+        });
+
+        // Reviews
+        api.client.from('reviews').select('*').order('created_at', { ascending: false }).then(({data, error}) => {
+            if (!error && data) {
+                allReviews = data;
+                setStat('stat-reviews', data.filter(r => !r.published).length);
+                renderReviews(data);
+            } else { setStat('stat-reviews', 0); renderReviews([]); }
+        });
+
+        // Broadcasts
+        api.client.from('broadcasts').select('*').order('created_at', { ascending: false }).then(({data, error}) => {
+            if (!error && data) renderBroadcasts(data);
+            else renderBroadcasts([]);
+        });
+
+        // Settings
+        api.client.from('site_settings').select('*').then(({data, error}) => {
+            if (!error && data) populateSettings(data);
+        });
+
+        // Analytics
+        if(typeof api.client.rpc === 'function') {
+            api.client.rpc('admin_get_analytics').then(({data, error}) => {
+                if (!error && data) {
+                    setStat('stat-views', data.views_week || 0);
+                    setStat('stat-rate', (data.conversion_rate || 0) + '%');
+                } else { setStat('stat-views', 0); setStat('stat-rate', '0%'); }
+            });
+        }
+    };
+
+    // --- 4. RENDER FUNCTIONS ---
     function renderInquiries(data) {
         const tbody = document.getElementById('inquiries-tbody');
-        if(!data.length) return tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4">No inquiries.</td></tr>';
+        if(!tbody) return;
+        if(!data || !data.length) return tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-[var(--text-muted)]">No inquiries found.</td></tr>';
         tbody.innerHTML = data.map(p => `
             <tr>
                 <td>${formatDate(p.created_at)}</td>
-                <td><strong>${p.name}</strong><br><span class="text-xs text-[var(--text-muted)]">${p.email}</span></td>
+                <td><strong>${p.name || 'Anonymous'}</strong><br><span class="text-xs text-[var(--text-muted)]">${p.email || '-'}</span></td>
                 <td>${p.project_type || 'Custom'}<br><span class="text-xs text-[var(--text-muted)]">${p.budget || '-'}</span></td>
                 <td>${formatStatus(p.status)}</td>
-                <td class="text-right">
-                    <button class="btn-action" onclick="viewInquiry('${p.id}')"><i class="fa-solid fa-eye"></i></button>
-                </td>
+                <td class="text-right"><button class="btn-action" onclick="viewInquiry('${p.id}')"><i class="fa-solid fa-eye"></i></button></td>
             </tr>
         `).join('');
     }
 
     function renderRecent(data) {
         const tbody = document.getElementById('recent-tbody');
-        if(!data.length) return tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4">No activity.</td></tr>';
+        if(!tbody) return;
+        if(!data || !data.length) return tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-[var(--text-muted)]">No recent activity.</td></tr>';
         tbody.innerHTML = data.slice(0, 5).map(p => `
-            <tr>
-                <td>${formatDate(p.created_at)}</td>
-                <td><strong>${p.name}</strong></td>
-                <td>${p.project_type || 'Custom'}</td>
-                <td>${formatStatus(p.status)}</td>
-            </tr>
+            <tr><td>${formatDate(p.created_at)}</td><td><strong>${p.name || 'Anonymous'}</strong></td><td>${p.project_type || 'Custom'}</td><td>${formatStatus(p.status)}</td></tr>
         `).join('');
     }
 
     function renderClients(data) {
         const tbody = document.getElementById('clients-tbody');
-        if(!data.length) return tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4">No clients.</td></tr>';
-        
-        tbody.innerHTML = data.map(c => {
-            let roleHtml = `<span class="badge badge-gray">${c.role}</span>`;
-            
-            if (currentAdminRole === 'admin' && c.id) {
-                roleHtml = `
-                    <select class="role-select" onchange="promoteToStaff('${c.id}', this.value)">
-                        <option value="client" selected>Client</option>
-                        <option value="staff">Promote to Staff</option>
-                        <option value="admin">Promote to Admin</option>
-                    </select>
-                `;
-            }
-
-            return `
-            <tr>
-                <td><strong>${c.full_name || '-'}</strong></td>
-                <td>${c.email}</td>
-                <td>${roleHtml}</td>
-                <td>${formatDate(c.created_at)}</td>
-            </tr>
-            `;
-        }).join('');
-    }
-
-    function populateStaffDropdown(clients) {
         const select = document.getElementById('new-staff-select');
-        if(!select) return;
-        select.innerHTML = '<option value="">Select a client to promote...</option>' + 
-            clients.map(c => `<option value="${c.id}">${c.full_name || c.email}</option>`).join('');
+        if(!tbody) return;
+        if(!data || !data.length) {
+            tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-[var(--text-muted)]">No registered clients found.</td></tr>';
+            if (select) select.innerHTML = '<option value="">No clients available</option>';
+            return;
+        }
+        tbody.innerHTML = data.map(c => `<tr><td><strong>${c.full_name || '-'}</strong></td><td>${c.email}</td><td><span class="badge badge-gray">CLIENT</span></td><td>${formatDate(c.created_at)}</td></tr>`).join('');
+        if (select) {
+            select.innerHTML = '<option value="">Select a client to promote...</option>' + data.map(c => `<option value="${c.id}">${c.full_name || c.email}</option>`).join('');
+        }
     }
 
     function renderTeam(data) {
         const tbody = document.getElementById('team-tbody');
-        if(!data.length) return tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4">No team members found.</td></tr>';
+        if(!tbody) return;
+        if(!data || !data.length) return tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-[var(--text-muted)]">No team members found.</td></tr>';
         
         tbody.innerHTML = data.map(c => {
-            let roleHtml = `<span class="badge ${c.role==='admin' ? 'badge-blue' : 'badge-purple'}">${c.role}</span>`;
-            const isMasterAdmin = c.email === 'admin@marzoft.com';
+            const isMasterAdmin = (c.email === 'rmaaz1612@gmail.com');
             
-            if (isMasterAdmin) {
-                roleHtml = `<span class="badge badge-blue" style="background:#0B1020; color:#fff;">MASTER ADMIN</span>`;
-            } else if (currentAdminRole === 'admin') {
-                roleHtml = `
-                    <select class="role-select" id="role-${c.id}">
-                        <option value="staff" ${c.role==='staff'?'selected':''}>Staff</option>
-                        <option value="admin" ${c.role==='admin'?'selected':''}>Admin</option>
-                    </select>
-                `;
-            }
+            let roleHtml = isMasterAdmin 
+                ? `<span class="badge" style="background: #2563EB; color: #fff; font-weight: 800; letter-spacing: 0.08em; padding: 5px 12px; border-radius: 8px;">MASTER ADMIN</span>` 
+                : (currentAdminRole === 'admin' 
+                    ? `<select class="role-select" id="role-${c.id}"><option value="staff" ${c.role==='staff'?'selected':''}>Staff</option><option value="admin" ${c.role==='admin'?'selected':''}>Admin</option></select>` 
+                    : `<span class="badge ${c.role==='admin' ? 'badge-blue' : 'badge-purple'}">${(c.role || '').toUpperCase()}</span>`);
+            
+            const jobDisplay = isMasterAdmin 
+                ? '<span class="font-bold text-sm text-[var(--text-primary)]">Founder</span>' 
+                : (currentAdminRole === 'admin' 
+                    ? `<input type="text" id="job-${c.id}" value="${c.job_title||''}" placeholder="e.g. Designer" class="admin-input py-2 px-3 text-xs">` 
+                    : `<span class="text-xs font-semibold">${c.job_title || 'No Title'}</span>`);
+            
+            const actionBtn = isMasterAdmin 
+                ? '<span class="text-[10px] font-bold tracking-widest text-[var(--text-muted)]uppercase inline-block">IMMUTABLE</span>' 
+                : (currentAdminRole === 'admin' 
+                    ? `<button class="btn-action" onclick="saveTeamMember('${c.id}')"><i class="fa-solid fa-check text-green-500"></i></button><button class="btn-action btn-danger" onclick="demoteToClient('${c.id}')"><i class="fa-solid fa-user-minus"></i></button>` 
+                    : '-');
 
-            const jobInput = (currentAdminRole === 'admin' && !isMasterAdmin) 
-                ? `<input type="text" id="job-${c.id}" value="${c.job_title||''}" placeholder="e.g. Designer" class="admin-input py-2 px-3 text-xs">`
-                : (isMasterAdmin ? '<strong>Founder</strong>' : (c.job_title || 'No Title'));
-
-            const actionBtn = (currentAdminRole === 'admin' && !isMasterAdmin) 
-                ? `<button class="btn-action" onclick="saveTeamMember('${c.id}')" title="Save Role & Title"><i class="fa-solid fa-check text-green-500"></i></button>
-                   <button class="btn-action btn-danger" onclick="demoteToClient('${c.id}')" title="Remove from Team"><i class="fa-solid fa-user-minus"></i></button>`
-                : '-';
-
-            return `
-            <tr>
-                <td><strong>${c.full_name || '-'}</strong><br><span class="text-[10px] text-[var(--text-muted)]">${c.email}</span></td>
-                <td>${roleHtml}</td>
-                <td>${jobInput}</td>
-                <td class="text-right">${actionBtn}</td>
-            </tr>
-            `;
+            return `<tr class="${isMasterAdmin ? 'master-admin-row' : ''}"><td><strong class="text-sm">${c.full_name || 'Master Admin'}</strong><br><span class="text-xs text-[var(--text-muted)]">${c.email}</span></td><td>${roleHtml}</td><td>${jobDisplay}</td><td>${actionBtn}</td></tr>`;
         }).join('');
     }
-function renderReviews(data) {
+
+    function renderReviews(data) {
         const tbody = document.getElementById('reviews-tbody');
-        if(!data.length) return tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4">No reviews.</td></tr>';
-        
-        tbody.innerHTML = data.map(r => {
-            const editBtn = `<button class="btn-action" onclick="editReview('${r.id}')" title="Edit Review"><i class="fa-solid fa-pen"></i></button>`;
-            const deleteBtn = currentAdminRole === 'admin' ? `<button class="btn-action btn-danger" onclick="deleteReview('${r.id}')"><i class="fa-solid fa-trash"></i></button>` : '';
-            return `
+        if(!tbody) return;
+        if(!data || !data.length) return tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-[var(--text-muted)]">No reviews found.</td></tr>';
+        tbody.innerHTML = data.map(r => `
             <tr>
                 <td><strong>${r.name}</strong></td>
-                <td class="max-w-[200px] truncate" title="${r.review_text.replace(/"/g, '&quot;')}">"${r.review_text}"</td>
-                <td class="text-yellow-500 text-xs">${'★'.repeat(r.rating)}</td>
+                <td class="max-w-[200px] truncate" title="${(r.review_text || '').replace(/"/g, '&quot;')}">"${r.review_text || ''}"</td>
+                <td class="text-yellow-500 text-xs">${'★'.repeat(r.rating || 5)}</td>
                 <td><span class="badge ${r.published ? 'badge-green' : 'badge-gray'}">${r.published ? 'Published' : 'Hidden'}</span></td>
                 <td class="text-right whitespace-nowrap">
-                    <button class="btn-action" onclick="toggleReview('${r.id}', ${!r.published})" title="${r.published ? 'Hide' : 'Publish'}"><i class="fa-solid ${r.published ? 'fa-eye-slash' : 'fa-eye'}"></i></button>
-                    ${editBtn}
-                    ${deleteBtn}
+                    <button class="btn-action" onclick="toggleReview('${r.id}', ${!r.published})"><i class="fa-solid ${r.published ? 'fa-eye-slash' : 'fa-eye'}"></i></button>
+                    <button class="btn-action" onclick="editReview('${r.id}')"><i class="fa-solid fa-pen"></i></button>
+                    ${currentAdminRole === 'admin' ? `<button class="btn-action btn-danger" onclick="deleteReview('${r.id}')"><i class="fa-solid fa-trash"></i></button>` : ''}
                 </td>
             </tr>
-            `;
-        }).join('');
+        `).join('');
     }
 
-    // Team Actions
-    window.promoteSelectedToStaff = async () => {
-        const select = document.getElementById('new-staff-select');
-        const id = select.value;
-        if(!id) return showToast("Please select a client to promote.", "error");
+    function renderBroadcasts(data) {
+        const tbody = document.getElementById('broadcasts-tbody');
+        if(!tbody) return;
+        if(!data || !data.length) return tbody.innerHTML = '<tr><td colspan="3" class="text-center py-4 text-[var(--text-muted)]">No broadcasts sent yet.</td></tr>';
+        tbody.innerHTML = data.map(b => `
+            <tr>
+                <td class="whitespace-nowrap text-xs">${formatDate(b.created_at)}</td>
+                <td><strong>${b.title}</strong><br><span class="text-xs text-[var(--text-muted)]">${b.message}</span></td>
+                <td class="text-right"><button class="btn-action btn-danger" onclick="deleteBroadcast('${b.id}')"><i class="fa-solid fa-trash"></i></button></td>
+            </tr>
+        `).join('');
+    }
+
+    function populateSettings(settings) {
+        if (!Array.isArray(settings)) return;
+        const waNum = settings.find(s => s.key === 'whatsapp_number' || s.key === 'waNumber')?.value || '';
+        let waMsgs = settings.find(s => s.key === 'whatsapp_greeting' || s.key === 'waMessages')?.value || [];
+        if (typeof waMsgs === 'string') waMsgs = [waMsgs];
+        const secWord = settings.find(s => s.key === 'secret_word')?.value || 'adminx';
+        const alertEmail = settings.find(s => s.key === 'admin_alert_email')?.value || 'rmaaz1612@gmail.com';
+
+        const setVal = (id, v) => { const el = document.getElementById(id); if (el) el.value = v; };
+        const setTxt = (id, v) => { const el = document.getElementById(id); if (el) el.innerText = v; };
+
+        setVal('wa-number', String(waNum).replace(/['"]/g, ''));
+        setTxt('current-sec-word', String(secWord).replace(/['"]/g, ''));
+        setVal('set-alert-email', String(alertEmail).replace(/['"]/g, ''));
+        
+        waMessagesArray = Array.isArray(waMsgs) ? waMsgs : [];
+        if (window.renderWaMessages) window.renderWaMessages();
+    }
+
+    // --- 5. AUDIT LOGS FUNCTION (Restored) ---
+    window.loadAuditLogs = async function() {
+        const tbody = document.getElementById('audit-logs-tbody');
+        if (!tbody) return;
+        tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-[var(--text-muted)]"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Fetching security logs...</td></tr>';
         
         try {
-            await api.adminUpdateStaff(id, 'staff', null);
-            showToast("Added to Team successfully!");
-            select.value = "";
-            loadData();
-        } catch(e) { showToast("Failed to promote.", "error"); }
-    }
+            if (!api.client || typeof api.client.rpc !== 'function') throw new Error("RPC not available");
+            const { data, error } = await api.client.rpc('admin_get_audit_logs');
+            if (error) throw error;
+            
+            if (!data || !data.length) {
+                tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-[var(--text-muted)]">No security logs recorded yet.</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = data.map(log => {
+                const isBlocked = log.status === 'BLOCKED';
+                const badgeStyle = isBlocked ? 'background: rgba(239,68,68,0.15); color: #EF4444;' : '';
+                return `
+                <tr>
+                    <td class="whitespace-nowrap text-xs">${new Date(log.created_at).toLocaleString()}</td>
+                    <td><strong>${log.email || 'Anonymous'}</strong></td>
+                    <td class="text-xs font-mono">${log.event_type}</td>
+                    <td><span class="badge ${isBlocked ? 'badge-gray' : 'badge-green'}" style="${badgeStyle}">${log.status}</span></td>
+                    <td class="text-xs text-[var(--text-muted)]">${log.details || '-'}</td>
+                </tr>
+                `;
+            }).join('');
+        } catch(e) {
+            console.error("Audit log error:", e);
+            tbody.innerHTML = `<tr><td colspan="5" class="text-center py-4 text-red-500">Failed to load logs.</td></tr>`;
+        }
+    };
+
+    // --- 6. ACTIONS & INTERACTIONS ---
+    window.promoteSelectedToStaff = async () => {
+        const select = document.getElementById('new-staff-select');
+        if (!select || !select.value) return showToast("Select a client.", "error");
+        try { await api.client.from('profiles').update({role: 'staff'}).eq('id', select.value); showToast("Added to Team!"); select.value = ""; window.loadData(); } 
+        catch(e) { showToast("Failed to promote.", "error"); }
+    };
 
     window.saveTeamMember = async (id) => {
-        const role = document.getElementById(`role-${id}`).value;
-        const job = document.getElementById(`job-${id}`).value.trim();
-        try {
-            await api.adminUpdateStaff(id, role, job);
-            showToast("Team member updated.");
-            loadData();
-        } catch(e) { showToast("Failed to update.", "error"); }
-    }
+        const role = document.getElementById(`role-${id}`)?.value;
+        const job = document.getElementById(`job-${id}`)?.value.trim();
+        try { await api.client.from('profiles').update({role, job_title: job}).eq('id', id); showToast("Team updated."); window.loadData(); } 
+        catch(e) { showToast("Update failed.", "error"); }
+    };
 
     window.demoteToClient = async (id) => {
-        if(!confirm("Remove this person from the team? They will become a standard client.")) return;
-        try {
-            await api.adminUpdateStaff(id, 'client', null);
-            showToast("Removed from team.");
-            loadData();
-        } catch(e) { showToast("Failed to remove.", "error"); }
-    }
+        if(!confirm("Remove from team?")) return;
+        try { await api.client.from('profiles').update({role: 'client', job_title: null}).eq('id', id); showToast("Removed from team."); window.loadData(); } 
+        catch(e) { showToast("Removal failed.", "error"); }
+    };
 
-    // Actions
     window.viewInquiry = (id) => {
         const p = allInquiries.find(x => x.id === id);
         if(!p) return;
@@ -725,233 +840,48 @@ function renderReviews(data) {
         document.getElementById('modal-client-info').innerHTML = `<strong>${p.name}</strong> • ${p.email} • ${p.whatsapp || '-'}`;
         document.getElementById('modal-type').innerText = p.project_type || 'Custom';
         document.getElementById('modal-budget').innerText = p.budget || '-';
-        
-        let goals = p.goals;
-        try { if(typeof goals === 'string') goals = JSON.parse(goals).join(', '); } catch(e){}
+        let goals = p.goals; try { if(typeof goals === 'string') goals = JSON.parse(goals).join(', '); } catch(e){}
         document.getElementById('modal-goals').innerText = goals || '-';
-        
         document.getElementById('modal-desc').innerText = p.description || 'No description.';
         document.getElementById('modal-status').value = p.status;
         document.getElementById('modal-note').value = p.admin_notes || '';
-        
-        openModal('inquiry-modal', 'inquiry-box');
-    }
+        window.openModal('inquiry-modal', 'inquiry-box');
+    };
 
     window.saveInquiryUpdate = async () => {
         const id = document.getElementById('modal-id').value;
-        const patch = {
-            status: document.getElementById('modal-status').value,
-            admin_notes: document.getElementById('modal-note').value.trim()
-        };
-        try {
-            await api.client.from('project_requests').update(patch).eq('id', id); 
-            showToast("Project updated successfully.");
-            closeModal('inquiry-modal', 'inquiry-box');
-            loadData();
-        } catch(e) { showToast("Failed to update.", "error"); }
-    }
-
-   // --- MANUAL REVIEW ADDITION & EDITING LOGIC ---
-    function setupAdminStars() {
-        const stars = document.querySelectorAll('#admin-rev-stars i');
-        const input = document.getElementById('admin-rev-rating');
-        stars.forEach(star => {
-            star.addEventListener('click', () => {
-                const val = parseInt(star.getAttribute('data-val'));
-                input.value = val;
-                stars.forEach(s => {
-                    if (parseInt(s.getAttribute('data-val')) <= val) {
-                        s.classList.add('fa-solid', 'text-yellow-500');
-                        s.classList.remove('fa-regular', 'text-gray-300', 'dark:text-gray-600');
-                    } else {
-                        s.classList.remove('fa-solid', 'text-yellow-500');
-                        s.classList.add('fa-regular', 'text-gray-300', 'dark:text-gray-600');
-                    }
-                });
-            });
-        });
-    }
-
-    window.openAdminReviewModal = () => {
-        document.getElementById('admin-review-form').reset();
-        document.getElementById('admin-rev-id').value = '';
-        document.getElementById('admin-review-modal-title').innerText = 'Add Manual Review';
-        document.getElementById('admin-rev-rating').value = 5;
-        document.querySelectorAll('#admin-rev-stars i').forEach(s => {
-            s.classList.add('fa-solid', 'text-yellow-500');
-            s.classList.remove('fa-regular', 'text-gray-300', 'dark:text-gray-600');
-        });
-        document.getElementById('admin-rev-publish').checked = true;
-        openModal('admin-review-modal', 'admin-review-box');
-    }
-
-    window.editReview = (id) => {
-        const r = allReviews.find(x => x.id === id);
-        if(!r) return;
-        document.getElementById('admin-rev-id').value = r.id;
-        document.getElementById('admin-review-modal-title').innerText = 'Edit Review';
-        document.getElementById('admin-rev-name').value = r.name;
-        document.getElementById('admin-rev-text').value = r.review_text;
-        document.getElementById('admin-rev-rating').value = r.rating;
-        document.getElementById('admin-rev-publish').checked = r.published;
-        
-        document.querySelectorAll('#admin-rev-stars i').forEach(s => {
-            if (parseInt(s.getAttribute('data-val')) <= r.rating) {
-                s.classList.add('fa-solid', 'text-yellow-500');
-                s.classList.remove('fa-regular', 'text-gray-300', 'dark:text-gray-600');
-            } else {
-                s.classList.remove('fa-solid', 'text-yellow-500');
-                s.classList.add('fa-regular', 'text-gray-300', 'dark:text-gray-600');
-            }
-        });
-        openModal('admin-review-modal', 'admin-review-box');
-    }
-
-    document.getElementById('admin-review-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const btn = document.getElementById('admin-rev-submit');
-        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
-        btn.disabled = true;
-
-        try {
-            const reviewId = document.getElementById('admin-rev-id').value;
-            const isPublished = document.getElementById('admin-rev-publish').checked;
-            
-            const payload = {
-                name: document.getElementById('admin-rev-name').value,
-                rating: parseInt(document.getElementById('admin-rev-rating').value),
-                review_text: document.getElementById('admin-rev-text').value,
-            };
-
-            if (reviewId) {
-                // Edit Mode
-                payload.published = isPublished;
-                if (typeof api.adminUpdateReview === 'function') {
-                    await api.adminUpdateReview(reviewId, payload);
-                } else {
-                    const { error } = await api.client.from('reviews').update(payload).eq('id', reviewId);
-                    if (error) throw error;
-                }
-                showToast("Review updated successfully.");
-            } else {
-                // Insert Mode
-                payload.published = false; 
-                const { data: newReview, error: insertError } = await api.client.from('reviews').insert(payload).select().single();
-                if (insertError) throw insertError;
-
-                if (isPublished && newReview?.id) {
-                    if (typeof api.adminUpdateReview === 'function') {
-                        await api.adminUpdateReview(newReview.id, { published: true });
-                    } else {
-                        await api.client.from('reviews').update({ published: true }).eq('id', newReview.id);
-                    }
-                }
-                showToast("Review added successfully.");
-            }
-
-            closeModal('admin-review-modal', 'admin-review-box');
-            loadData();
-        } catch (err) {
-            showToast("Failed to save review.", "error");
-            console.error(err);
-        } finally {
-            btn.innerHTML = 'Save Review';
-            btn.disabled = false;
-        }
-    });
+        try { await api.client.from('project_requests').update({status: document.getElementById('modal-status').value, admin_notes: document.getElementById('modal-note').value.trim()}).eq('id', id); showToast("Project updated."); window.closeModal('inquiry-modal', 'inquiry-box'); window.loadData(); } 
+        catch(e) { showToast("Failed to update.", "error"); }
+    };
 
     window.toggleReview = async (id, state) => {
-        try {
-            if (typeof api.adminUpdateReview === 'function') {
-                await api.adminUpdateReview(id, { published: state });
-            } else {
-                const { error } = await api.client.from('reviews').update({published: state}).eq('id', id);
-                if (error) throw error;
-            }
-            showToast(state ? "Review Published" : "Review Hidden");
-            loadData();
-        } catch(e) { showToast("Failed to update review.", "error"); }
-    }
+        try { await api.client.from('reviews').update({published: state}).eq('id', id); showToast(state ? "Published" : "Hidden"); window.loadData(); } 
+        catch(e) { showToast("Update failed.", "error"); }
+    };
 
-    window.deleteReview = (id) => {     if(currentAdminRole !== 'admin') return;
+    window.deleteReview = (id) => {
+        if(currentAdminRole !== 'admin') return;
         document.getElementById('confirm-btn').onclick = async () => {
-            try {
-                await api.adminDeleteReview(id);
-                showToast("Review deleted.");
-                closeModal('confirm-modal', 'confirm-box');
-                loadData();
-            } catch(e) { showToast("Delete failed.", "error"); }
+            try { await api.client.from('reviews').delete().eq('id', id); showToast("Review deleted."); window.closeModal('confirm-modal', 'confirm-box'); window.loadData(); } 
+            catch(e) { showToast("Delete failed.", "error"); }
         };
-        openModal('confirm-modal', 'confirm-box');
-    }
+        window.openModal('confirm-modal', 'confirm-box');
+    };
 
-    // Settings
-    function populateSettings(settings) {
-        const waNum = settings.find(s => s.key === 'whatsapp_number' || s.key === 'waNumber')?.value || '';
-        let waMsgs = settings.find(s => s.key === 'whatsapp_greeting' || s.key === 'waMessages')?.value || [];
-        if (typeof waMsgs === 'string') waMsgs = [waMsgs];
-        const secWord = settings.find(s => s.key === 'secret_word')?.value || 'adminx';
+    document.getElementById('broadcast-form')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const title = document.getElementById('broadcast-title').value.trim();
+        const message = document.getElementById('broadcast-message').value.trim();
+        if(!title || !message) return showToast("Required.", "error");
+        try { await api.client.from('broadcasts').insert({ title, message }); showToast("Broadcast sent!"); document.getElementById('broadcast-form').reset(); window.loadData(); } 
+        catch(err) { showToast("Failed to send.", "error"); }
+    });
 
-        document.getElementById('wa-number').value = String(waNum).replace(/['"]/g, '');
-        document.getElementById('current-sec-word').innerText = String(secWord).replace(/['"]/g, '');
-        
-        waMessagesArray = Array.isArray(waMsgs) ? waMsgs : [];
-        renderWaMessages();
-    }
-
-    function renderWaMessages() {
-        const container = document.getElementById('wa-messages-list');
-        container.innerHTML = waMessagesArray.map((msg, i) => `
-            <div class="flex gap-2">
-                <input type="text" class="admin-input flex-1 wa-msg-input" value="${msg.replace(/"/g, '&quot;')}" oninput="updateWaPreview()">
-                <button type="button" onclick="removeWaMessage(${i})" class="w-11 h-11 flex-shrink-0 bg-red-50 text-red-500 rounded-xl hover:bg-red-500 hover:text-white transition-colors"><i class="fa-solid fa-trash"></i></button>
-            </div>
-        `).join('');
-        updateWaPreview();
-    }
-
-    window.addWaMessage = () => { waMessagesArray.push("New message..."); renderWaMessages(); }
-    window.removeWaMessage = (i) => { waMessagesArray.splice(i, 1); renderWaMessages(); }
-    
-    window.updateWaPreview = () => {
-        const inputs = document.querySelectorAll('.wa-msg-input');
-        waMessagesArray = Array.from(inputs).map(i => i.value);
-        const container = document.getElementById('wa-preview-messages');
-        if(!waMessagesArray.length) { container.innerHTML = '<p class="text-xs text-center mt-4 opacity-50">No messages.</p>'; return; }
-        container.innerHTML = waMessagesArray.map(m => `<div class="bg-white text-slate-800 text-xs p-3 rounded-2xl rounded-tl-none w-fit max-w-[90%] shadow-sm">${m}</div>`).join('');
-    }
-
-    window.saveWhatsApp = async () => {
-        const num = document.getElementById('wa-number').value;
-        const msgs = Array.from(document.querySelectorAll('.wa-msg-input')).map(i => i.value.trim()).filter(v => v);
-        try {
-            await api.adminSetSetting('whatsapp_number', num);
-            await api.adminSetSetting('whatsapp_greeting', msgs);
-            showToast("WhatsApp configuration saved.");
-        } catch(e) { showToast("Failed to save config.", "error"); }
-    }
-
-    window.saveSecretWord = async () => {
-        const word = document.getElementById('set-sec-word').value.toLowerCase().trim();
-        if(!word) return showToast("Enter a word", "error");
-        try {
-            await api.adminSetSetting('secret_word', word);
-            document.getElementById('current-sec-word').innerText = word;
-            document.getElementById('set-sec-word').value = '';
-            showToast("Gateway word updated.");
-        } catch(e) { showToast("Failed to update.", "error"); }
-    }
-
-    window.saveAdminPassword = async () => {
-        const pwd = document.getElementById('set-sec-pwd').value;
-        if(pwd.length < 8) return showToast("Min 8 characters required.", "error");
-        try {
-            const { error } = await api.client.auth.updateUser({ password: pwd });
-            if(error) throw error;
-            document.getElementById('set-sec-pwd').value = '';
-            showToast("Password updated securely.");
-        } catch(e) { showToast("Failed to update password.", "error"); }
-    }
+    window.deleteBroadcast = async (id) => {
+        if(!confirm("Delete broadcast?")) return;
+        try { await api.client.from('broadcasts').delete().eq('id', id); showToast("Deleted."); window.loadData(); } 
+        catch(e) { showToast("Delete failed.", "error"); }
+    };
 
   </script>
 </body>

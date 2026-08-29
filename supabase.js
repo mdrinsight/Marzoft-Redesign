@@ -9,13 +9,13 @@
     const unavailable = (message = 'Supabase is not configured yet.') => ({ data: null, error: new Error(message) });
 
     let client = null;
-    if (window.supabase) {
+   if (window.supabase) {
         client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
             auth: { 
                 persistSession: true, 
                 autoRefreshToken: true, 
                 detectSessionInUrl: true,
-                storageKey: 'marzoft-auth-token' // Forces reliable local storage
+                storageKey: 'marzoft-auth-token'
             }
         });
     } else {
@@ -104,7 +104,7 @@
             }).select().single();
         },
 
-        // Admin / Staff RPCs
+    // Admin / Staff RPCs
         adminListProjectRequests() { return rpc('admin_list_project_requests'); },
         adminListReviews() { return rpc('admin_list_reviews'); },
         adminGetSettings() { return rpc('admin_get_settings'); },

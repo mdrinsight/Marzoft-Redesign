@@ -477,6 +477,120 @@
     @keyframes spin { to { transform: rotate(360deg); } }
 
     /* Footer */
+    /* Notification Hub */
+    .notification-bell {
+        position: relative;
+        width: 40px; height: 40px;
+        border: 1px solid var(--border-light);
+        border-radius: 50%;
+        color: var(--text-muted);
+        display: grid;
+        place-items: center;
+        transition: all 0.3s var(--ease);
+    }
+    .notification-bell:hover {
+        color: var(--blue-primary);
+        border-color: var(--blue-primary);
+        background: var(--blue-soft);
+    }
+    .unread-dot {
+        position: absolute;
+        top: 6px; right: 6px;
+        width: 8px; height: 8px;
+        border-radius: 50%;
+        background: var(--blue-primary);
+        border: 2px solid #fff;
+        box-shadow: 0 0 10px var(--blue-primary);
+        transform: scale(0);
+        transition: transform 0.4s var(--ease);
+    }
+    .unread-dot.visible {
+        transform: scale(1);
+    }
+    .notifications-panel {
+        position: fixed;
+        top: 0; right: 0; bottom: 0;
+        width: min(420px, 90vw);
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(30px);
+        -webkit-backdrop-filter: blur(30px);
+        z-index: 2000;
+        border-left: 1px solid var(--border-light);
+        box-shadow: -20px 0 60px rgba(0,0,0,0.1);
+        transform: translateX(100%);
+        transition: transform 0.6s var(--ease);
+        display: flex;
+        flex-direction: column;
+    }
+    .notifications-panel.is-open {
+        transform: translateX(0);
+    }
+    .notifications-header {
+        padding: 24px;
+        border-bottom: 1px solid var(--border-light);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-shrink: 0;
+    }
+    .notifications-header h3 {
+        font-family: var(--font-display);
+        font-size: 1.2rem;
+        font-weight: 700;
+    }
+    .notifications-list {
+        flex: 1;
+        overflow-y: auto;
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+    .notification-item {
+        display: flex;
+        gap: 16px;
+        position: relative;
+    }
+    .notification-item.is-unread::after {
+        content: '';
+        position: absolute;
+        top: 6px; left: -12px;
+        width: 6px; height: 6px;
+        border-radius: 50%;
+        background: var(--blue-primary);
+    }
+    .notification-icon {
+        width: 36px; height: 36px;
+        border-radius: 12px;
+        background: var(--blue-soft);
+        color: var(--blue-primary);
+        display: grid;
+        place-items: center;
+        flex-shrink: 0;
+        font-size: 1rem;
+    }
+    .notification-content h4 {
+        font-size: 0.9rem;
+        font-weight: 700;
+        margin-bottom: 2px;
+    }
+    .notification-content p {
+        font-size: 0.85rem;
+        line-height: 1.5;
+        color: var(--text-muted);
+    }
+    .notification-content time {
+        font-size: 0.7rem;
+        color: var(--text-light);
+        margin-top: 6px;
+        display: block;
+    }
+    .notifications-footer {
+        padding: 16px 24px;
+        border-top: 1px solid var(--border-light);
+        flex-shrink: 0;
+    }
+
     .site-footer {
         margin-top: auto;
         border-top: 1px solid var(--border-light);
@@ -499,6 +613,12 @@
         </a>
         <div class="nav-actions">
             <a href="index.html" class="btn-back"><i class="fa-solid fa-arrow-left"></i> <span>Back to website</span></a>
+            
+            <button class="notification-bell" id="notificationBell" aria-label="Open Notifications">
+                <i class="fa-regular fa-bell"></i>
+                <span class="unread-dot" id="unreadDot"></span>
+            </button>
+
             <div class="nav-profile" id="userProfileBadge" style="display: none;">
                 <i id="userInitial">M</i>
                 <span class="hidden-mobile" id="userName">Client</span>
@@ -546,6 +666,19 @@
     </div>
 </main>
 
+<div class="notifications-panel" id="notificationsPanel" aria-hidden="true">
+    <div class="notifications-header">
+        <h3>Broadcasts & Updates</h3>
+        <button id="closeNotifications" class="btn-logout" style="padding: 6px 12px; font-size: 0.75rem;"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="notifications-list" id="notificationsList">
+        <!-- Notifications will be rendered here by JS -->
+    </div>
+    <div class="notifications-footer">
+        <button class="btn-primary" id="markAllRead" style="width: 100%; font-size: 0.8rem; min-height: 40px; padding: 10px;">Mark all as read</button>
+    </div>
+</div>
+
 <footer class="site-footer">
     <div class="container">
         © 2026 Marzoft Technologies. Private Client Portal.
@@ -571,54 +704,97 @@
 <script src="supabase.js"></script>
 
 <script>
+    // --- HELPER FUNCTIONS (GLOBAL SCOPE) ---
+    const formatStatus = (status) => {
+        const map = {
+            'new': { label: 'Brief Received', class: 'status-new' },
+            'in_progress': { label: 'In Progress', class: 'status-in_progress' },
+            'waiting_for_client': { label: 'Action Required', class: 'status-in_progress' },
+            'completed': { label: 'Completed', class: 'status-completed' },
+            'closed': { label: 'Closed', class: 'status-closed' }
+        };
+        return map[status] || { label: status, class: 'status-closed' };
+    };
+
+    const formatDate = (isoString) => {
+        if (!isoString) return '';
+        const date = new Date(isoString);
+        return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+    };
+
+    const timeAgo = (date) => {
+        const seconds = Math.floor((new Date() - new Date(date)) / 1000);
+        let interval = seconds / 31536000;
+        if (interval > 1) return Math.floor(interval) + " years ago";
+        interval = seconds / 2592000;
+        if (interval > 1) return Math.floor(interval) + " months ago";
+        interval = seconds / 86400;
+        if (interval > 1) return Math.floor(interval) + " days ago";
+        interval = seconds / 3600;
+        if (interval > 1) return Math.floor(interval) + " hours ago";
+        interval = seconds / 60;
+        if (interval > 1) return Math.floor(interval) + " minutes ago";
+        return "Just now";
+    };
+
+    // --- MAIN SCRIPT EXECUTION ---
     document.addEventListener('DOMContentLoaded', async () => {
+        // --- Element Definitions ---
         const container = document.getElementById('projectsContainer');
         const loadingState = document.getElementById('loadingState');
         const btnSignOut = document.getElementById('btnSignOut');
         const userNameDisplay = document.getElementById('userName');
         const userInitialDisplay = document.getElementById('userInitial');
         const profileBadge = document.getElementById('userProfileBadge');
-
-        // 1. Resolve Backend API
-        const api = window.marzoftBackend || window.MarzoftSupabase || {};
-
-        // 2. Auth Check & Guard
-        try {
-            if (!api.client) throw new Error("Backend not initialized");
-            
-            const { data: { user }, error } = await api.client.auth.getUser();
-            if (error || !user) {
-                window.location.href = 'index.html#client-login';
-                return;
-            }
-
-            // Update Profile Badge
-            const fullName = user.user_metadata?.full_name || user.email.split('@')[0];
-            userNameDisplay.textContent = fullName;
-            userInitialDisplay.textContent = fullName.charAt(0).toUpperCase();
-            profileBadge.style.display = 'flex';
-
-            // 3. Load Projects
-            loadProjects();
-
-        } catch (err) {
-            console.error("Auth Error:", err);
-            window.location.href = 'index.html#client-login';
-        }
-
-        // 4. Sign Out Handler
-        btnSignOut.addEventListener('click', async () => {
-            await api.signOut();
-            window.location.href = 'index.html';
-        });
-
-        // 5. Edit Profile Logic
+        
         const btnEditProfile = document.getElementById('btnEditProfile');
         const editProfileModal = document.getElementById('editProfileModal');
         const editNameInput = document.getElementById('editNameInput');
         const btnCancelEdit = document.getElementById('btnCancelEdit');
         const btnSaveEdit = document.getElementById('btnSaveEdit');
+        
+        const notificationBell = document.getElementById('notificationBell');
+        const unreadDot = document.getElementById('unreadDot');
+        const notificationsPanel = document.getElementById('notificationsPanel');
+        const notificationsList = document.getElementById('notificationsList');
+        const closeNotifications = document.getElementById('closeNotifications');
+        const markAllRead = document.getElementById('markAllRead');
+        
+        const READ_STORAGE_KEY = 'marzoft_read_broadcasts';
+        let allBroadcasts = [];
+        const api = window.marzoftBackend || window.MarzoftSupabase || {};
 
+        // --- AUTHENTICATION ---
+        try {
+            if (!api.client) throw new Error("Backend not initialized");
+            
+            const { data: { user }, error } = await api.client.auth.getUser();
+            if (error || !user) {
+                window.location.href = 'index.html'; // Redirect to home if not logged in
+                return;
+            }
+
+            const fullName = user.user_metadata?.full_name || user.email.split('@')[0];
+            userNameDisplay.textContent = fullName;
+            userInitialDisplay.textContent = fullName.charAt(0).toUpperCase();
+            profileBadge.style.display = 'flex';
+
+            // Load initial data
+            loadProjects();
+            loadNotifications();
+
+        } catch (err) {
+            console.error("Auth Error:", err);
+            window.location.href = 'index.html';
+        }
+
+        // --- EVENT LISTENERS ---
+        btnSignOut.addEventListener('click', async () => {
+            await api.signOut();
+            window.location.href = 'index.html';
+        });
+
+        // Edit Profile Modal Listeners
         const closeEditModal = () => {
             editProfileModal.style.opacity = '0';
             editProfileModal.querySelector('.modal-box').style.transform = 'translateY(20px)';
@@ -634,7 +810,6 @@
         });
 
         btnCancelEdit.addEventListener('click', closeEditModal);
-        
         btnCancelEdit.addEventListener('mouseover', () => btnCancelEdit.style.background = '#F8FAFC');
         btnCancelEdit.addEventListener('mouseout', () => btnCancelEdit.style.background = 'transparent');
 
@@ -643,55 +818,92 @@
             if (!newName) return;
             
             btnSaveEdit.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i>';
-            btnSaveEdit.style.pointerEvents = 'none';
+            btnSaveEdit.disabled = true;
 
             try {
-                const { error } = await api.client.auth.updateUser({
-                    data: { full_name: newName }
-                });
-
+                const { error } = await api.client.auth.updateUser({ data: { full_name: newName } });
                 if (error) throw error;
 
-                // Update UI instantly
                 userNameDisplay.textContent = newName;
                 userInitialDisplay.textContent = newName.charAt(0).toUpperCase();
                 closeEditModal();
-
             } catch (err) {
                 console.error("Update Error:", err);
                 alert("Could not update name. Please try again.");
             } finally {
                 btnSaveEdit.innerHTML = 'Save Changes';
-                btnSaveEdit.style.pointerEvents = 'auto';
+                btnSaveEdit.disabled = false;
             }
         });
 
-        // Status Badge Formatting Helper
-        const formatStatus = (status) => {
-            const map = {
-                'new': { label: 'Brief Received', class: 'status-new' },
-                'in_progress': { label: 'In Progress', class: 'status-in_progress' },
-                'waiting_for_client': { label: 'Action Required', class: 'status-in_progress' },
-                'completed': { label: 'Completed', class: 'status-completed' },
-                'closed': { label: 'Closed', class: 'status-closed' }
-            };
-            return map[status] || { label: status, class: 'status-closed' };
-        };
+        // Notification Panel Listeners
+        notificationBell.addEventListener('click', () => {
+            notificationsPanel.classList.add('is-open');
+            notificationsPanel.setAttribute('aria-hidden', 'false');
+            markAsRead();
+        });
+        
+        closeNotifications.addEventListener('click', () => {
+            notificationsPanel.classList.remove('is-open');
+            notificationsPanel.setAttribute('aria-hidden', 'true');
+        });
 
-        // Format Date Helper
-        const formatDate = (isoString) => {
-            const date = new Date(isoString);
-            return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
-        };
+        markAllRead.addEventListener('click', () => {
+            markAsRead();
+            markAllRead.textContent = 'All Caught Up!';
+            setTimeout(() => markAllRead.textContent = 'Mark all as read', 1500);
+        });
 
-        // Main Load Function
+        // --- DATA FUNCTIONS ---
+        function getReadIds() {
+            try { return JSON.parse(localStorage.getItem(READ_STORAGE_KEY) || '[]'); } 
+            catch { return []; }
+        }
+
+        function markAsRead() {
+            const allIds = allBroadcasts.map(b => b.id);
+            localStorage.setItem(READ_STORAGE_KEY, JSON.stringify(allIds));
+            unreadDot.classList.remove('visible');
+            document.querySelectorAll('.notification-item.is-unread').forEach(item => item.classList.remove('is-unread'));
+        }
+
+        async function loadNotifications() {
+            try {
+                const { data, error } = await api.client.from('broadcasts').select('*').order('created_at', { ascending: false });
+                if (error) throw error;
+                
+                allBroadcasts = data || [];
+                const readIds = getReadIds();
+                const unreadCount = allBroadcasts.filter(b => !readIds.includes(b.id)).length;
+                
+                if (unreadCount > 0) unreadDot.classList.add('visible');
+
+                if (allBroadcasts.length === 0) {
+                    notificationsList.innerHTML = `<p class="text-center text-sm text-muted">No updates from the studio yet.</p>`;
+                    return;
+                }
+
+                notificationsList.innerHTML = allBroadcasts.map(b => `
+                    <div class="notification-item ${readIds.includes(b.id) ? '' : 'is-unread'}">
+                        <div class="notification-icon"><i class="fa-solid fa-bullhorn"></i></div>
+                        <div class="notification-content">
+                            <h4>${b.title}</h4>
+                            <p>${b.message}</p>
+                            <time>${timeAgo(b.created_at)}</time>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (err) {
+                console.error("Failed to load notifications:", err);
+                notificationsList.innerHTML = `<p class="text-center text-sm text-red-500">Could not load updates.</p>`;
+            }
+        }
+        
         async function loadProjects() {
             try {
                 const result = await api.getMyProjectRequests();
                 loadingState.style.display = 'none';
-
                 if (result.error) throw result.error;
-                
                 const projects = result.data || [];
 
                 if (projects.length === 0) {
@@ -705,34 +917,19 @@
                     return;
                 }
 
-                // Render Cards
                 container.innerHTML = projects.map((proj, index) => {
                     const statusObj = formatStatus(proj.status);
                     const delay = 0.15 + (index * 0.1);
+                    let goalsHtml = '<p>Not specified</p>';
+                    if (Array.isArray(proj.goals) && proj.goals.length > 0) {
+                        goalsHtml = `<p>${proj.goals.join(', ')}</p>`;
+                    }
                     
-                    let goalsHtml = '';
-                    if (proj.goals && proj.goals.length > 0) {
-                        try {
-                            const goalsArr = typeof proj.goals === 'string' ? JSON.parse(proj.goals) : proj.goals;
-                            goalsHtml = `<p>${goalsArr.join(', ')}</p>`;
-                        } catch(e) {
-                            goalsHtml = `<p>${proj.goals}</p>`;
-                        }
-                    } else {
-                        goalsHtml = `<p>Not specified</p>`;
-                    }
-
-                    let adminNoteHtml = '';
-                    if (proj.admin_notes) {
-                        adminNoteHtml = `
-                            <div class="admin-note">
-                                <div class="admin-note-label">
-                                    <i class="fa-solid fa-asterisk"></i> Note from Marzoft
-                                </div>
-                                <p>"${proj.admin_notes}"</p>
-                            </div>
-                        `;
-                    }
+                    const adminNoteHtml = proj.admin_notes ? `
+                        <div class="admin-note">
+                            <div class="admin-note-label"><i class="fa-solid fa-asterisk"></i> Note from Marzoft</div>
+                            <p>"${proj.admin_notes}"</p>
+                        </div>` : '';
 
                     return `
                         <article class="project-card" style="animation-delay: ${delay}s">
@@ -743,7 +940,6 @@
                                 </div>
                                 <div class="status-badge ${statusObj.class}">${statusObj.label}</div>
                             </div>
-
                             <div class="project-details">
                                 <div class="detail-item">
                                     <span>Budget</span>
@@ -754,23 +950,19 @@
                                     ${goalsHtml}
                                 </div>
                             </div>
-
                             ${proj.description ? `<p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 20px; line-height: 1.6;">${proj.description}</p>` : ''}
-                            
                             ${adminNoteHtml}
-                        </article>
-                    `;
+                        </article>`;
                 }).join('');
-
             } catch (error) {
                 console.error("Failed to load projects:", error);
+                loadingState.style.display = 'none';
                 container.innerHTML = `
                     <div class="state-container">
                         <i class="fa-solid fa-triangle-exclamation" style="color: #ef4444;"></i>
                         <h3 style="font-family: var(--font-display); font-weight: 800; font-size: 1.25rem;">Could not load projects</h3>
                         <p style="color: var(--text-muted); font-size: 0.9rem;">Please refresh the page to try again.</p>
-                    </div>
-                `;
+                    </div>`;
             }
         }
     });

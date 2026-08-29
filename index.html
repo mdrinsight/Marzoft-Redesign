@@ -4900,15 +4900,22 @@ const redirect = new URL(window.location.href);
             // The existing project hand-off continues to open the current request flow.
 
             const openAdmin = () => { window.location.href = 'admindashboard.html'; };
-            logo?.addEventListener('click', (event) => {
+          logo?.addEventListener('click', (event) => {
                 event.preventDefault();
                 tapCount += 1;
                 window.clearTimeout(tapTimer);
-                if (tapCount >= 3) { tapCount = 0; openAdmin(); return; }
+                
+                if (tapCount >= 3) { 
+                    tapCount = 0; 
+                    openAdmin(); 
+                    return; 
+                }
+                
+                // Increased to 1000ms (1 full second) so you can tap casually.
+                // Removed the annoying page scroll that causes you to misclick.
                 tapTimer = window.setTimeout(() => {
-                    if (tapCount < 3) document.getElementById('home')?.scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth' });
                     tapCount = 0;
-                }, 400);
+                }, 1000); 
             });
             document.addEventListener('keydown', (event) => {
                 if (event.key.length !== 1 || /^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement?.tagName || '')) return;
@@ -5889,7 +5896,7 @@ const redirect = new URL(window.location.href);
             updateSend();
         })();
 
-        // 13. Global Auth State UI Manager - Personalized Greeting & Dashboard Routing
+// 13. Global Auth State UI Manager - Personalized Greeting & Dashboard Routing
         (async () => {
             const api = window.marzoftBackend || window.MarzoftSupabase || window.marzoftSupabase;
             if (!api || !api.client) return;
@@ -5897,8 +5904,10 @@ const redirect = new URL(window.location.href);
             try {
                 const { data: { session } } = await api.client.auth.getSession();
                 if (!session?.user) return; // Not logged in
-const user = session.user;
+                
+                const user = session.user;
                 const fullName = user.user_metadata?.full_name || user.email?.split('@')[0] || 'there';
+                const firstName = fullName.split(' ')[0];
 
                 // 1. Update Login Buttons to "Dashboard"
                 document.querySelectorAll('[data-auth-portal-open]').forEach(btn => {
@@ -5923,101 +5932,124 @@ const user = session.user;
                     });
                 });
 
-              // 2. Welcome Back Overlay - High Aesthetic Cinematic Reveal
-                if (!sessionStorage.getItem('marzoft_greeted')) {
-                    sessionStorage.setItem('marzoft_greeted', 'true');
+                // 2. The Ultimate Snappy Cinematic Reveal
+                if (!sessionStorage.getItem('marzoft_greeted_v17')) {
+                    sessionStorage.setItem('marzoft_greeted_v17', 'true');
                     
                     const overlay = document.createElement('div');
                     overlay.style.cssText = `
                         position: fixed; inset: 0; z-index: 999999;
-                        background: rgba(255, 255, 255, 0.4);
-                        backdrop-filter: blur(40px) saturate(150%);
-                        -webkit-backdrop-filter: blur(40px) saturate(150%);
+                        background: rgba(255, 255, 255, 0.45); 
+                        backdrop-filter: blur(40px) saturate(120%);
+                        -webkit-backdrop-filter: blur(40px) saturate(120%);
                         display: flex; flex-direction: column; align-items: center; justify-content: center;
-                        opacity: 0; transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1);
+                        opacity: 0; transition: opacity 0.8s ease-out;
                         pointer-events: none; overflow: hidden;
                     `;
 
-                    // Inject dynamic CSS animations for the ultimate smooth feel
                     const style = document.createElement('style');
                     style.textContent = `
-                        @keyframes mzGlowFloat1 { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(8vw, -8vh) scale(1.2); } }
-                        @keyframes mzGlowFloat2 { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(-8vw, 8vh) scale(1.1); } }
-                        @keyframes mzTextRise { 
-                            0% { transform: translateY(50px) scale(0.95); opacity: 0; filter: blur(12px); clip-path: inset(0 0 100% 0); } 
-                            100% { transform: translateY(0) scale(1); opacity: 1; filter: blur(0); clip-path: inset(0 0 -20% 0); } 
+                        @keyframes mzAuraFloatFast { 0% { transform: translate(-50%, -50%) scale(1); } 100% { transform: translate(-50%, -50%) scale(1.1); } }
+                        @keyframes mzCinematicFocusFast { 
+                            0% { transform: scale(1.05) translateY(15px); opacity: 0; letter-spacing: -0.01em; } 
+                            100% { transform: scale(1) translateY(0); opacity: 1; letter-spacing: -0.06em; } 
+                        }
+                        @keyframes mzTextFadeUpFast {
+                            0% { opacity: 0; transform: translateY(10px); }
+                            100% { opacity: 1; transform: translateY(0); }
+                        }
+                        @keyframes mzGradientShimmerFast {
+                            0% { background-position: 0% 50%; }
+                            100% { background-position: 200% 50%; }
                         }
                     `;
                     overlay.appendChild(style);
 
-                    // Dynamic background glowing orbs
-                    const orb1 = document.createElement('div');
-                    orb1.style.cssText = `position: absolute; width: 60vw; height: 60vw; background: radial-gradient(circle, rgba(37,99,235,0.15), transparent 70%); top: -20%; left: -10%; filter: blur(60px); animation: mzGlowFloat1 5s ease-in-out infinite alternate; z-index: 1;`;
-                    
-                    const orb2 = document.createElement('div');
-                    orb2.style.cssText = `position: absolute; width: 60vw; height: 60vw; background: radial-gradient(circle, rgba(124,58,237,0.12), transparent 70%); bottom: -20%; right: -10%; filter: blur(60px); animation: mzGlowFloat2 6s ease-in-out infinite alternate-reverse; z-index: 1;`;
+                    // Deep Glowing Orb
+                    const orb = document.createElement('div');
+                    orb.style.cssText = `
+                        position: absolute; width: 85vw; height: 85vw; border-radius: 50%;
+                        background: radial-gradient(circle, rgba(37,99,235,0.22) 0%, rgba(37,99,235,0) 65%);
+                        top: 50%; left: 50%; transform: translate(-50%, -50%);
+                        pointer-events: none;
+                        animation: mzAuraFloatFast 4s ease-in-out infinite alternate; z-index: 1;
+                    `;
 
                     const textWrapper = document.createElement('div');
-                    textWrapper.style.cssText = `position: relative; z-index: 10; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; width: 100%;`;
+                    textWrapper.style.cssText = `
+                        position: relative; z-index: 10; text-align: center; 
+                        display: flex; flex-direction: column; align-items: center; justify-content: center; 
+                        width: 100%; padding: 0 20px;
+                    `;
 
-                    // The Kicker
+                    // "Hello," - Darker, highly visible, elegant
                     const eyebrow = document.createElement('div');
-                    eyebrow.style.cssText = `font-family: var(--font-sans, sans-serif); font-size: clamp(0.65rem, 2vw, 0.8rem); font-weight: 800; letter-spacing: 0.3em; text-transform: uppercase; color: #526079; animation: mzTextRise 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both;`;
-                    eyebrow.innerText = "THE STAGE IS YOURS,";
+                    eyebrow.style.cssText = `
+                        font-family: 'Newsreader', Georgia, serif; font-style: italic; 
+                        font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 500; 
+                        color: #0F172A; opacity: 0; 
+                        animation: mzTextFadeUpFast 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.1s forwards;
+                        margin-bottom: -0.15em;
+                    `;
+                    eyebrow.innerHTML = `Hello,`;
 
-                    // The Massive Aesthetic Name
+                    // The Name: Massive, Iridescent Blue/Purple Gradient
                     const nameDisplay = document.createElement('div');
                     nameDisplay.style.cssText = `
                         font-family: 'Instrument Serif', Georgia, serif; 
                         font-style: italic; font-weight: 400; 
-                        font-size: clamp(4.5rem, 15vw, 11rem); 
-                        line-height: 0.95; 
+                        font-size: clamp(5.5rem, 20vw, 15rem); 
+                        line-height: 1; 
                         color: transparent; 
-                        background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 40%, #7c3aed 100%); 
+                        background: linear-gradient(135deg, #0B1020 0%, #3b82f6 40%, #1e40af 60%, #172554 100%);
+                        background-size: 200% auto;
                         -webkit-background-clip: text; 
                         background-clip: text; 
-                        padding-right: 0.05em; 
-                        animation: mzTextRise 1.3s cubic-bezier(0.16, 1, 0.3, 1) 0.25s both;
-                        max-width: 95vw;
-                        overflow: hidden;
-                        text-overflow: ellipsis;
-                        white-space: nowrap;
+                        padding-right: 0.05em; padding-bottom: 0.1em;
+                        animation: 
+                            mzCinematicFocusFast 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.15s both,
+                            mzGradientShimmerFast 5s linear infinite;
+                        max-width: 95vw; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
                     `;
-                    nameDisplay.innerText = fullName;
+                    nameDisplay.innerText = firstName + ".";
 
-                    // The Subtext
+                    // The Slogan - Color perfectly matched to "Hello,"
                     const subtext = document.createElement('div');
-                    subtext.style.cssText = `font-family: var(--font-sans, sans-serif); font-size: clamp(0.95rem, 2.5vw, 1.2rem); font-weight: 500; color: #0B1020; margin-top: 10px; animation: mzTextRise 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.4s both;`;
-                    subtext.innerHTML = `Let’s build something <b>unforgettable.</b>`;
+                    subtext.style.cssText = `
+                        font-family: var(--font-sans, sans-serif); 
+                        font-size: clamp(0.75rem, 1.5vw, 1rem); 
+                        font-weight: 600; color: #0F172A; 
+                        letter-spacing: 0.15em; text-transform: uppercase;
+                        margin-top: 5px;
+                        opacity: 0; animation: mzTextFadeUpFast 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.4s forwards;
+                    `;
+                    subtext.innerHTML = `Let's build an experience <span style="font-weight: 800;">they won't forget.</span>`;
 
                     textWrapper.appendChild(eyebrow);
                     textWrapper.appendChild(nameDisplay);
                     textWrapper.appendChild(subtext);
 
-                    overlay.appendChild(orb1);
-                    overlay.appendChild(orb2);
+                    overlay.appendChild(orb);
                     overlay.appendChild(textWrapper);
                     document.body.appendChild(overlay);
                     
-                    // Cinematic Animate In
+                    // Fire the Reveal
                     requestAnimationFrame(() => {
                         overlay.style.opacity = '1';
                     });
                     
-                    // Hold and Cinematic Animate Out
+                    // Snappy dissolve
                     setTimeout(() => {
                         overlay.style.opacity = '0';
-                        textWrapper.style.transform = 'translateY(-40px) scale(1.05)';
-                        textWrapper.style.filter = 'blur(15px)';
-                        textWrapper.style.opacity = '0';
-                        setTimeout(() => overlay.remove(), 1000);
-                    }, 3400); // Gives them a nice long moment to appreciate it
+                        textWrapper.style.transform = 'scale(1.02)';
+                        textWrapper.style.transition = 'all 0.8s ease-out';
+                        setTimeout(() => overlay.remove(), 800);
+                    }, 2400); 
                 }
             } catch (err) {
                 console.error("Auth UI Sync Error:", err);
             }
         })();
-
     </script>
 </body>
 </html>
