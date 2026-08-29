@@ -338,7 +338,7 @@
               <h4 class="font-bold text-sm mb-1">Admin Security Alert Email</h4>
               <p class="text-xs text-[var(--text-muted)] mb-3">Security breach attempts and unauthorized logins will be targeted to this email.</p>
               <div class="flex gap-2">
-                <input type="email" id="set-alert-email" class="admin-input flex-1" placeholder="rmaaz1612@gmail.com">
+                <input type="email" id="set-alert-email" class="admin-input flex-1" placeholder="hellomarzoft@gmail.com">
                 <button onclick="saveAlertEmail()" class="px-6 py-2 bg-blue-500 text-white font-bold rounded-xl hover:bg-blue-600 transition-colors shadow-md text-sm">Update Email</button>
               </div>
             </div>
@@ -709,7 +709,7 @@
         if(!data || !data.length) return tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-[var(--text-muted)]">No team members found.</td></tr>';
         
         tbody.innerHTML = data.map(c => {
-            const isMasterAdmin = (c.email === 'rmaaz1612@gmail.com');
+            const isMasterAdmin = (c.email === 'hellomarzoft@gmail.com');
             
             let roleHtml = isMasterAdmin 
                 ? `<span class="badge" style="background: #2563EB; color: #fff; font-weight: 800; letter-spacing: 0.08em; padding: 5px 12px; border-radius: 8px;">MASTER ADMIN</span>` 
@@ -774,7 +774,7 @@
         if (!Array.isArray(waMsgs)) waMsgs = waMsgs ? [waMsgs] : [];
 
         const secWord = settings.find(s => s.key === 'secret_word')?.value || 'adminx';
-        const alertEmail = settings.find(s => s.key === 'admin_alert_email')?.value || 'rmaaz1612@gmail.com';
+        const alertEmail = settings.find(s => s.key === 'admin_alert_email')?.value || 'hellomarzoft@gmail.com';
 
         const setVal = (id, v) => { const el = document.getElementById(id); if (el) el.value = v; };
         const setTxt = (id, v) => { const el = document.getElementById(id); if (el) el.innerText = v; };
@@ -830,25 +830,62 @@
         }
     };
 
-    // --- 6. ACTIONS & INTERACTIONS ---
+// --- 6. ACTIONS & INTERACTIONS ---
     window.promoteSelectedToStaff = async () => {
         const select = document.getElementById('new-staff-select');
-        if (!select || !select.value) return showToast("Select a client.", "error");
-        try { await api.client.from('profiles').update({role: 'staff'}).eq('id', select.value); showToast("Added to Team!"); select.value = ""; window.loadData(); } 
-        catch(e) { showToast("Failed to promote.", "error"); }
+        if (!select || !select.value) return showToast("Select a client to promote.", "error");
+        
+        const userId = select.value;
+        try {
+            const { error } = await api.client.rpc('admin_update_staff', { 
+                p_user_id: userId, 
+                p_role: 'staff', 
+                p_job_title: 'Team Member' 
+            });
+            if (error) throw error;
+            
+            showToast("Added to Team!");
+            select.value = "";
+            window.loadData();
+        } catch(e) {
+            console.error("Promote error:", e);
+            showToast("Failed to promote: " + (e.message || "Error"), "error");
+        }
     };
 
     window.saveTeamMember = async (id) => {
-        const role = document.getElementById(`role-${id}`)?.value;
-        const job = document.getElementById(`job-${id}`)?.value.trim();
-        try { await api.client.from('profiles').update({role, job_title: job}).eq('id', id); showToast("Team updated."); window.loadData(); } 
-        catch(e) { showToast("Update failed.", "error"); }
+        const role = document.getElementById(`role-${id}`)?.value || 'staff';
+        const job = document.getElementById(`job-${id}`)?.value.trim() || '';
+        try {
+            const { error } = await api.client.rpc('admin_update_staff', { 
+                p_user_id: id, 
+                p_role: role, 
+                p_job_title: job 
+            });
+            if (error) throw error;
+            showToast("Team member updated!");
+            window.loadData();
+        } catch(e) {
+            console.error("Save team member error:", e);
+            showToast("Update failed: " + (e.message || "Error"), "error");
+        }
     };
 
     window.demoteToClient = async (id) => {
-        if(!confirm("Remove from team?")) return;
-        try { await api.client.from('profiles').update({role: 'client', job_title: null}).eq('id', id); showToast("Removed from team."); window.loadData(); } 
-        catch(e) { showToast("Removal failed.", "error"); }
+        if (!confirm("Remove this member from team?")) return;
+        try {
+            const { error } = await api.client.rpc('admin_update_staff', { 
+                p_user_id: id, 
+                p_role: 'client', 
+                p_job_title: null 
+            });
+            if (error) throw error;
+            showToast("Removed from team.");
+            window.loadData();
+        } catch(e) {
+            console.error("Demote error:", e);
+            showToast("Removal failed: " + (e.message || "Error"), "error");
+        }
     };
 
     window.viewInquiry = (id) => {
