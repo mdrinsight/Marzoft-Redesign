@@ -3660,12 +3660,24 @@
                     position: relative;
                     min-height: 100vh;
                     min-height: 100svh;
-                    background:
-                        radial-gradient(ellipse 58% 70% at 88% 56%, rgba(26, 55, 145, 0.3) 0%, rgba(11, 28, 82, 0.2) 39%, transparent 72%),
-                        radial-gradient(ellipse 32% 30% at 84% 8%, rgba(35, 66, 158, 0.2) 0%, transparent 75%),
-                        radial-gradient(ellipse 34% 42% at 4% 96%, rgba(27, 35, 93, 0.22) 0%, transparent 72%),
-                        linear-gradient(112deg, #020614 0%, #030817 42%, #050b20 72%, #07112d 100%) !important;
-                    color: #FFFFFF !important;
+                    --hero-reference-background:
+                        radial-gradient(ellipse 32% 48% at 12% 39%, rgba(95, 140, 255, 0.14) 0%, rgba(165, 189, 255, 0.07) 45%, transparent 78%),
+                        radial-gradient(ellipse 25% 31% at 39% 18%, rgba(147, 161, 248, 0.08) 0%, transparent 78%),
+                        linear-gradient(115deg, #FBFCFF 0%, #F5F7FF 46%, #EEF1FC 100%);
+                    --hero-ink: #0B1020;
+                    --hero-muted: #526079;
+                    --hero-kicker: #2563EB;
+                    --hero-button-bg: #2563EB;
+                    --hero-button-ink: #FFFFFF;
+                    --hero-button-hover: #1D4ED8;
+                    --hero-button-shadow: rgba(37, 99, 235, 0.18);
+                    --hero-button-hover-shadow: rgba(37, 99, 235, 0.24);
+                    --hero-avatar-bg: #E8EDFF;
+                    --hero-avatar-border: #F5F7FF;
+                    --hero-card-shadow: rgba(31, 54, 118, 0.12);
+                    --hero-orb-opacity: 0.4;
+                    background: var(--hero-reference-background) !important;
+                    color: var(--hero-ink) !important;
                     display: flex;
                     align-items: center;
                     justify-content: center;
@@ -3675,11 +3687,29 @@
                     isolation: isolate;
                 }
                 html.dark .studio-split-hero {
-                    background:
-                        radial-gradient(ellipse 58% 70% at 88% 56%, rgba(26, 55, 145, 0.3) 0%, rgba(11, 28, 82, 0.2) 39%, transparent 72%),
-                        radial-gradient(ellipse 32% 30% at 84% 8%, rgba(35, 66, 158, 0.2) 0%, transparent 75%),
-                        radial-gradient(ellipse 34% 42% at 4% 96%, rgba(27, 35, 93, 0.22) 0%, transparent 72%),
-                        linear-gradient(112deg, #020614 0%, #030817 42%, #050b20 72%, #07112d 100%) !important;
+                    --hero-reference-background:
+                        radial-gradient(ellipse 32% 48% at 12% 39%, rgba(21, 39, 112, 0.28) 0%, rgba(12, 23, 70, 0.15) 45%, transparent 78%),
+                        radial-gradient(ellipse 25% 31% at 39% 18%, rgba(14, 27, 78, 0.13) 0%, transparent 78%),
+                        linear-gradient(115deg, #030513 0%, #040617 46%, #030411 100%);
+                    --hero-ink: #FFFFFF;
+                    --hero-muted: #94A3B8;
+                    --hero-kicker: #60A5FA;
+                    --hero-button-bg: #FFFFFF;
+                    --hero-button-ink: #030712;
+                    --hero-button-hover: #F3F4F6;
+                    --hero-button-shadow: rgba(255, 255, 255, 0.1);
+                    --hero-button-hover-shadow: rgba(255, 255, 255, 0.15);
+                    --hero-avatar-bg: #111827;
+                    --hero-avatar-border: #030712;
+                    --hero-card-shadow: rgba(0, 0, 0, 0.42);
+                    --hero-orb-opacity: 1;
+                    background: var(--hero-reference-background) !important;
+                }
+                /* Replace the older hero's light surface and patterned overlays. */
+                .studio-split-hero::before,
+                .studio-split-hero::after {
+                    content: none;
+                    display: none;
                 }
 
                 /* --- AMBIENT GLOW SYSTEM --- */
@@ -3696,59 +3726,62 @@
                     content: "";
                     position: absolute;
                     z-index: 0;
-                    right: -9%;
-                    bottom: -18%;
-                    width: min(47vw, 610px);
-                    aspect-ratio: 1;
-                    border: 1px solid rgba(92, 105, 244, 0.12);
-                    border-radius: 50%;
-                    box-shadow: 0 0 0 28px rgba(82, 93, 227, 0.07), 0 0 0 58px rgba(69, 77, 190, 0.045), 0 0 100px 35px rgba(54, 68, 196, 0.1);
+                    inset: 0;
+                    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180' viewBox='0 0 180 180'%3E%3Cfilter id='grain'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.92' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Cpath fill='%23fff' filter='url(%23grain)' opacity='.45' d='M0 0h180v180H0z'/%3E%3C/svg%3E");
+                    opacity: 0.065;
+                    mix-blend-mode: soft-light;
                     pointer-events: none;
                 }
                 .hero-exact-glow-canvas::before {
                     content: "";
                     position: absolute;
                     z-index: 0;
-                    right: -2%;
-                    bottom: -12%;
-                    width: min(38vw, 450px);
-                    aspect-ratio: 1;
+                    left: -12%;
+                    top: 12%;
+                    width: 48%;
+                    height: 62%;
                     border-radius: 50%;
-                    background: radial-gradient(circle at 50% 48%, rgba(62, 82, 205, 0.3) 0%, rgba(48, 60, 161, 0.2) 42%, rgba(35, 40, 111, 0.1) 66%, transparent 76%);
-                    filter: blur(32px);
-                    opacity: 0.72;
+                    background: radial-gradient(ellipse at center, rgba(24, 43, 123, 0.15) 0%, rgba(15, 28, 85, 0.07) 45%, transparent 72%);
+                    filter: blur(46px);
                     pointer-events: none;
                 }
-                /* Violet orb and halo behind the right-side card */
+                /* Reference: a 480px disc behind a 745px card, protruding
+                   about 20px to the right and 73px below, with 34px rings.
+                   Card-relative sizing keeps this alignment at every width. */
                 .hero-exact-glow-orb {
                     position: absolute;
-                    z-index: 1;
-                    width: clamp(320px, 26vw, 360px);
+                    z-index: -1;
+                    width: 64.5%;
                     aspect-ratio: 1;
                     border-radius: 50%;
-                    background: radial-gradient(circle at 50% 48%, #5f50ef 0%, #4937cf 43%, rgba(55, 43, 172, 0.82) 62%, rgba(31, 28, 102, 0.16) 72%, transparent 73%);
-                    bottom: 13%;
-                    right: 5%;
-                    box-shadow: 0 0 0 24px rgba(92, 66, 239, 0.2), 0 0 0 50px rgba(82, 60, 211, 0.12), 0 0 105px 58px rgba(67, 49, 235, 0.42), 0 25px 90px rgba(55, 38, 210, 0.34);
+                    background:
+                        radial-gradient(ellipse at 52% 100%, rgba(111, 73, 255, 0.6) 0%, transparent 58%),
+                        linear-gradient(165deg, #24174f 8%, #39258d 43%, #5034ca 73%, #603ded 100%);
+                    bottom: -12.1%;
+                    right: -2.7%;
+                    box-shadow: 0 22px 62px rgba(73, 43, 202, 0.2);
                     isolation: isolate;
+                    pointer-events: none;
+                    opacity: var(--hero-orb-opacity);
                     animation: none;
                 }
-                .hero-exact-glow-orb::before {
+                .hero-exact-glow-orb::before,
+                .hero-exact-glow-orb::after {
                     content: "";
                     position: absolute;
-                    z-index: 0;
-                    top: -20%;
-                    right: -80%;
-                    width: 200%;
-                    height: 140%;
                     border-radius: 50%;
-                    background: radial-gradient(circle at 68% 50%, rgba(105, 78, 255, 0.88) 0%, rgba(77, 55, 235, 0.58) 34%, rgba(48, 39, 165, 0.24) 57%, transparent 75%);
-                    filter: blur(38px);
                     pointer-events: none;
                 }
-                @keyframes heroGlowPulse {
-                    0% { transform: scale(1) translate(0, 0); }
-                    100% { transform: scale(1.08) translate(-20px, -10px); }
+                .hero-exact-glow-orb::before {
+                    z-index: -1;
+                    inset: -7.1%;
+                    background: radial-gradient(circle closest-side, transparent 87.5%, rgba(81, 46, 174, 0.24) 87.7%);
+                }
+                .hero-exact-glow-orb::after {
+                    z-index: -2;
+                    inset: -14.5%;
+                    background: radial-gradient(circle closest-side, transparent 88.8%, rgba(50, 27, 106, 0.1) 89%);
+                    box-shadow: 0 0 65px 24px rgba(69, 36, 168, 0.12);
                 }
 
                /* --- GRID LAYOUT --- */
@@ -3772,7 +3805,7 @@
                     font-weight: 800;
                     letter-spacing: 0.15em;
                     text-transform: uppercase;
-                    color: #60A5FA; /* Muted bright blue kicker */
+                    color: var(--hero-kicker);
                     margin-bottom: 20px;
                     display: block;
                 }
@@ -3782,7 +3815,7 @@
                     font-weight: 800;
                     line-height: 1.02;
                     letter-spacing: -0.04em;
-                    color: #FFFFFF;
+                    color: var(--hero-ink);
                     margin-bottom: 24px;
                 }
                 .hero-exact-title span {
@@ -3802,7 +3835,7 @@
                 }
                 .hero-exact-desc {
                     font-size: clamp(0.95rem, 1.1vw, 1.1rem);
-                    color: #94A3B8; /* Soft slate description */
+                    color: var(--hero-muted);
                     line-height: 1.6;
                     margin-bottom: 36px;
                     max-width: 520px;
@@ -3821,21 +3854,21 @@
                     justify-content: center;
                     gap: 10px;
                     padding: 16px 36px;
-                    background-color: #FFFFFF;
-                    color: #030712;
+                    background-color: var(--hero-button-bg);
+                    color: var(--hero-button-ink);
                     border-radius: 999px;
                     font-size: 0.95rem;
                     font-weight: 700;
-                    box-shadow: 0 10px 30px rgba(255, 255, 255, 0.1);
+                    box-shadow: 0 10px 30px var(--hero-button-shadow);
                     transition: transform 0.3s var(--ease), box-shadow 0.3s ease, background 0.3s ease;
                 }
                 .hero-exact-btn-primary:hover {
-                    background-color: #F3F4F6;
+                    background-color: var(--hero-button-hover);
                     transform: translateY(-2px);
-                    box-shadow: 0 14px 36px rgba(255, 255, 255, 0.15);
+                    box-shadow: 0 14px 36px var(--hero-button-hover-shadow);
                 }
                 .hero-exact-btn-link {
-                    color: #94A3B8;
+                    color: var(--hero-muted);
                     font-size: 0.95rem;
                     font-weight: 600;
                     display: inline-flex;
@@ -3844,7 +3877,7 @@
                     transition: color 0.3s ease;
                 }
                 .hero-exact-btn-link:hover {
-                    color: #FFFFFF;
+                    color: var(--hero-ink);
                 }
 
                 /* Social Proof Row */
@@ -3861,16 +3894,16 @@
                     width: 32px;
                     height: 32px;
                     border-radius: 50%;
-                    border: 2px solid #030712;
+                    border: 2px solid var(--hero-avatar-border);
                     margin-right: -10px;
                 }
                 .hero-exact-avatars .avatars-badge {
                     width: 32px;
                     height: 32px;
                     border-radius: 50%;
-                    background: #111827;
-                    border: 2px solid #030712;
-                    color: #94A3B8;
+                    background: var(--hero-avatar-bg);
+                    border: 2px solid var(--hero-avatar-border);
+                    color: var(--hero-muted);
                     font-size: 0.65rem;
                     font-weight: 800;
                     display: grid;
@@ -3879,16 +3912,17 @@
                 }
                 .hero-exact-proof-text {
                     font-size: 0.85rem;
-                    color: #94A3B8;
+                    color: var(--hero-muted);
                     font-weight: 600;
                 }
 
                 /* --- RIGHT COLUMN: THE CARD --- */
                 .hero-exact-panel {
+                    position: relative;
                     background: #F5F6FF !important; /* Reference white box surface */
                     border-radius: 20px !important;
                     padding: clamp(36px, 4.8vh, 54px) clamp(30px, 3.3vw, 46px) !important;
-                    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.42), 0 0 0 1px rgba(214, 221, 255, 0.45) !important;
+                    box-shadow: 0 30px 80px var(--hero-card-shadow), 0 0 0 1px rgba(214, 221, 255, 0.45) !important;
                     color: #0B1020 !important;
                     border: 1px solid rgba(220, 226, 255, 0.95) !important;
                     display: flex;
@@ -3986,9 +4020,7 @@
             </style>
 
             <!-- Indigo/Purple Ambient Glow Projection -->
-            <div class="hero-exact-glow-canvas" aria-hidden="true">
-                <div class="hero-exact-glow-orb"></div>
-            </div>
+            <div class="hero-exact-glow-canvas" aria-hidden="true"></div>
 
             <div class="container">
                 <div class="hero-exact-grid">
@@ -4023,6 +4055,7 @@
 
                     <!-- Right: Scoped Porcelain Card with Separators -->
                     <section class="hero-exact-panel" aria-label="Marzoft's approach">
+                        <div class="hero-exact-glow-orb" aria-hidden="true"></div>
                         <div>
                             <div class="hero-exact-card-icon">✦</div>
                             <span class="hero-exact-card-kicker">THE MARZOFT APPROACH</span>
