@@ -2562,6 +2562,207 @@
             }
         }
 
+        /* Scene 03-05 composition rebuild: explore / compare / decide */
+        .scene-websites { overflow: hidden; pointer-events: none !important; }
+        .scene-websites .abstract-website {
+            right: auto; bottom: auto; margin: 0; overflow: hidden;
+            border: 1px solid rgba(112, 132, 176, .18); border-radius: 13px;
+            background: #fff; box-shadow: 0 20px 50px -26px rgba(11, 16, 32, .34);
+            transition: left .8s cubic-bezier(.22,.61,.36,1), top .8s cubic-bezier(.22,.61,.36,1),
+                width .8s cubic-bezier(.22,.61,.36,1), height .8s cubic-bezier(.22,.61,.36,1),
+                opacity .55s ease, transform .8s cubic-bezier(.22,.61,.36,1),
+                border-color .5s ease, box-shadow .5s ease;
+        }
+
+        .scene-websites .website-main {
+            left: 4%; top: 15%; width: 72%; height: 68%; z-index: 3;
+            opacity: 0; clip-path: inset(12% 10% 12% 10% round 13px);
+            transform: translateY(18px) scale(.96);
+        }
+        .decision-window.step-2 .website-main {
+            left: 4%; top: 15%; width: 72%; height: 68%; opacity: 1;
+            clip-path: inset(0 0 0 0 round 13px); transform: none;
+        }
+        .decision-window.step-3 .website-main {
+            left: 4%; top: 20%; width: 42%; height: 52%; opacity: 1;
+            clip-path: inset(0 0 0 0 round 13px); transform: none;
+            border-color: rgba(54,113,245,.33);
+            animation: compareMainFocus 1.6s ease-in-out .72s both;
+        }
+        .decision-window.step-4 .website-main {
+            left: 62%; top: 25%; width: 32%; height: 46%; opacity: 1;
+            clip-path: inset(0 0 0 0 round 13px); transform: none; animation: none;
+            border-color: rgba(54,113,245,.62);
+            box-shadow: 0 22px 46px -27px rgba(16,39,92,.48);
+        }
+
+        .scene-websites .aw-page { height: 100%; display: flex; flex-direction: column; background: #fff; }
+        .scene-websites .aw-site-nav {
+            height: 40px; min-height: 40px; flex-basis: 40px; padding: 0 20px;
+            border-bottom: 1px solid #e9edf4; opacity: 1; transform: none;
+        }
+        .scene-websites .aw-logo { color: #10192e; font-size: .62rem; letter-spacing: .1em; }
+        .scene-websites .aw-nav-lines { gap: 8px; }
+        .scene-websites .aw-nav-lines i { width: 20px; height: 2px; background: #ced5e0; }
+        .scene-websites .aw-nav-lines i:last-child { width: 31px; height: 14px; background: #dde7ff; }
+        .aw-viewport { position: relative; min-height: 0; flex: 1; overflow: hidden; }
+        .aw-scroll-content { width: 100%; transform: translateY(0); }
+        .decision-window.step-2 .aw-scroll-content { animation: websiteExplore 2.15s cubic-bezier(.55,.05,.28,1) .08s both; }
+        .decision-window:is(.step-3,.step-4) .aw-scroll-content { height: 100%; transform: none; animation: none; }
+
+        .scene-websites .aw-content {
+            min-height: 185px; padding: 21px 24px 18px; display: grid;
+            grid-template-columns: 1.18fr .82fr; gap: 22px;
+        }
+        .scene-websites .aw-copy { align-self: center; }
+        .scene-websites .aw-eyebrow { margin-bottom: 8px; font-size: .44rem; opacity: 0; transform: translateY(7px); }
+        .scene-websites .aw-title { margin-bottom: 9px; color: #10192e; font-size: 1.45rem; }
+        .scene-websites .aw-title span { opacity: 0; transform: translateY(9px); }
+        .aw-paragraph {
+            max-width: 230px; margin: 0 0 12px; color: #6b778c; font-size: .52rem; line-height: 1.55;
+            opacity: 0; transform: translateY(7px); transition: opacity .4s ease .42s, transform .5s ease .42s;
+        }
+        .scene-websites .aw-cta { width: max-content; min-width: 103px; height: 28px; opacity: 0; transform: translateY(8px); }
+        .scene-websites .aw-showcase {
+            min-width: 0; padding: 16px; border-radius: 10px; border-color: rgba(54,113,245,.16);
+            background: #f3f6fc; opacity: 0; transform: translateY(15px);
+        }
+        .aw-project-lines { height: 35px; margin-top: 11px; display: grid; grid-template-columns: 1.3fr .8fr 1fr; align-items: end; gap: 5px; }
+        .aw-project-lines i { height: 58%; border-radius: 3px; background: #c5d6fb; transform: scaleY(.2); transform-origin: bottom; transition: transform .5s ease .7s; }
+        .aw-project-lines i:nth-child(2) { height: 100%; transition-delay: .78s; }
+        .aw-project-lines i:nth-child(3) { height: 75%; background: #8faff7; transition-delay: .86s; }
+        .decision-window:is(.step-2,.step-3,.step-4) :is(.aw-eyebrow,.aw-title span,.aw-paragraph,.aw-cta,.aw-showcase) { opacity: 1; transform: none; }
+        .decision-window:is(.step-2,.step-3,.step-4) .aw-project-lines i { transform: scaleY(1); }
+
+        .aw-section-rule { height: 30px; padding: 0 24px; display: flex; align-items: center; gap: 12px; color: #8a96a9; font-size: .39rem; font-weight: 800; letter-spacing: .12em; }
+        .aw-section-rule i { height: 1px; flex: 1; background: #e3e8f0; }
+        .aw-second-section { min-height: 126px; padding: 18px 24px; display: grid; grid-template-columns: .9fr 1.1fr; gap: 20px; border-top: 1px solid #eef1f6; background: #f8fafd; }
+        .aw-second-copy span,.aw-second-copy strong,.aw-second-copy i { display: block; }
+        .aw-second-copy span { margin-bottom: 8px; color: #3671f5; font-size: .42rem; font-weight: 800; letter-spacing: .1em; }
+        .aw-second-copy strong { margin-bottom: 12px; color: #18243b; font-size: .78rem; }
+        .aw-second-copy i { width: 84%; height: 3px; margin-bottom: 5px; border-radius: 99px; background: #d5dce7; }
+        .aw-second-copy i.short { width: 58%; }
+        .aw-second-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 6px; }
+        .aw-second-grid i { border-radius: 6px; background: #e6ebf3; }
+        .aw-second-grid i:nth-child(2) { background: #dde6f8; }
+        .scene-websites .aw-content-strip { min-height: 48px; padding: 0 24px; opacity: 1; transform: none; }
+        .aw-footer-hint { min-height: 31px; padding: 0 24px; display: flex; align-items: center; gap: 10px; border-top: 1px solid #e9edf4; color: #9aa5b5; font-size: .4rem; }
+        .aw-footer-hint b { color: #5e6b80; letter-spacing: .08em; }
+        .aw-footer-hint span { width: 28px; height: 2px; margin-left: auto; background: #d4dae4; }
+        .aw-footer-hint i { width: 18px; height: 2px; background: #d4dae4; }
+
+        .aw-check-cursor { position: absolute; z-index: 8; left: 43%; top: 54%; width: 0; height: 0; border-top: 10px solid #24324c; border-right: 7px solid transparent; opacity: 0; transform: rotate(-22deg); }
+        .decision-window.step-2 .aw-check-cursor { animation: inspectPointer 2.15s ease-in-out .1s both; }
+        .scene-websites .aw-focus-note { top: 13px; right: 12px; padding: 5px 8px; background: #f6f9ff; box-shadow: none; opacity: 0; }
+        .decision-window.step-4 .aw-focus-note { opacity: 1; transform: none; }
+
+        .website-alt,.website-alt-secondary {
+            left: 54%; top: 20%; width: 42%; height: 52%; z-index: 2; opacity: 0;
+            transform: translateX(64px); filter: saturate(.48) contrast(.92);
+        }
+        .website-alt-secondary { left: 61%; top: 23%; width: 38%; height: 47%; z-index: 1; transform: translateX(76px) scale(.96); }
+        .decision-window.step-3 .website-alt { opacity: .82; transform: none; animation: compareSiteEnter .82s cubic-bezier(.22,.61,.36,1) both, compareAltFocus 1.6s ease-in-out .72s both; }
+        .decision-window.step-3 .website-alt-secondary { opacity: .17; transform: translateX(24px) scale(.96); animation: thirdOptionEnter .72s cubic-bezier(.22,.61,.36,1) .5s both; }
+        .decision-window.step-4 :is(.website-alt,.website-alt-secondary) { opacity: 0; transform: translateX(30px); animation: none; }
+
+        .decision-window:is(.step-3,.step-4) .website-main .aw-content { height: 100%; min-height: 0; padding: 14px; gap: 10px; }
+        .decision-window:is(.step-3,.step-4) .website-main .aw-title { font-size: 1rem; }
+        .decision-window:is(.step-3,.step-4) .website-main :is(.aw-paragraph,.aw-section-rule,.aw-second-section,.aw-content-strip,.aw-footer-hint) { display: none; }
+        .decision-window.step-4 .website-main .aw-content { padding: 12px; gap: 8px; }
+        .decision-window.step-4 .website-main .aw-title { font-size: .82rem; }
+        .decision-window.step-4 .website-main .aw-eyebrow { font-size: .34rem; }
+        .decision-window.step-4 .website-main .aw-cta { min-width: 76px; height: 22px; padding-inline: 8px; font-size: .4rem; }
+        .decision-window.step-4 .website-main .aw-showcase { padding: 8px; }
+        .decision-window.step-4 .website-main .aw-showcase strong { font-size: .72rem; }
+
+        .alt-nav { height: 37px; padding: 0 17px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #e8ecf2; }
+        .alt-nav i,.alt-nav span { display: block; height: 4px; border-radius: 99px; background: #c8cfd9; }
+        .alt-nav i { width: 38px; } .alt-nav span { width: 67px; }
+        .alt-hero { padding: 23px 18px 13px; }
+        .alt-hero strong,.alt-hero i,.alt-hero b { display: block; border-radius: 4px; }
+        .alt-hero strong { width: 78%; height: 15px; margin-bottom: 13px; background: #bbc3cf; }
+        .alt-hero i { width: 88%; height: 4px; margin-bottom: 6px; background: #d6dbe3; }
+        .alt-hero i.short { width: 61%; }
+        .alt-hero b { width: 72px; height: 21px; margin-top: 16px; background: #c8d0dc; }
+        .alt-feature { height: 57px; margin: 0 18px 12px; border-radius: 6px; background: #e6e9ee; }
+        .alt-blocks { padding: 0 18px; display: grid; grid-template-columns: repeat(3,1fr); gap: 6px; }
+        .alt-blocks i { height: 31px; border-radius: 5px; background: #eceff3; }
+
+        .compare-divider { position: absolute; z-index: 5; left: 50%; top: 22%; width: 1px; height: 47%; background: rgba(123,139,173,.27); opacity: 0; transform: scaleY(0); transition: opacity .45s ease, transform .7s cubic-bezier(.22,.61,.36,1); }
+        .compare-divider span { position: absolute; left: 50%; top: 50%; padding: 6px 4px; background: #fafbff; color: #73809a; font-size: .48rem; font-weight: 800; transform: translate(-50%,-50%); }
+        .decision-window.step-3 .compare-divider { opacity: 1; transform: scaleY(1); }
+        .decision-window.step-4 .compare-divider { opacity: 0; transform: scaleY(0); }
+
+        .scene-check .check-message { left: auto; right: 4%; top: 43%; bottom: auto; width: 17%; padding: 0; border: 0; color: #26344e; font-size: .78rem; line-height: 1.45; letter-spacing: .075em; }
+        .scene-check .check-message span,.scene-compare .compare-message span { display: block; }
+        .scene-check .check-message span:last-child { color: #3671f5; }
+        .scene-compare .compare-message { left: 50%; bottom: 66px; width: auto; padding: 0; border: 0; color: #56657d; font-size: .72rem; font-weight: 700; line-height: 1.45; letter-spacing: .1em; text-align: center; transform: translate(-50%,8px); }
+        .decision-window.step-3 .scene-compare .compare-message { transform: translate(-50%,0); }
+        .scene-decide { justify-content: flex-start; }
+        .scene-decide .decide-message { left: 6%; top: 29%; bottom: auto; width: 52%; padding: 0; border: 0; transform: translateX(-20px); }
+        .decision-window.step-4 .scene-decide .decide-message { transform: none; }
+        .scene-decide .dm-large { margin: 0 0 17px; font-size: clamp(2rem,3.5vw,3.1rem); line-height: .94; letter-spacing: -.045em; }
+        .scene-decide .dm-large span,.scene-decide .dm-large em { display: block; opacity: 0; transform: translateY(13px); }
+        .scene-decide .dm-large span { color: #131d32; font-style: normal; }
+        .scene-decide .dm-large em { color: #3671f5; font-family: var(--font-serif,serif); font-weight: 500; }
+        .decision-window.step-4 .dm-large span { animation: decisionWordsIn .65s cubic-bezier(.22,.61,.36,1) .18s both; }
+        .decision-window.step-4 .dm-large em { animation: decisionWordsIn .72s cubic-bezier(.22,.61,.36,1) .32s both; }
+        .scene-decide .dm-small { max-width: 230px; color: #64738a; font-size: .9rem; line-height: 1.5; opacity: 0; transform: translateY(8px); }
+        .decision-window.step-4 .dm-small { animation: decisionWordsIn .6s ease .54s both; }
+
+        @keyframes websiteExplore { 0%,36%{transform:none} 70%,88%{transform:translateY(-82px)} 100%{transform:translateY(-62px)} }
+        @keyframes inspectPointer { 0%,18%{left:43%;top:54%;opacity:0} 28%{opacity:.72} 48%{left:32%;top:62%;opacity:.72} 72%{left:58%;top:69%;opacity:.58} 100%{left:54%;top:63%;opacity:0} }
+        @keyframes compareSiteEnter { from{opacity:0;transform:translateX(64px)} to{opacity:.82;transform:none} }
+        @keyframes thirdOptionEnter { from{opacity:0;transform:translateX(70px) scale(.93)} to{opacity:.17;transform:translateX(24px) scale(.96)} }
+        @keyframes compareMainFocus { 0%,35%{border-color:rgba(54,113,245,.22)} 58%,100%{border-color:rgba(54,113,245,.48);box-shadow:0 19px 44px -24px rgba(54,113,245,.4)} }
+        @keyframes compareAltFocus { 0%,18%{border-color:rgba(112,132,176,.16)} 34%,51%{border-color:rgba(104,123,160,.36);box-shadow:0 20px 44px -24px rgba(42,56,84,.34)} 72%,100%{border-color:rgba(112,132,176,.12);filter:saturate(.35) contrast(.9)} }
+        @keyframes decisionWordsIn { from{opacity:0;transform:translateY(13px)} to{opacity:1;transform:none} }
+
+        html.dark .scene-websites .abstract-website { background:#0a1530!important; border-color:rgba(120,145,205,.16)!important; }
+        html.dark .scene-websites .aw-page { background:#0a1530; }
+        html.dark .scene-websites .aw-site-nav { border-color:#182642; }
+        html.dark .scene-websites .aw-logo,html.dark .scene-websites .aw-title { color:#f2f5fc; }
+        html.dark .scene-websites .aw-nav-lines i { background:#2a3956; }
+        html.dark .aw-paragraph { color:#8d9bb4; }
+        html.dark .scene-websites .aw-showcase { background:#0e1c38; }
+        html.dark .aw-section-rule i,html.dark .aw-footer-hint { border-color:#172541; }
+        html.dark .aw-second-section { border-color:#172541; background:#0c1831; }
+        html.dark .aw-second-copy strong { color:#e7ecf6; }
+        html.dark .aw-second-grid i,html.dark .alt-feature,html.dark .alt-blocks i { background:#15243e; }
+        html.dark .alt-nav { border-color:#1c2942; }
+        html.dark .alt-nav i,html.dark .alt-nav span,html.dark .alt-hero strong,html.dark .alt-hero b { background:#344158; }
+        html.dark .alt-hero i { background:#253148; }
+        html.dark .compare-divider span { background:#07122a; color:#7f8eab; }
+        html.dark .scene-check .check-message { color:#f0f4fc!important; }
+        html.dark .scene-check .check-message span:last-child,html.dark .scene-decide .dm-large em { color:#6895ff; }
+        html.dark .scene-compare .compare-message,html.dark .scene-decide .dm-small { color:#a5b2c9!important; }
+        html.dark .scene-decide .dm-large span { color:#f3f6fc; }
+
+        @media(max-width:768px) {
+            .decision-window.step-2 .website-main { left:4%;top:17%;width:66%;height:62%; }
+            .decision-window.step-3 .website-main { left:3%;top:23%;width:43%;height:43%;animation:none; }
+            .decision-window.step-4 .website-main { left:62%;top:29%;width:34%;height:39%; }
+            .website-alt { left:54%;top:23%;width:43%;height:43%; }
+            .website-alt-secondary { left:62%;top:25%;width:39%;height:39%; }
+            .scene-websites .aw-site-nav { height:30px;min-height:30px;flex-basis:30px;padding:0 10px; }
+            .scene-websites .aw-content { min-height:145px;padding:13px 12px 11px;gap:8px; }
+            .scene-websites .aw-title { font-size:.88rem; }
+            .aw-paragraph { margin-bottom:8px;font-size:.4rem; }
+            .scene-websites .aw-cta { min-width:72px;height:21px;padding-inline:7px;font-size:.4rem; }
+            .scene-websites .aw-showcase { padding:8px; }
+            .aw-second-section { min-height:105px;padding:12px;gap:9px; }
+            .alt-nav { height:29px;padding-inline:9px; }
+            .alt-hero { padding:14px 10px 9px; }
+            .alt-feature { height:34px;margin:0 10px 8px; }
+            .alt-blocks { padding-inline:10px; }
+            .alt-blocks i { height:19px; }
+            .scene-check .check-message { right:3%;top:43%;width:23%;font-size:.58rem; }
+            .scene-compare .compare-message { bottom:61px;font-size:.57rem; }
+            .scene-decide .decide-message { left:5%;top:33%;width:54%; }
+            .scene-decide .dm-large { margin-bottom:10px;font-size:clamp(1.25rem,6vw,1.75rem); }
+            .scene-decide .dm-small { font-size:.66rem; }
+        }
+
         /* ==========================================================================
            05. SECTION 3: WHAT WE DO / PROCESS
            ========================================================================== */
@@ -21812,90 +22013,74 @@
 
                         <!-- Shared Continuity Website layer (CHECK / COMPARE / DECIDE) -->
                         <div class="scene scene-websites">
-                            <!-- Ghost 2 (back) -->
-                            <div class="abstract-website website-ghost ghost-2" aria-hidden="true">
-                                <div class="aw-browserbar">
-                                    <span class="aw-browser-dots"><i></i><i></i><i></i></span>
-                                    <span class="aw-domain">another-studio.com</span>
-                                </div>
-                                <div class="aw-ghost-page">
-                                    <div class="aw-ghost-nav"><span></span><span></span></div>
-                                    <div class="aw-ghost-grid">
-                                        <div><span class="aw-ghost-kicker"></span><span class="aw-ghost-heading"></span><span class="aw-ghost-line"></span><span class="aw-ghost-line short"></span></div>
-                                        <span class="aw-ghost-visual"></span>
-                                    </div>
-                                </div>
+                            <div class="abstract-website website-alt-secondary" aria-hidden="true">
+                                <div class="alt-nav"><i></i><span></span></div>
+                                <div class="alt-hero"><strong></strong><i></i><i class="short"></i></div>
+                                <div class="alt-blocks"><i></i><i></i></div>
                             </div>
-                            <!-- Ghost 1 (middle) -->
-                            <div class="abstract-website website-ghost ghost-1" aria-hidden="true">
-                                <div class="aw-browserbar">
-                                    <span class="aw-browser-dots"><i></i><i></i><i></i></span>
-                                    <span class="aw-domain">typical-agency.com</span>
-                                </div>
-                                <div class="aw-ghost-page">
-                                    <div class="aw-ghost-nav"><span></span><span></span></div>
-                                    <div class="aw-ghost-grid">
-                                        <div><span class="aw-ghost-kicker"></span><span class="aw-ghost-heading"></span><span class="aw-ghost-line"></span><span class="aw-ghost-line short"></span></div>
-                                        <span class="aw-ghost-visual"></span>
-                                    </div>
-                                </div>
+                            <div class="abstract-website website-alt" aria-hidden="true">
+                                <div class="alt-nav"><i></i><span></span></div>
+                                <div class="alt-hero"><strong></strong><i></i><i class="short"></i><b></b></div>
+                                <div class="alt-feature"></div>
+                                <div class="alt-blocks"><i></i><i></i><i></i></div>
                             </div>
-                            <!-- Main Website (front) -->
+                            <div class="compare-divider" aria-hidden="true"><span>VS</span></div>
                             <div class="abstract-website website-main" id="websiteMain">
-                                <div class="aw-browserbar">
-                                    <span class="aw-browser-dots" aria-hidden="true"><i></i><i></i><i></i></span>
-                                    <span class="aw-domain">marzoft.com</span>
-                                    <span class="aw-secure" aria-label="Secure website">SECURE</span>
-                                </div>
                                 <div class="aw-page">
                                     <div class="aw-site-nav">
                                         <span class="aw-logo">MARZOFT</span>
                                         <span class="aw-nav-lines" aria-hidden="true"><i></i><i></i><i></i></span>
                                     </div>
-                                    <div class="aw-content">
-                                        <div class="aw-copy">
-                                            <span class="aw-eyebrow">DIGITAL EXPERIENCES</span>
-                                            <div class="aw-title" aria-label="Built to be remembered.">
-                                                <span>Built to be</span><span>remembered.</span>
+                                    <div class="aw-viewport">
+                                        <div class="aw-scroll-content">
+                                            <div class="aw-content">
+                                                <div class="aw-copy">
+                                                    <span class="aw-eyebrow">DIGITAL EXPERIENCES</span>
+                                                    <div class="aw-title" aria-label="Built to be remembered."><span>Built to be</span><span>remembered.</span></div>
+                                                    <p class="aw-paragraph">Distinctive digital work for businesses ready to be seen, trusted and chosen.</p>
+                                                    <div class="aw-cta"><span>Start a project</span><i aria-hidden="true">&rarr;</i></div>
+                                                </div>
+                                                <div class="aw-showcase" aria-hidden="true">
+                                                    <span class="aw-card-label">SELECTED WORK</span>
+                                                    <strong>Made clear.</strong>
+                                                    <span class="aw-card-copy">Purpose before decoration.</span>
+                                                    <div class="aw-project-lines"><i></i><i></i><i></i></div>
+                                                </div>
                                             </div>
-                                            <div class="aw-body-lines" aria-hidden="true"><i></i><i></i></div>
-                                            <div class="aw-cta"><span>Start a project</span><i aria-hidden="true">&rarr;</i></div>
+                                            <div class="aw-section-rule" aria-hidden="true"><span>SCROLL TO EXPLORE</span><i></i></div>
+                                            <div class="aw-second-section">
+                                                <div class="aw-second-copy"><span>HOW WE WORK</span><strong>Clarity at every step.</strong><i></i><i class="short"></i></div>
+                                                <div class="aw-second-grid" aria-hidden="true"><i></i><i></i><i></i></div>
+                                            </div>
+                                            <div class="aw-content-strip" aria-hidden="true">
+                                                <span><i>01</i> Intentional</span><span><i>02</i> Memorable</span><span><i>03</i> Credible</span>
+                                            </div>
+                                            <div class="aw-footer-hint" aria-hidden="true"><b>MARZOFT</b><span></span><i></i></div>
                                         </div>
-                                        <div class="aw-showcase" aria-hidden="true">
-                                            <span class="aw-card-label">SIGNAL 01</span>
-                                            <strong>Clear.</strong>
-                                            <span class="aw-card-copy">Purpose before decoration.</span>
-                                            <div class="aw-card-bars"><i></i><i></i><i></i></div>
-                                        </div>
-                                    </div>
-                                    <div class="aw-content-strip" aria-hidden="true">
-                                        <span><i>01</i> Intentional</span>
-                                        <span><i>02</i> Memorable</span>
-                                        <span><i>03</i> Credible</span>
                                     </div>
                                 </div>
-                                <div class="aw-scanline" aria-hidden="true"></div>
-                                <div class="aw-focus-note"><i aria-hidden="true"></i> CREDIBLE CHOICE</div>
+                                <div class="aw-check-cursor" aria-hidden="true"></div>
+                                <div class="aw-focus-note"><i aria-hidden="true"></i> SELECTED</div>
                             </div>
                         </div>
 
                         <!-- SCENE 3: CHECK (Overlay) -->
                         <div class="scene scene-check">
                             <span class="scene-label">03 / CHECK</span>
-                            <div class="check-message">FIRST IMPRESSIONS<br>HAPPEN HERE.</div>
+                            <div class="check-message"><span>FIRST IMPRESSIONS</span><span>HAPPEN HERE.</span></div>
                         </div>
 
                         <!-- SCENE 4: COMPARE (Overlay) -->
                         <div class="scene scene-compare">
                             <span class="scene-label">04 / COMPARE</span>
-                            <div class="compare-message">You're rarely the only option.</div>
+                            <div class="compare-message"><span>YOU'RE RARELY</span><span>THE ONLY OPTION.</span></div>
                         </div>
 
                         <!-- SCENE 5: DECIDE (Overlay) -->
                         <div class="scene scene-decide">
                             <span class="scene-label">05 / DECIDE</span>
                             <div class="decide-message">
-                                <div class="dm-large">THIS ONE<br>FEELS CREDIBLE.</div>
+                                <div class="dm-large"><span>THIS ONE</span><em>FEELS CREDIBLE.</em></div>
                                 <div class="dm-small">They choose who feels credible.</div>
                             </div>
                         </div>
@@ -22378,6 +22563,7 @@
             let sectionIsVisible = false;
             let loopController = null;
             let currentSequenceId = 0;
+            let activeScene = 0;
             let userPaused = false;
             let pauseTimeout = null;
 
@@ -22394,12 +22580,16 @@
             }
 
             function setActiveScene(sceneIndex) {
+                if (!Number.isInteger(sceneIndex) || sceneIndex < 0 || sceneIndex > 4) return;
+                activeScene = sceneIndex;
                 for (let i = 0; i < 5; i++) {
                     windowEl.classList.remove(`step-${i}`);
                 }
-                windowEl.classList.add(`step-${sceneIndex}`);
-                indexBtns.forEach((btn, index) => {
-                    if (index === sceneIndex) {
+                windowEl.classList.add(`step-${activeScene}`);
+                windowEl.dataset.activeScene = String(activeScene);
+                indexBtns.forEach((btn) => {
+                    const buttonScene = Number(btn.getAttribute('data-stage'));
+                    if (buttonScene === activeScene) {
                         btn.setAttribute('aria-current', 'step');
                     } else {
                         btn.removeAttribute('aria-current');
@@ -22438,18 +22628,18 @@
 
                     // 03: CHECK
                     if (!(await playScene(2, seqId))) break;
-                    await delay(2000);
+                    await delay(2300);
 
                     // 04: COMPARE
                     if (!(await playScene(3, seqId))) break;
-                    await delay(2000);
+                    await delay(2400);
 
                     // 05: DECIDE
                     if (!(await playScene(4, seqId))) break;
-                    await delay(420);
+                    await delay(500);
                     closing?.classList.add('is-visible');
-                    await delay(1680);
-                    await delay(1800);
+                    await delay(2000);
+                    await delay(2000);
 
                     // Reset transition
                     if (currentSequenceId !== seqId || !sectionIsVisible) break;
