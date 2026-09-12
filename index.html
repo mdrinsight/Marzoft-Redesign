@@ -21961,7 +21961,53 @@
                 </div>
             </div>
         </section>
-        <!-- ==========================================================================
+        <style id="problem-single-screen-fix">
+            /* Keep the Decision Window and its headline together in one desktop section. */
+            @media (min-width: 993px) {
+                #problem {
+                    display: flex;
+                    min-height: 100svh;
+                    align-items: center;
+                    box-sizing: border-box;
+                    padding-block: clamp(36px, 6svh, 64px);
+                }
+
+                #problem > .container {
+                    display: grid;
+                    grid-template-columns: minmax(300px, 0.78fr) minmax(540px, 1.22fr);
+                    gap: clamp(40px, 5vw, 72px);
+                    align-items: center;
+                    min-height: 0;
+                    padding-top: 0;
+                    padding-bottom: 0;
+                }
+
+                #problem .journey-header {
+                    max-width: 480px;
+                    margin: 0;
+                    padding: 0;
+                }
+
+                #problem .decision-window {
+                    min-height: clamp(450px, 61svh, 520px);
+                }
+
+                #problem .decision-closing {
+                    margin-top: clamp(18px, 2.5svh, 28px);
+                }
+            }
+
+            @media (min-width: 993px) and (max-height: 820px) {
+                #problem {
+                    padding-block: 30px;
+                }
+
+                #problem .decision-window {
+                    min-height: 450px;
+                }
+            }
+        </style>
+        <!-- ========================================================================== 
              03. CUSTOMER JOURNEY / THE PROBLEM SECTION
              ========================================================================== -->
         <section class="journey-section" id="problem">
