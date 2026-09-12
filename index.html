@@ -21287,33 +21287,219 @@
         }
     </style>
     <style id="testimonials-viewport-fix">
-        /* Center the complete approved testimonial composition as one viewport unit. */
+        /* Fit the complete reviews composition inside one viewport with readable medium-sized typography */
         @media (min-width: 901px) {
             #reviews.reviews-section.past-reviews-section {
                 display: flex;
-                min-height: 90svh !important;
+                flex-direction: column;
+                justify-content: center;
                 align-items: center;
+                min-height: 100vh;
+                min-height: 100svh;
+                min-height: 100dvh;
+                height: 100dvh;
                 box-sizing: border-box;
-                padding-block: clamp(24px, 4svh, 44px);
+                padding-top: calc(var(--nav-height, 74px) + clamp(6px, 1.2vh, 16px));
+                padding-bottom: clamp(10px, 1.6vh, 20px);
+                overflow: hidden;
+                position: relative;
             }
 
             #reviews > .testimonials-inner {
-                flex: 0 0 auto;
-                margin-block: 0;
+                width: min(1200px, calc(100% - 56px));
+                max-height: calc(100dvh - var(--nav-height, 74px) - 24px);
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                margin: 0 auto;
+                box-sizing: border-box;
+            }
+
+            #reviews .past-reviews-heading {
+                padding: 0;
+                margin-bottom: 0;
+            }
+
+            #reviews .past-reviews-heading p {
+                margin: 0 0 6px;
+                font-size: 0.82rem;
+                font-weight: 600;
+                letter-spacing: 0.12em;
+                text-transform: uppercase;
+                opacity: 0.92;
+            }
+
+            #reviews .past-reviews-heading h2 {
+                font-size: clamp(2.3rem, 3.4vw, 3.2rem);
+                line-height: 1.08;
+                margin: 0;
+                font-weight: 800;
+                letter-spacing: -0.02em;
+            }
+
+            #reviews .past-reviews-heading > span {
+                margin: 10px auto 8px;
+                width: 42px;
+                height: 2px;
+            }
+
+            #reviews .past-reviews-heading small {
+                font-size: clamp(0.96rem, 1.1vw, 1.06rem);
+                line-height: 1.4;
+                display: block;
+                margin: 0;
+                font-weight: 400;
+                opacity: 0.9;
+            }
+
+            #reviews .past-reviews-carousel {
+                margin-top: clamp(12px, 1.8vh, 18px);
+            }
+
+            #reviews .past-reviews-track {
+                padding-bottom: 8px;
+            }
+
+            /* Preserve medium square-ish card silhouette and proportions */
+            #reviews .past-reviews-section .review-card,
+            #reviews .review-card,
+            #reviews .review-empty-card {
+                width: min(370px, calc(100vw - 48px)) !important;
+                min-height: 305px !important;
+                height: clamp(300px, 34vh, 318px) !important;
+                padding: 24px 26px 20px !important;
+                border-radius: 22px !important;
+            }
+
+            #reviews .past-reviews-section .review-card-top,
+            #reviews .review-card-top {
+                margin-bottom: 10px !important;
+            }
+
+            #reviews .past-reviews-section .review-card blockquote,
+            #reviews .review-card blockquote {
+                padding: 10px 0 !important;
+                font-size: clamp(0.98rem, 1.15vw, 1.1rem) !important;
+                line-height: 1.48 !important;
+                margin: auto 0 !important;
+            }
+
+            #reviews .past-reviews-section .review-card-person,
+            #reviews .review-card-person {
+                padding-top: 14px !important;
+            }
+
+            #reviews .past-reviews-meta {
+                margin-top: 8px;
+                font-size: 0.76rem;
+                font-weight: 600;
+                letter-spacing: 0.08em;
+                text-transform: uppercase;
+                opacity: 0.88;
+            }
+
+            #reviews .past-reviews-progress {
+                margin-top: 6px;
+            }
+
+            #reviews .past-reviews-actions {
+                margin-top: clamp(10px, 1.5vh, 16px);
+                display: flex;
+                justify-content: center;
+            }
+
+            #reviews .past-add-review {
+                min-height: 44px;
+                height: 44px;
+                padding: 0 24px;
+                font-size: 0.86rem;
+                font-weight: 700;
+                letter-spacing: 0.03em;
+                border-radius: 999px;
+                margin-top: 0;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+            }
+
+            #reviews .past-add-review span {
+                font-size: 1.1rem;
+                line-height: 1;
+                font-weight: 700;
             }
         }
 
-        @media (min-width: 901px) and (max-height: 820px) {
+        @media (min-width: 901px) and (max-height: 760px) {
             #reviews.reviews-section.past-reviews-section {
-                padding-top: 80px;
-                padding-bottom: 24px;
+                padding-top: calc(var(--nav-height, 74px) + 4px);
+                padding-bottom: 8px;
+            }
+
+            #reviews .past-reviews-heading p {
+                font-size: 0.74rem;
+            }
+
+            #reviews .past-reviews-heading h2 {
+                font-size: clamp(1.9rem, 2.7vw, 2.4rem);
+            }
+
+            #reviews .past-reviews-heading small {
+                font-size: 0.9rem;
+            }
+
+            #reviews .past-reviews-section .review-card,
+            #reviews .review-card,
+            #reviews .review-empty-card {
+                min-height: 285px !important;
+                height: 290px !important;
+                padding: 20px 22px 16px !important;
+            }
+
+            #reviews .past-reviews-carousel {
+                margin-top: 10px;
+            }
+
+            #reviews .past-reviews-meta {
+                font-size: 0.7rem;
+                margin-top: 6px;
+            }
+
+            #reviews .past-reviews-actions {
+                margin-top: 8px;
+            }
+
+            #reviews .past-add-review {
+                min-height: 40px;
+                height: 40px;
+                padding: 0 20px;
+                font-size: 0.8rem;
             }
         }
 
         @media (max-width: 900px) {
             #reviews.reviews-section.past-reviews-section {
                 display: block;
+                height: auto;
                 min-height: auto !important;
+            }
+
+            #reviews .past-reviews-heading p {
+                font-size: 0.78rem;
+            }
+
+            #reviews .past-reviews-heading small {
+                font-size: 0.92rem;
+            }
+
+            #reviews .past-reviews-meta {
+                font-size: 0.74rem;
+            }
+
+            #reviews .past-add-review {
+                min-height: 42px;
+                height: 42px;
+                font-size: 0.84rem;
             }
         }
     </style>
@@ -22374,6 +22560,338 @@
             </div>
         </section>
 
+        <style id="final-cta-viewport-fix">
+            /* ==========================================================================
+               FINAL CTA VIEWPORT FIT — One complete balanced frame
+               ========================================================================== */
+            @media (min-width: 993px) {
+                #booking.final-cta-section {
+                    min-height: 100vh;
+                    min-height: 100svh;
+                    min-height: 100dvh;
+                    height: 100dvh;
+                    box-sizing: border-box;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    position: relative;
+                    overflow: hidden;
+                    padding-top: calc(var(--nav-height, 74px) + clamp(10px, 1.8vh, 22px));
+                    padding-bottom: clamp(14px, 2.2vh, 26px);
+                    padding-inline: 0;
+                    margin: 0;
+                }
+
+                #booking > .container {
+                    width: min(1200px, calc(100% - 56px));
+                    max-width: 1200px;
+                    margin-inline: auto;
+                    height: auto;
+                    padding: 0;
+                }
+
+                #booking .final-cta-grid {
+                    display: grid;
+                    grid-template-columns: minmax(0, 1.12fr) minmax(360px, 0.88fr);
+                    gap: clamp(36px, 5vw, 76px);
+                    align-items: center;
+                    width: 100%;
+                    max-width: 100%;
+                    margin: 0;
+                }
+
+                #booking .final-cta-text-col {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: flex-start;
+                    text-align: left;
+                }
+
+                #booking .final-kicker {
+                    margin-bottom: clamp(10px, 1.5vh, 16px);
+                }
+
+                #booking .final-cta-text-col h2 {
+                    font-size: clamp(2.8rem, 4.2vw, 4.85rem);
+                    line-height: 0.96;
+                    letter-spacing: -0.05em;
+                    margin-bottom: clamp(14px, 2vh, 22px);
+                }
+
+                #booking .final-cta-text-col p {
+                    font-size: clamp(0.95rem, 1.1vw, 1.15rem);
+                    line-height: 1.55;
+                    margin-bottom: clamp(18px, 2.5vh, 28px);
+                    max-width: 460px;
+                }
+
+                #booking .final-action-card-wrapper {
+                    position: relative;
+                    z-index: 1;
+                    display: flex;
+                    justify-content: center;
+                }
+
+                /* Subtly vertical portrait proportions: taller than wide, as originally styled */
+                #booking .final-action-card.project-flow-card {
+                    width: 100%;
+                    max-width: 460px;
+                    height: clamp(525px, 62vh, 580px);
+                    min-height: 510px;
+                    max-height: calc(100dvh - var(--nav-height, 74px) - 28px);
+                    padding: 0;
+                    margin: 0;
+                }
+
+                /* Inner interactive flow panels: tuned to fit seamlessly without scrolling */
+                #booking .project-flow-progress {
+                    height: 56px;
+                    padding: 0 clamp(20px, 2.8vw, 34px);
+                }
+
+                #booking .project-flow-panel {
+                    padding: 68px clamp(24px, 3.5vw, 42px) 20px;
+                }
+
+                #booking .project-intro-trigger {
+                    padding: clamp(24px, 3.6vh, 42px) clamp(22px, 3.2vw, 40px);
+                }
+
+                #booking .project-intro-icon {
+                    width: 60px;
+                    height: 60px;
+                    margin-bottom: clamp(14px, 2.2vh, 24px);
+                    font-size: 1.25rem;
+                }
+
+                #booking .final-card-eyebrow {
+                    margin-bottom: 12px;
+                }
+
+                #booking .project-intro-trigger .final-card-title {
+                    font-size: clamp(2rem, 2.8vw, 2.55rem);
+                    line-height: 1.04;
+                    margin-bottom: clamp(10px, 1.5vh, 14px);
+                }
+
+                #booking .project-intro-trigger .final-card-desc {
+                    font-size: clamp(0.82rem, 1vw, 0.92rem);
+                    line-height: 1.5;
+                    margin-bottom: clamp(16px, 2.4vh, 24px);
+                    max-width: 320px;
+                }
+
+                #booking .project-intro-cta {
+                    min-height: 46px;
+                    padding: 10px 22px;
+                    font-size: 0.88rem;
+                }
+
+                #booking .project-intro-hint {
+                    margin-top: 10px;
+                }
+
+                /* Type Panel */
+                #booking .project-panel-heading {
+                    margin-bottom: clamp(12px, 1.8vh, 18px);
+                }
+
+                #booking .project-panel-heading.compact {
+                    margin-bottom: clamp(10px, 1.4vh, 14px);
+                }
+
+                #booking .project-panel-kicker {
+                    margin-bottom: 8px;
+                }
+
+                #booking .project-panel-heading h3 {
+                    font-size: clamp(1.75rem, 2.5vw, 2.45rem);
+                    line-height: 0.96;
+                }
+
+                #booking .project-panel-heading p {
+                    margin-top: 8px;
+                    font-size: 0.82rem;
+                }
+
+                #booking .project-choice-grid {
+                    gap: 8px;
+                }
+
+                #booking .project-choice {
+                    min-height: 50px;
+                    padding: 0 34px 0 12px;
+                    font-size: 0.73rem;
+                    gap: 10px;
+                    border-radius: 12px;
+                }
+
+                #booking .project-choice > span {
+                    width: 22px;
+                    height: 22px;
+                    font-size: 0.48rem;
+                }
+
+                #booking .project-choice > i {
+                    width: 18px;
+                    height: 18px;
+                    right: 10px;
+                    font-size: 0.58rem;
+                }
+
+                /* Goals Panel */
+                #booking .project-goal-grid {
+                    gap: 6px;
+                }
+
+                #booking .project-goal {
+                    min-height: 32px;
+                    padding: 0 12px;
+                    font-size: 0.67rem;
+                }
+
+                #booking .project-story-field {
+                    margin-top: 10px;
+                    gap: 5px;
+                }
+
+                #booking .project-story-field textarea {
+                    min-height: 56px;
+                    font-size: 0.74rem;
+                    padding: 8px 11px;
+                }
+
+                /* Details Form */
+                #booking .project-details-form {
+                    gap: 9px;
+                }
+
+                #booking .project-field {
+                    gap: 5px;
+                }
+
+                #booking .project-field > span {
+                    font-size: 0.54rem;
+                }
+
+                #booking .project-field input,
+                #booking .project-field select {
+                    height: 39px;
+                    padding: 0 11px;
+                    font-size: 0.75rem;
+                    border-radius: 11px;
+                }
+
+                /* Auth Panel */
+                #booking .project-auth-panel {
+                    padding-top: 68px;
+                }
+
+                #booking .auth-heading {
+                    margin-bottom: 10px;
+                }
+
+                #booking .google-auth-button {
+                    min-height: 38px;
+                    font-size: 0.73rem;
+                }
+
+                #booking .project-auth-divider {
+                    margin: 8px 0;
+                    font-size: 0.5rem;
+                }
+
+                #booking .project-auth-tabs {
+                    margin-bottom: 8px;
+                    padding: 3px;
+                }
+
+                #booking .project-auth-tabs button {
+                    min-height: 28px;
+                    font-size: 0.6rem;
+                }
+
+                #booking .project-auth-form {
+                    gap: 8px;
+                }
+
+                #booking .project-auth-form input {
+                    height: 38px;
+                    font-size: 0.74rem;
+                }
+
+                #booking .project-auth-submit {
+                    min-height: 40px;
+                    font-size: 0.68rem;
+                }
+
+                #booking .project-auth-note {
+                    margin: 6px 0 0;
+                    font-size: 0.49rem;
+                }
+
+                #booking .project-auth-back {
+                    margin-top: 6px;
+                    font-size: 0.62rem;
+                }
+
+                /* Actions Row */
+                #booking .project-panel-actions {
+                    padding-top: 12px;
+                    margin-top: auto;
+                }
+
+                #booking .project-back {
+                    font-size: 0.64rem;
+                }
+
+                #booking .project-next {
+                    min-height: 38px;
+                    padding: 8px 18px;
+                    font-size: 0.72rem;
+                }
+
+                /* Success Panel */
+                #booking .project-success-mark {
+                    width: 48px;
+                    height: 48px;
+                    margin-bottom: 12px;
+                }
+
+                #booking .project-success-panel h3 {
+                    font-size: clamp(1.75rem, 2.5vw, 2.45rem);
+                }
+
+                #booking .project-success-button {
+                    min-height: 42px;
+                    padding: 10px 22px;
+                    font-size: 0.78rem;
+                    margin-top: 14px;
+                }
+            }
+
+            @media (min-width: 993px) and (max-height: 760px) {
+                #booking.final-cta-section {
+                    padding-top: calc(var(--nav-height, 74px) + 8px);
+                    padding-bottom: 12px;
+                }
+
+                #booking .final-action-card.project-flow-card {
+                    max-width: 420px;
+                    height: 495px;
+                    min-height: 480px;
+                }
+
+                #booking .final-cta-text-col h2 {
+                    font-size: clamp(2.4rem, 3.8vw, 3.6rem);
+                    margin-bottom: 10px;
+                }
+
+                #booking .final-cta-text-col p {
+                    margin-bottom: 14px;
+                }
+            }
+        </style>
         <!-- ==========================================================================
              07. FINAL PROJECT CTA
              ========================================================================== -->
