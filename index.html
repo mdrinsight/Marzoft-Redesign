@@ -21286,6 +21286,37 @@
             }
         }
     </style>
+    <style id="testimonials-viewport-fix">
+        /* Center the complete approved testimonial composition as one viewport unit. */
+        @media (min-width: 901px) {
+            #reviews.reviews-section.past-reviews-section {
+                display: flex;
+                min-height: 90svh !important;
+                align-items: center;
+                box-sizing: border-box;
+                padding-block: clamp(24px, 4svh, 44px);
+            }
+
+            #reviews > .testimonials-inner {
+                flex: 0 0 auto;
+                margin-block: 0;
+            }
+        }
+
+        @media (min-width: 901px) and (max-height: 820px) {
+            #reviews.reviews-section.past-reviews-section {
+                padding-top: 80px;
+                padding-bottom: 24px;
+            }
+        }
+
+        @media (max-width: 900px) {
+            #reviews.reviews-section.past-reviews-section {
+                display: block;
+                min-height: auto !important;
+            }
+        }
+    </style>
 </head>
 
 <body>
@@ -22234,7 +22265,7 @@
              ========================================================================== -->
         <section class="reviews-section past-reviews-section" id="reviews" aria-labelledby="reviewsTitle">
             <div class="past-reviews-ambient" aria-hidden="true"><i></i><b></b><span></span></div>
-            <div class="container">
+            <div class="container testimonials-inner">
                 <header class="past-reviews-heading">
                     <p>Kind words from real clients</p>
                     <h2 id="reviewsTitle">Client testimonials</h2>
