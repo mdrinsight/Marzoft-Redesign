@@ -1,0 +1,1231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Workspace — MARZOFT</title>
+
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: { 'mz-blue': '#2563EB', 'mz-blue-hover': '#1D4ED8', 'mz-bg-light': '#F8F9FC', 'mz-dark': '#0B1020' },
+                    fontFamily: { display: ['Bricolage Grotesque', 'sans-serif'], sans: ['Plus Jakarta Sans', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+   <script>
+        // Instant Dark Mode Persistence (Prevents white flash on load)
+        (() => {
+            const saved = localStorage.getItem('marzoft-theme') || localStorage.getItem('mz_theme');
+            const isDark = saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches);
+            const theme = isDark ? 'dark' : 'light';
+            document.documentElement.classList.toggle('dark', isDark);
+            document.documentElement.dataset.theme = theme;
+        })();
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+    <script src="supabase.js"></script>
+
+    <style>
+        :root {
+            --bg-main: #F8F9FC; --bg-secondary: #F1F5F9; --bg-panel: #FFFFFF;
+            --text-primary: #0B1020; --text-muted: #64748B; --border-color: #E2E8F0;
+            --accent: #2563EB; --shadow-md: 0 10px 25px rgba(37, 99, 235, 0.1);
+            --table-header: #F1F5F9;
+        }
+        .dark {
+            --bg-main: #0B1020; --bg-panel: #111827; --bg-secondary: #1E293B;
+            --text-primary: #F8FAFC; --text-muted: #94A3B8; --border-color: rgba(255, 255, 255, 0.1);
+            --table-header: #111827;
+        }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-main); color: var(--text-primary); transition: background-color 0.5s ease; margin: 0; overflow-x: hidden; display: flex; height: 100vh; }
+        button { cursor: pointer; border: none; outline: none; background: none; }
+        .glass-panel { background: var(--bg-panel); border: 1px solid var(--border-color); box-shadow: 0 12px 35px rgba(0,0,0,0.05); transition: background-color 0.5s ease, border-color 0.5s ease; }
+        .inner-card { background: var(--bg-secondary); border: 1px solid var(--border-color); transition: background-color 0.5s ease, border-color 0.5s ease; }
+        .admin-input { background: var(--bg-main); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: 12px; padding: 12px 16px; width: 100%; outline: none; transition: all 0.3s ease; }
+        .admin-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15); }
+        .hover-lift { transition: transform 0.3s ease, box-shadow 0.3s ease; }
+        .hover-lift:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 10px; }
+        .admin-table-container { overflow-x: auto; border-radius: 0 0 20px 20px; }
+        .admin-table { width: 100%; border-collapse: collapse; }
+        .admin-table th { background: var(--table-header); color: var(--text-muted); font-size: 11px; font-weight: 700; text-transform: uppercase; padding: 16px; text-align: left; border-bottom: 1px solid var(--border-color); white-space: nowrap; }
+        .admin-table td { padding: 16px; border-bottom: 1px solid var(--border-color); font-size: 13px; color: var(--text-primary); }
+        .admin-table tr:hover td { background-color: rgba(37, 99, 235, 0.02); }
+        .admin-section { display: none; animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) both; }
+        .admin-section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .badge { padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; display: inline-block; }
+        .badge-blue { background: rgba(37,99,235,0.1); color: #2563EB; }
+        .badge-green { background: rgba(34,197,94,0.1); color: #16A34A; }
+        .badge-yellow { background: rgba(245,158,11,0.1); color: #D97706; }
+        .badge-purple { background: rgba(168,85,247,0.1); color: #9333EA; }
+        .badge-gray { background: rgba(100,116,139,0.1); color: #64748B; }
+        .btn-action { width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--border-color); display: inline-grid; place-items: center; color: var(--text-muted); transition: all 0.3s ease; margin-right: 6px; }
+        .btn-action:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+        .btn-danger:hover { background: #DC2626; border-color: #DC2626; color: #fff; }
+        .skeleton { background: linear-gradient(90deg, var(--bg-secondary) 25%, var(--border-color) 50%, var(--bg-secondary) 75%); background-size: 200% 100%; animation: skeleton-loading 1.5s infinite; border-radius: 8px; }
+        @keyframes skeleton-loading { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+        #initial-loader { position: absolute; inset: 0; z-index: 100; background: var(--bg-main); display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.5s ease; }
+        .modal-overlay { position: fixed; inset: 0; z-index: 2000; background: rgba(11, 16, 32, 0.4); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
+        .modal-overlay.is-active { opacity: 1; pointer-events: auto; }
+        .modal-box { background: var(--bg-panel); width: min(600px, 90%); border-radius: 24px; padding: 32px; border: 1px solid var(--border-color); box-shadow: 0 25px 50px rgba(0,0,0,0.2); transform: scale(0.95) translateY(20px); transition: transform 0.4s ease; max-height: 90vh; overflow-y: auto; }
+        .modal-overlay.is-active .modal-box { transform: scale(1) translateY(0); }
+        #toast { position: fixed; bottom: 30px; right: 30px; z-index: 3000; background: #10B981; color: #fff; padding: 16px 24px; border-radius: 12px; font-weight: 700; font-size: 0.9rem; box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3); display: flex; align-items: center; gap: 12px; transform: translateY(100px); opacity: 0; transition: all 0.4s ease; }
+        #toast.show { transform: translateY(0); opacity: 1; }
+        #toast.error { background: #EF4444; box-shadow: 0 10px 30px rgba(239, 68, 68, 0.3); }
+      .role-select { padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: 800; text-transform: uppercase; border: 1px solid var(--border-color); background: var(--bg-main); color: var(--text-primary); outline: none; cursor: pointer; }
+        
+    </style>
+</head>
+<body class="h-screen w-screen overflow-hidden flex relative">
+
+  <!-- SECURITY LOADER (Prevents dashboard flash for unauthorized users) -->
+  <div id="initial-loader" class="absolute inset-0 z-[9999] flex flex-col items-center justify-center bg-[var(--bg-main)] transition-opacity duration-300">
+    <i class="fa-solid fa-shield-halved text-mz-blue text-4xl mb-4 animate-pulse"></i>
+    <h2 class="font-display font-bold text-xl tracking-tight">Verifying Secure Access...</h2>
+  </div>
+
+  <!-- SIDEBAR -->
+  <aside class="w-64 h-full flex flex-col absolute md:relative -translate-x-full md:translate-x-0 transition-transform z-50 border-r border-[var(--border-color)]" style="background-color: var(--bg-panel) !important;" id="sidebar">
+    <div class="p-6 flex justify-between items-center border-b border-[var(--border-color)]">
+      <div class="font-display font-black text-xl tracking-tight flex items-end">
+        MARZOFT<span class="w-2 h-2 bg-mz-blue rounded-full ml-1 mb-1 shadow-[0_0_10px_rgba(37,99,235,0.5)]"></span>
+      </div>
+      <button class="md:hidden text-[var(--text-muted)] text-xl" onclick="toggleSidebar()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+
+    <nav class="flex-1 px-4 py-6 space-y-2 overflow-y-auto custom-scrollbar" id="nav-menu">
+        <button onclick="switchSection('overview')" id="nav-overview" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all bg-blue-50 dark:bg-blue-900/30 text-mz-blue nav-btn active"><i class="fa-solid fa-chart-pie w-5 text-center"></i> Overview</button>
+        <button onclick="switchSection('inquiries')" id="nav-inquiries" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all text-[var(--text-muted)] hover:bg-black/5 dark:hover:bg-white/5 nav-btn"><i class="fa-solid fa-layer-group w-5 text-center"></i> Inquiries</button>
+        <button onclick="switchSection('clients')" id="nav-clients" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all text-[var(--text-muted)] hover:bg-black/5 dark:hover:bg-white/5 nav-btn"><i class="fa-solid fa-users w-5 text-center"></i> Clients</button>
+        
+        <!-- TEAM TAB (Admin Only) -->
+       <button onclick="switchSection('team')" id="nav-team" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all text-[var(--text-muted)] hover:bg-black/5 dark:hover:bg-white/5 nav-btn"><i class="fa-solid fa-id-badge w-5 text-center"></i> Team</button>
+        
+        <button onclick="switchSection('broadcasts')" id="nav-broadcasts" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all text-[var(--text-muted)] hover:bg-black/5 dark:hover:bg-white/5 nav-btn"><i class="fa-solid fa-bullhorn w-5 text-center"></i> Broadcasts</button>
+        
+        <button onclick="switchSection('reviews')" id="nav-reviews" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all text-[var(--text-muted)] hover:bg-black/5 dark:hover:bg-white/5 nav-btn"><i class="fa-solid fa-star w-5 text-center"></i> Reviews</button>
+        <button onclick="switchSection('whatsapp')" id="nav-whatsapp" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all text-[var(--text-muted)] hover:bg-black/5 dark:hover:bg-white/5 nav-btn"><i class="fa-brands fa-whatsapp w-5 text-center"></i> Chat Widget</button>
+        
+      <!-- Security Logs (Admin Only) -->
+        <button onclick="switchSection('audit-logs')" id="nav-audit-logs" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all text-[var(--text-muted)] hover:bg-black/5 dark:hover:bg-white/5 nav-btn"><i class="fa-solid fa-clock-rotate-left w-5 text-center"></i> Security Logs</button>
+        
+        <!-- Security Settings (Admin Only) -->
+        <button onclick="switchSection('settings')" id="nav-settings" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all text-[var(--text-muted)] hover:bg-black/5 dark:hover:bg-white/5 nav-btn"><i class="fa-solid fa-shield-halved w-5 text-center"></i> Security Settings</button>
+    </nav>
+    
+    <div class="p-4 border-t border-[var(--border-color)]">
+        <div class="text-xs font-bold text-[var(--text-muted)] mb-3 text-center uppercase tracking-widest" id="user-role-display">ROLE: ADMIN</div>
+        <button onclick="logout()" class="w-full flex items-center justify-center gap-2 px-4 py-3 text-sm font-bold text-red-500 bg-red-50 dark:bg-red-500/10 rounded-xl hover-lift transition-colors"><i class="fa-solid fa-arrow-right-from-bracket"></i> Secure Logout</button>
+    </div>
+  </aside>
+
+  <main class="flex-1 h-full flex flex-col relative z-10 w-full overflow-hidden">
+    <header class="h-20 flex items-center justify-between px-6 bg-[var(--bg-panel)] border-b border-[var(--border-color)] z-40 shadow-sm shrink-0">
+      <div class="flex items-center gap-4">
+        <button class="md:hidden text-xl text-[var(--text-muted)]" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></button>
+        <h2 id="header-title" class="font-display font-bold text-xl">Overview</h2>
+      </div>
+      <div class="flex items-center gap-4">
+  <button onclick="toggleTheme()" class="w-10 h-10 rounded-full inner-card flex items-center justify-center shadow-sm hover:scale-105 transition-transform"><i class="fa-solid fa-moon dark:hidden text-[var(--text-muted)]"></i><i class="fa-solid fa-sun hidden dark:block text-[var(--text-muted)]"></i></button>
+        <div class="w-10 h-10 rounded-full bg-mz-blue text-white flex items-center justify-center font-bold shadow-md">MZ</div>
+      </div>
+    </header>
+
+    <div class="flex-1 overflow-y-auto p-4 md:p-8 relative custom-scrollbar" id="main-content">
+      
+      <!-- OVERVIEW SECTION -->
+      <section id="sec-overview" class="admin-section active">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          <div class="glass-panel p-6 flex items-center justify-between hover-lift">
+            <div><p class="text-xs font-bold uppercase text-[var(--text-muted)] tracking-wider">Page Views (Week)</p><h3 class="text-3xl font-black font-display mt-1" id="stat-views"><div class="skeleton w-12 h-8"></div></h3></div>
+            <div class="w-14 h-14 rounded-full bg-indigo-100 dark:bg-indigo-500/20 flex items-center justify-center text-2xl text-indigo-600"><i class="fa-solid fa-eye"></i></div>
+          </div>
+          <div class="glass-panel p-6 flex items-center justify-between hover-lift">
+            <div><p class="text-xs font-bold uppercase text-[var(--text-muted)] tracking-wider">Conversion Rate</p><h3 class="text-3xl font-black font-display mt-1 text-green-500" id="stat-rate"><div class="skeleton w-12 h-8"></div></h3></div>
+            <div class="w-14 h-14 rounded-full bg-green-100 dark:bg-green-500/20 flex items-center justify-center text-2xl text-green-600"><i class="fa-solid fa-arrow-trend-up"></i></div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div class="glass-panel p-6 flex items-center gap-5 hover-lift cursor-pointer" onclick="switchSection('inquiries')">
+            <div class="w-14 h-14 rounded-full bg-blue-100 dark:bg-blue-500/20 flex items-center justify-center text-2xl text-mz-blue"><i class="fa-solid fa-briefcase"></i></div>
+            <div><p class="text-xs font-bold uppercase text-[var(--text-muted)] tracking-wider">Total Inquiries</p><h3 class="text-3xl font-black font-display mt-1" id="stat-projects"><div class="skeleton w-12 h-8"></div></h3></div>
+          </div>
+          <div class="glass-panel p-6 flex items-center gap-5 hover-lift cursor-pointer" onclick="switchSection('clients')">
+            <div class="w-14 h-14 rounded-full bg-green-100 dark:bg-green-500/20 flex items-center justify-center text-2xl text-green-600"><i class="fa-solid fa-users"></i></div>
+            <div><p class="text-xs font-bold uppercase text-[var(--text-muted)] tracking-wider">Registered Clients</p><h3 class="text-3xl font-black font-display mt-1" id="stat-clients"><div class="skeleton w-12 h-8"></div></h3></div>
+          </div>
+          <div class="glass-panel p-6 flex items-center gap-5 hover-lift cursor-pointer" onclick="switchSection('reviews')">
+            <div class="w-14 h-14 rounded-full bg-purple-100 dark:bg-purple-500/20 flex items-center justify-center text-2xl text-purple-600"><i class="fa-solid fa-star"></i></div>
+            <div><p class="text-xs font-bold uppercase text-[var(--text-muted)] tracking-wider">Pending Reviews</p><h3 class="text-3xl font-black font-display mt-1" id="stat-reviews"><div class="skeleton w-12 h-8"></div></h3></div>
+          </div>
+        </div>
+
+        <div class="glass-panel p-6 md:p-8 hover-lift">
+          <div class="flex justify-between items-center mb-6">
+            <h3 class="font-bold font-display text-xl"><i class="fa-solid fa-bolt text-mz-blue mr-2"></i> Recent Pipeline</h3>
+          </div>
+          <div class="admin-table-container">
+            <table class="admin-table">
+              <thead><tr><th>Date</th><th>Client</th><th>Type</th><th>Status</th></tr></thead>
+              <tbody id="recent-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- INQUIRIES SECTION -->
+      <section id="sec-inquiries" class="admin-section">
+        <div class="glass-panel overflow-hidden flex flex-col h-full hover-lift">
+          <div class="p-6 border-b border-[var(--border-color)]" style="background: var(--table-header);">
+            <h3 class="font-bold font-display text-lg">Project Requests</h3>
+            <p class="text-xs text-[var(--text-muted)] mt-1">Manage incoming briefs and update client statuses.</p>
+          </div>
+          <div class="admin-table-container">
+            <table class="admin-table">
+              <thead><tr><th>Date</th><th>Client</th><th>Type & Budget</th><th>Status</th><th class="text-right">Action</th></tr></thead>
+              <tbody id="inquiries-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- CLIENTS SECTION -->
+      <section id="sec-clients" class="admin-section">
+        <div class="glass-panel overflow-hidden flex flex-col h-full hover-lift">
+          <div class="p-6 border-b border-[var(--border-color)] flex justify-between items-center" style="background: var(--table-header);">
+            <div>
+                <h3 class="font-bold font-display text-lg">Client Directory</h3>
+                <p class="text-xs text-[var(--text-muted)] mt-1">Change a client's role to 'staff' to move them to your team.</p>
+            </div>
+          </div>
+          <div class="admin-table-container">
+            <table class="admin-table">
+              <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Joined Date</th></tr></thead>
+              <tbody id="clients-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- NEW TEAM SECTION -->
+      <section id="sec-team" class="admin-section">
+        <div class="glass-panel overflow-hidden flex flex-col h-full hover-lift">
+          <div class="p-6 border-b border-[var(--border-color)] flex flex-col md:flex-row justify-between items-start md:items-center gap-4" style="background: var(--table-header);">
+            <div>
+                <h3 class="font-bold font-display text-lg">Team Directory</h3>
+                <p class="text-xs text-[var(--text-muted)] mt-1">To add a new staff member, ask them to create an account on the website first, then promote them here.</p>
+            </div>
+            <div class="flex items-center gap-2 w-full md:w-auto" id="add-staff-container">
+                <select id="new-staff-select" class="admin-input py-2 px-3 text-xs flex-1 md:w-48">
+                    <option value="">Select client to promote...</option>
+                </select>
+                <button onclick="promoteSelectedToStaff()" class="px-4 py-2 bg-mz-blue text-white font-bold rounded-xl hover:bg-mz-blue-hover transition-colors shadow-md text-xs whitespace-nowrap">Add to Team</button>
+            </div>
+          </div>
+          <div class="admin-table-container">
+            <table class="admin-table">
+           <thead><tr><th>Name</th><th>Access Level</th><th>Role</th><th class="text-right">Action</th></tr></thead>
+
+              <tbody id="team-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- BROADCASTS SECTION -->
+      <section id="sec-broadcasts" class="admin-section">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div class="glass-panel p-6 md:p-8 hover-lift">
+                <h3 class="font-bold mb-6 font-display text-xl"><i class="fa-solid fa-paper-plane mr-2 text-mz-blue"></i> New Broadcast</h3>
+                <form id="broadcast-form" class="space-y-6">
+                    <div>
+                        <label class="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider mb-2 block">Broadcast Title</label>
+                        <input type="text" id="broadcast-title" class="admin-input" placeholder="e.g., Diwali Offer Extended!" required>
+                    </div>
+                    <div>
+                        <label class="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider mb-2 block">Message</label>
+                        <textarea id="broadcast-message" class="admin-input" rows="4" placeholder="Share an update or special offer with all your clients..." required></textarea>
+                    </div>
+                    <button type="submit" class="w-full py-3 bg-mz-blue text-white font-bold rounded-xl hover:bg-mz-blue-hover transition-colors shadow-md mt-4">Send to All Clients</button>
+                </form>
+            </div>
+            <div class="glass-panel overflow-hidden flex flex-col h-full hover-lift">
+                <div class="p-6 border-b border-[var(--border-color)]">
+                    <h3 class="font-bold font-display text-lg">Sent Broadcasts</h3>
+                </div>
+                <div class="admin-table-container flex-1">
+                    <table class="admin-table">
+                        <thead><tr><th>Date</th><th>Title</th><th class="text-right">Action</th></tr></thead>
+                        <tbody id="broadcasts-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+      </section>
+
+      <!-- REVIEWS SECTION -->
+      <section id="sec-reviews" class="admin-section">
+        <div class="glass-panel overflow-hidden flex flex-col h-full hover-lift">
+          <div class="p-6 border-b border-[var(--border-color)] flex justify-between items-center" style="background: var(--table-header);">
+            <div>
+              <h3 class="font-bold font-display text-lg">Review Moderation</h3>
+              <p class="text-xs text-[var(--text-muted)] mt-1">Publish reviews to show them on the public homepage.</p>
+            </div>
+            <button onclick="openAdminReviewModal()" class="px-4 py-2 bg-mz-blue text-white font-bold rounded-xl hover:bg-mz-blue-hover transition-colors shadow-md text-xs whitespace-nowrap"><i class="fa-solid fa-plus mr-1"></i> Add Review</button>
+          </div>
+          <div class="admin-table-container">
+            <table class="admin-table">
+              <thead><tr><th>Client</th><th>Review</th><th>Rating</th><th>Status</th><th class="text-right">Actions</th></tr></thead>
+              <tbody id="reviews-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- WHATSAPP SECTION -->
+      <section id="sec-whatsapp" class="admin-section max-w-5xl mx-auto">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div class="glass-panel p-6 md:p-8 hover-lift">
+            <h3 class="font-bold mb-6 font-display text-xl"><i class="fa-brands fa-whatsapp mr-2 text-[#25D366]"></i>Chat Widget</h3>
+            <div class="space-y-6">
+              <div class="flex gap-3">
+                <div class="w-1/3"><label class="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider mb-2 block">Code</label><input type="text" id="wa-code" class="admin-input" placeholder="91"></div>
+                <div class="w-2/3"><label class="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider mb-2 block">WhatsApp Number</label><input type="text" id="wa-number" class="admin-input" placeholder="9876543210"></div>
+              </div>
+              <div>
+                <div class="flex justify-between items-center mb-2">
+                  <label class="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider">Bot Messages</label>
+                  <button type="button" onclick="addWaMessage()" class="text-xs font-bold text-mz-blue hover:underline"><i class="fa-solid fa-plus"></i> Add Line</button>
+                </div>
+                <div id="wa-messages-list" class="space-y-3"></div>
+              </div>
+              <button onclick="saveWhatsApp()" class="w-full py-3 bg-mz-blue text-white font-bold rounded-xl hover:bg-mz-blue-hover transition-colors shadow-md mt-4">Save Configuration</button>
+            </div>
+          </div>
+          
+          <div class="flex items-center justify-center p-6">
+            <div class="w-[340px] inner-card overflow-hidden shadow-2xl flex flex-col relative rounded-3xl border border-white/20">
+              <div class="bg-gradient-to-r from-[#25D366] to-[#128C7E] p-4 flex items-center gap-3 text-white">
+                <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center"><i class="fa-brands fa-whatsapp text-xl"></i></div>
+                <div><h3 class="font-bold text-sm">Marzoft Concierge</h3><p class="text-[10px] opacity-90">Online</p></div>
+              </div>
+              <div class="p-5 h-[300px] flex flex-col gap-3 overflow-y-auto custom-scrollbar" style="background: var(--bg-main);" id="wa-preview-messages"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+     <!-- SECURITY SECTION (Hidden for Staff) -->
+      <section id="sec-settings" class="admin-section max-w-4xl mx-auto">
+        <div class="glass-panel p-6 md:p-8 hover-lift mb-8">
+          <h3 class="font-bold mb-6 text-red-500 font-display text-xl"><i class="fa-solid fa-shield-halved mr-2"></i>Security & Access Logs</h3>
+          <div class="space-y-8">
+            <!-- Alert Email Setting -->
+            <div class="p-5 inner-card border-l-4 border-blue-500 rounded-r-xl">
+              <h4 class="font-bold text-sm mb-1">Admin Security Alert Email</h4>
+              <p class="text-xs text-[var(--text-muted)] mb-3">Security breach attempts and unauthorized logins will be targeted to this email.</p>
+              <div class="flex gap-2">
+                <input type="email" id="set-alert-email" class="admin-input flex-1" placeholder="hellomarzoft@gmail.com">
+                <button onclick="saveAlertEmail()" class="px-6 py-2 bg-blue-500 text-white font-bold rounded-xl hover:bg-blue-600 transition-colors shadow-md text-sm">Update Email</button>
+              </div>
+            </div>
+            <div class="p-5 inner-card border-l-4 border-amber-500 rounded-r-xl">
+              <h4 class="font-bold text-sm mb-1">Gateway Secret Word</h4>
+              <p class="text-xs text-[var(--text-muted)] mb-4">The secret word typed on the website to open the hidden admin login.</p>
+              <div class="space-y-3">
+                <div>
+                  <label class="text-[10px] font-bold uppercase text-[var(--text-muted)] tracking-wider">Current Word</label>
+                  <div class="font-mono text-sm font-bold bg-black/5 dark:bg-white/5 p-2 rounded-lg inline-block px-4 mt-1" id="current-sec-word">adminx</div>
+                </div>
+                <div class="mt-3">
+                  <div class="flex gap-2">
+                    <input type="text" id="set-sec-word" class="admin-input flex-1" placeholder="Type new secret word..." autocomplete="off">
+                    <button onclick="saveSecretWord()" class="px-6 py-2 bg-amber-500 text-white font-bold rounded-xl hover:bg-amber-600 transition-colors shadow-md text-sm">Update</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          <div class="p-5 inner-card border-l-4 border-red-500 rounded-r-xl">
+              <h4 class="font-bold text-sm mb-1">Admin Password</h4>
+              <p class="text-xs text-[var(--text-muted)] mb-4">Change the password you use to log into this dashboard.</p>
+              <div class="flex gap-2 mt-1">
+              <input type="text" id="set-sec-pwd" class="admin-input flex-1" placeholder="Type new gateway password..." autocomplete="off">
+                <button onclick="saveAdminPassword()" class="px-6 py-2 bg-red-500 text-white font-bold rounded-xl hover:bg-red-600 transition-colors shadow-md text-sm">Update</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- DEDICATED SECURITY & BREACH LOGS SECTION -->
+      <section id="sec-audit-logs" class="admin-section">
+        <div class="glass-panel overflow-hidden flex flex-col h-full hover-lift">
+          <div class="p-6 border-b border-[var(--border-color)] flex justify-between items-center" style="background: var(--table-header);">
+            <div>
+              <h3 class="font-bold font-display text-lg"><i class="fa-solid fa-shield-halved mr-2 text-red-500"></i>Security & Breach Logs</h3>
+              <p class="text-xs text-[var(--text-muted)] mt-1">Real-time audit log of authorized logins, failed attempts, and blocked breach actions.</p>
+            </div>
+            <button onclick="loadAuditLogs()" class="px-4 py-2 inner-card rounded-xl text-xs font-bold hover:bg-black/5"><i class="fa-solid fa-rotate-right mr-1"></i> Refresh Logs</button>
+          </div>
+          <div class="admin-table-container">
+            <table class="admin-table">
+              <thead><tr><th>Timestamp</th><th>User / Target Email</th><th>Security Event</th><th>Access Status</th><th>Details</th></tr></thead>
+              <tbody id="audit-logs-tbody"><tr><td colspan="5" class="text-center py-4">Loading logs...</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- MODALS -->
+  <div id="inquiry-modal" class="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity">
+    <div class="glass-panel p-6 md:p-8 w-[90%] max-w-2xl transform scale-95 relative max-h-[90vh] overflow-y-auto custom-scrollbar transition-transform rounded-3xl" id="inquiry-box">
+      <button onclick="closeModal('inquiry-modal', 'inquiry-box')" class="absolute top-6 right-6 w-8 h-8 inner-card rounded-full flex items-center justify-center hover:bg-black/5"><i class="fa-solid fa-xmark"></i></button>
+      
+      <h2 class="font-display font-black text-2xl mb-1">Project Brief</h2>
+      <p class="text-sm text-[var(--text-muted)] mb-6" id="modal-client-info"></p>
+      
+      <div class="inner-card p-5 mb-6">
+        <div class="grid grid-cols-2 gap-4 mb-4">
+          <div><p class="text-[10px] font-bold uppercase text-[var(--text-muted)] tracking-wider">Type</p><p class="font-bold text-sm" id="modal-type"></p></div>
+          <div><p class="text-[10px] font-bold uppercase text-[var(--text-muted)] tracking-wider">Budget</p><p class="font-bold text-sm" id="modal-budget"></p></div>
+          <div class="col-span-2"><p class="text-[10px] font-bold uppercase text-[var(--text-muted)] tracking-wider">Goals</p><p class="font-bold text-sm" id="modal-goals"></p></div>
+        </div>
+        <div class="pt-4 border-t border-[var(--border-color)]">
+          <p class="text-[10px] font-bold uppercase text-[var(--text-muted)] tracking-wider mb-1">Description</p>
+          <p class="text-sm leading-relaxed" id="modal-desc"></p>
+        </div>
+      </div>
+
+      <div class="space-y-4">
+        <div>
+          <label class="text-xs font-bold uppercase text-[var(--text-muted)] tracking-wider mb-2 block">Status</label>
+          <select id="modal-status" class="admin-input py-3">
+            <option value="new">New (Brief Received)</option>
+            <option value="in_progress">In Progress</option>
+            <option value="waiting_for_client">Waiting on Client</option>
+            <option value="completed">Completed</option>
+            <option value="closed">Closed / Cancelled</option>
+          </select>
+        </div>
+        <div>
+          <label class="text-xs font-bold uppercase text-[var(--text-muted)] tracking-wider mb-2 block">Admin Note & Figma Links (Visible to Client)</label>
+          <textarea id="modal-note" class="admin-input" rows="3" placeholder="Leave a note or paste Figma links for the client..."></textarea>
+        </div>
+      </div>
+
+      <div class="mt-6 flex justify-end">
+        <button onclick="saveInquiryUpdate()" class="px-8 py-3 bg-mz-blue text-white rounded-xl font-bold text-sm hover:bg-mz-blue-hover transition-colors shadow-md">Save Updates</button>
+      </div>
+      <input type="hidden" id="modal-id">
+    </div>
+  </div>
+<!-- ADD / EDIT REVIEW MODAL -->
+  <div id="admin-review-modal" class="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity">
+    <div class="glass-panel p-6 md:p-8 w-[90%] max-w-lg transform scale-95 relative max-h-[90vh] overflow-y-auto custom-scrollbar transition-transform rounded-3xl" id="admin-review-box">
+      <button onclick="closeModal('admin-review-modal', 'admin-review-box')" class="absolute top-6 right-6 w-8 h-8 inner-card rounded-full flex items-center justify-center hover:bg-black/5"><i class="fa-solid fa-xmark"></i></button>
+      <h2 id="admin-review-modal-title" class="font-display font-black text-2xl mb-6 border-b border-[var(--border-color)] pb-4">Add Manual Review</h2>
+      
+      <form id="admin-review-form" class="space-y-4">
+        <input type="hidden" id="admin-rev-id" value="">
+        <div class="flex flex-col items-center mb-4">
+          <label class="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider mb-2">Rating</label>
+          <div class="flex gap-2 text-2xl cursor-pointer" id="admin-rev-stars">
+            <i class="fa-solid fa-star text-yellow-500 hover:scale-110 transition-transform" data-val="1"></i>
+            <i class="fa-solid fa-star text-yellow-500 hover:scale-110 transition-transform" data-val="2"></i>
+            <i class="fa-solid fa-star text-yellow-500 hover:scale-110 transition-transform" data-val="3"></i>
+            <i class="fa-solid fa-star text-yellow-500 hover:scale-110 transition-transform" data-val="4"></i>
+            <i class="fa-solid fa-star text-yellow-500 hover:scale-110 transition-transform" data-val="5"></i>
+          </div>
+          <input type="hidden" id="admin-rev-rating" value="5">
+        </div>
+        
+        <div><label class="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider mb-2 block">Client Name</label><input type="text" id="admin-rev-name" class="admin-input" required></div>
+        <div><label class="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider mb-2 block">Review Message</label><textarea id="admin-rev-text" class="admin-input" rows="3" required></textarea></div>
+        
+        <div class="flex items-center justify-between p-4 inner-card rounded-xl mt-2">
+          <span class="font-bold text-sm">Publish Immediately?</span>
+          <label class="toggle-switch"><input type="checkbox" id="admin-rev-publish" checked><span class="slider"></span></label>
+        </div>
+
+        <div class="mt-6 flex justify-end gap-3 pt-4 border-t border-[var(--border-color)]">
+          <button type="button" onclick="closeModal('admin-review-modal', 'admin-review-box')" class="px-6 py-3 inner-card rounded-xl font-bold text-sm">Cancel</button>
+          <button type="submit" class="px-8 py-3 bg-mz-blue text-white rounded-xl font-bold text-sm hover:bg-mz-blue-hover transition-colors shadow-md" id="admin-rev-submit">Save Review</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="confirm-modal" class="fixed inset-0 z-[70] flex items-center justify-center bg-black/40 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity">
+    <div class="glass-panel p-8 w-[90%] max-w-sm transform scale-95 text-center transition-transform rounded-3xl" id="confirm-box">
+      <div class="w-16 h-16 mx-auto bg-red-100 text-red-500 rounded-full flex items-center justify-center text-2xl mb-4"><i class="fa-solid fa-triangle-exclamation"></i></div>
+      <h3 class="font-bold text-lg mb-2">Delete Review?</h3>
+      <p class="text-sm text-[var(--text-muted)] mb-6">This action cannot be undone.</p>
+      <div class="flex gap-3">
+        <button onclick="closeModal('confirm-modal', 'confirm-box')" class="flex-1 py-3 inner-card rounded-xl font-bold text-sm">Cancel</button>
+        <button id="confirm-btn" class="flex-1 py-3 bg-red-500 text-white rounded-xl font-bold text-sm hover:bg-red-600 shadow-md">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOASTS -->
+  <div id="toast-container" class="fixed bottom-6 right-6 z-[100] flex flex-col gap-2"></div>
+
+  <script>
+    const api = window.marzoftBackend || window.MarzoftSupabase || window.marzoftSupabase;
+    let allInquiries = [];
+    let allReviews = [];
+    let waMessagesArray = [];
+    let currentAdminRole = 'admin';
+    let editingTeamId = null;
+    let cachedTeamData = [];
+
+    // --- 1. CORE FUNCTIONS & UTILS ---
+    const setStat = (id, val) => { const el = document.getElementById(id); if (el) el.innerText = val; };
+    const formatDate = (iso) => iso ? new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '-';
+    const formatStatus = (s) => {
+        const map = { 'new': 'New', 'in_progress': 'In Progress', 'waiting_for_client': 'Waiting', 'completed': 'Completed', 'closed': 'Closed' };
+        const colors = { 'new': 'badge-blue', 'in_progress': 'badge-yellow', 'waiting_for_client': 'badge-yellow', 'completed': 'badge-green', 'closed': 'badge-gray' };
+        return `<span class="badge ${colors[s] || 'badge-gray'}">${map[s] || s}</span>`;
+    };
+
+    window.showToast = function(message, type = 'success') {
+      const container = document.getElementById('toast-container');
+      if (!container) return;
+      const bg = type === 'success' ? 'bg-green-600' : 'bg-red-500';
+      const icon = type === 'success' ? 'fa-check' : 'fa-xmark';
+      const toast = document.createElement('div');
+      toast.className = `${bg} text-white px-4 py-3 rounded-xl shadow-lg flex items-center gap-3 text-sm font-bold`;
+      toast.innerHTML = `<i class="fa-solid ${icon}"></i> ${message}`;
+      container.appendChild(toast);
+      setTimeout(() => toast.remove(), 3500);
+    };
+
+    window.openModal = (mId, bId) => {
+      const m = document.getElementById(mId), b = document.getElementById(bId);
+      if (m) { m.classList.remove('pointer-events-none'); m.classList.add('opacity-100'); }
+      if (b) { b.classList.remove('scale-95'); b.classList.add('scale-100'); }
+    };
+    
+    window.closeModal = (mId, bId) => {
+      const m = document.getElementById(mId), b = document.getElementById(bId);
+      if (m) { m.classList.remove('opacity-100'); setTimeout(() => m.classList.add('pointer-events-none'), 300); }
+      if (b) { b.classList.remove('scale-100'); b.classList.add('scale-95'); }
+    };
+
+    window.switchSection = function(id) {
+      document.querySelectorAll('.nav-btn').forEach(b => b.className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all text-[var(--text-muted)] hover:bg-black/5 dark:hover:bg-white/5 nav-btn");
+      const activeBtn = document.getElementById('nav-' + id);
+      if(activeBtn) {
+          activeBtn.className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all bg-blue-50 dark:bg-blue-900/30 text-mz-blue nav-btn active";
+          const headerTitle = document.getElementById('header-title');
+          if(headerTitle) headerTitle.innerText = activeBtn.innerText.trim();
+      }
+      document.querySelectorAll('.admin-section').forEach(sec => sec.classList.remove('active'));
+      const targetSec = document.getElementById('sec-' + id);
+      if (targetSec) targetSec.classList.add('active');
+      if (id === 'audit-logs' && window.loadAuditLogs) window.loadAuditLogs();
+      if (id === 'whatsapp' && typeof renderWaMessages === 'function') renderWaMessages();
+      if(window.innerWidth < 768) document.getElementById('sidebar')?.classList.add('-translate-x-full');
+    };
+
+    window.toggleSidebar = () => document.getElementById('sidebar')?.classList.toggle('-translate-x-full');
+    window.toggleTheme = () => {
+      document.documentElement.classList.toggle('dark');
+      const isDark = document.documentElement.classList.contains('dark');
+      const theme = isDark ? 'dark' : 'light';
+      document.documentElement.dataset.theme = theme;
+      localStorage.setItem('marzoft-theme', theme);
+      localStorage.setItem('mz_theme', theme);
+    };
+
+    window.addEventListener('storage', (event) => {
+      if (event.key === 'marzoft-theme' || event.key === 'mz_theme') {
+        const theme = event.newValue === 'dark' ? 'dark' : 'light';
+        document.documentElement.classList.toggle('dark', theme === 'dark');
+        document.documentElement.dataset.theme = theme;
+      }
+    });
+    window.logout = async () => { await api.signOut(); window.location.href = 'index.html'; };
+
+    // --- 2. INITIALIZATION & SECURITY GATEKEEPER ---
+    const initDashboard = async () => {
+        const hideLoader = () => {
+            const loader = document.getElementById('initial-loader');
+            if (loader && loader.style.display !== 'none') {
+                loader.style.opacity = '0';
+                setTimeout(() => loader.style.display = 'none', 300);
+            }
+        };
+        const fallbackTimer = setTimeout(hideLoader, 2000);
+
+        try {
+            if (!api || !api.client) throw new Error("No client");
+            const { data: { user }, error: authErr } = await api.client.auth.getUser();
+            if (authErr || !user) throw new Error("Not logged in");
+
+            const { data: profile } = await api.client.from('profiles').select('role').eq('id', user.id).single();
+            currentAdminRole = profile?.role || 'client';
+
+            if (currentAdminRole !== 'admin' && currentAdminRole !== 'staff') {
+                window.location.replace('index.html');
+                return;
+            }
+
+            const roleDisplay = document.getElementById('user-role-display');
+            if (roleDisplay) roleDisplay.innerText = `ROLE: ${currentAdminRole.toUpperCase()}`;
+
+            if (currentAdminRole === 'staff') {
+                ['nav-settings', 'nav-audit-logs', 'nav-team', 'add-staff-container'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.style.display = 'none';
+                });
+            }
+
+            clearTimeout(fallbackTimer);
+            hideLoader();
+            window.loadData();
+        } catch (e) {
+            console.error("Init Error:", e);
+            window.location.replace('index.html');
+        }
+    };
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initDashboard);
+    } else {
+        initDashboard();
+    }
+
+    // --- 3. INDEPENDENT DATA FETCHING ---
+    window.loadData = function() {
+        if (!api || !api.client) return;
+
+        // Inquiries
+        api.client.from('project_requests').select('*').order('created_at', { ascending: false }).then(({data, error}) => {
+            if (!error && data) {
+                allInquiries = data;
+                setStat('stat-projects', data.length);
+                renderInquiries(data);
+                renderRecent(data);
+            } else { setStat('stat-projects', 0); renderInquiries([]); renderRecent([]); }
+        });
+
+        // Profiles / Team
+        api.client.from('profiles').select('*').order('created_at', { ascending: false }).then(({data, error}) => {
+            if (!error && data) {
+                const clientsOnly = data.filter(p => p.role === 'client');
+                const teamOnly = data.filter(p => p.role === 'admin' || p.role === 'staff');
+                setStat('stat-clients', clientsOnly.length);
+                renderClients(clientsOnly);
+                renderTeam(teamOnly);
+            } else { setStat('stat-clients', 0); renderClients([]); renderTeam([]); }
+        });
+
+        // Reviews
+        api.client.from('reviews').select('*').order('created_at', { ascending: false }).then(({data, error}) => {
+            allReviews = data || [];
+            setStat('stat-reviews', allReviews.filter(r => !r.published).length);
+            renderReviews(allReviews);
+        });
+
+        // Broadcasts
+        api.client.from('broadcasts').select('*').order('created_at', { ascending: false }).then(({data, error}) => {
+            renderBroadcasts(data || []);
+        });
+
+        // Settings
+        api.client.from('site_settings').select('*').then(({data, error}) => {
+            if (data) populateSettings(data);
+        });
+
+        // Analytics
+        if(typeof api.client.rpc === 'function') {
+            api.client.rpc('admin_get_analytics').then(({data, error}) => {
+                if (!error && data) {
+                    setStat('stat-views', data.views_week || 0);
+                    setStat('stat-rate', (data.conversion_rate || 0) + '%');
+                } else { setStat('stat-views', 0); setStat('stat-rate', '0%'); }
+            });
+        }
+    };
+
+    // --- 4. RENDER FUNCTIONS ---
+    function renderInquiries(data) {
+        const tbody = document.getElementById('inquiries-tbody');
+        if(!tbody) return;
+        if(!data || !data.length) return tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-[var(--text-muted)]">No inquiries found.</td></tr>';
+        tbody.innerHTML = data.map(p => `
+            <tr>
+                <td>${formatDate(p.created_at)}</td>
+                <td><strong>${p.name || 'Anonymous'}</strong><br><span class="text-xs text-[var(--text-muted)]">${p.email || '-'}</span></td>
+                <td>${p.project_type || 'Custom'}<br><span class="text-xs text-[var(--text-muted)]">${p.budget || '-'}</span></td>
+                <td>${formatStatus(p.status)}</td>
+                <td class="text-right"><button class="btn-action" style="margin-right: 0;" onclick="viewInquiry('${p.id}')"><i class="fa-solid fa-eye"></i></button></td>
+            </tr>
+        `).join('');
+    }
+
+    function renderRecent(data) {
+        const tbody = document.getElementById('recent-tbody');
+        if(!tbody) return;
+        if(!data || !data.length) return tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-[var(--text-muted)]">No recent activity.</td></tr>';
+        tbody.innerHTML = data.slice(0, 5).map(p => `
+            <tr><td>${formatDate(p.created_at)}</td><td><strong>${p.name || 'Anonymous'}</strong></td><td>${p.project_type || 'Custom'}</td><td>${formatStatus(p.status)}</td></tr>
+        `).join('');
+    }
+
+    function renderClients(data) {
+        const tbody = document.getElementById('clients-tbody');
+        const select = document.getElementById('new-staff-select');
+        if(!tbody) return;
+        if(!data || !data.length) {
+            tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-[var(--text-muted)]">No registered clients found.</td></tr>';
+            if (select) select.innerHTML = '<option value="">No clients available</option>';
+            return;
+        }
+        tbody.innerHTML = data.map(c => `<tr><td><strong>${c.full_name || '-'}</strong></td><td>${c.email}</td><td><span class="badge badge-gray">CLIENT</span></td><td>${formatDate(c.created_at)}</td></tr>`).join('');
+        if (select) {
+            select.innerHTML = '<option value="">Select a client to promote...</option>' + data.map(c => `<option value="${c.id}">${c.full_name || c.email}</option>`).join('');
+        }
+    }
+
+    function renderTeam(data) {
+        const tbody = document.getElementById('team-tbody');
+        if(!tbody) return;
+        
+        if(!data?.length) {
+            tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-[var(--text-muted)]">No team members found.</td></tr>';
+            return;
+        }
+
+        // Pin 1. Marzoft (Company) and 2. R. Maaz (Founder) at top
+        const companyAcc = data.find(p => p.email === 'hellomarzoft@gmail.com');
+        const founderAcc = data.find(p => p.email === 'rmaaz1612@gmail.com');
+        const otherStaff = data.filter(p => p.email !== 'hellomarzoft@gmail.com' && p.email !== 'rmaaz1612@gmail.com')
+                               .sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+
+        const pinnedData = [];
+        if (companyAcc) pinnedData.push(companyAcc);
+        if (founderAcc) pinnedData.push(founderAcc);
+        pinnedData.push(...otherStaff);
+
+        cachedTeamData = pinnedData;
+
+        tbody.innerHTML = pinnedData.map(c => {
+            const isCompanyAccount = (c.email === 'hellomarzoft@gmail.com');
+            const isFounder = (c.email === 'rmaaz1612@gmail.com');
+            const isMasterAdmin = isCompanyAccount || isFounder;
+            const isEditing = (editingTeamId === c.id);
+
+            let roleHtml;
+            let jobDisplay;
+            let actionBtn;
+
+            if (isCompanyAccount) {
+                roleHtml = `<span class="badge" style="background: #2563EB; color: #fff; font-weight: 800; letter-spacing: 0.08em; padding: 5px 12px; border-radius: 8px;">ORGANIZATION</span>`;
+                jobDisplay = '<span class="font-bold text-sm text-[var(--text-primary)]">Workspace</span>';
+                actionBtn = '<span class="text-[10px] font-bold tracking-widest text-[var(--text-muted)] uppercase inline-block">IMMUTABLE</span>';
+            } else if (isFounder) {
+                roleHtml = `<span class="badge" style="background: #2563EB; color: #fff; font-weight: 800; letter-spacing: 0.08em; padding: 5px 12px; border-radius: 8px;">MASTER ADMIN</span>`;
+                jobDisplay = '<span class="font-bold text-sm text-[var(--text-primary)]">Founder</span>';
+                actionBtn = '<span class="text-[10px] font-bold tracking-widest text-[var(--text-muted)] uppercase inline-block">IMMUTABLE</span>';
+            } else {
+                if (isEditing) {
+                    roleHtml = `
+                        <select class="role-select" id="role-${c.id}">
+                            <option value="staff" ${c.role==='staff'?'selected':''}>Staff</option>
+                            <option value="admin" ${c.role==='admin'?'selected':''}>Admin</option>
+                        </select>
+                    `;
+                    jobDisplay = `
+                        <input type="text" id="job-${c.id}" value="${c.job_title||''}" placeholder="e.g. Lead Designer" class="admin-input py-2 px-3 text-xs w-full max-w-[220px]">
+                    `;
+                    actionBtn = `
+                        <button class="btn-action" style="color: #22C55E; border-color: rgba(34,197,94,0.3);" title="Save" onclick="saveTeamMember('${c.id}')"><i class="fa-solid fa-check"></i></button>
+                        <button class="btn-action" title="Cancel" onclick="cancelEditTeam()"><i class="fa-solid fa-xmark"></i></button>
+                    `;
+                } else {
+                    roleHtml = `<span class="badge" style="background: #2563EB; color: #fff; font-weight: 800; letter-spacing: 0.08em; padding: 5px 12px; border-radius: 8px;">${(c.role || 'STAFF').toUpperCase()}</span>`;
+                    jobDisplay = `<span class="text-sm font-semibold text-[var(--text-primary)]">${c.job_title || 'Team Member'}</span>`;
+                    actionBtn = currentAdminRole === 'admin' 
+                        ? `<button class="btn-action" title="Edit Member" onclick="editTeamMember('${c.id}')"><i class="fa-solid fa-pen"></i></button><button class="btn-action btn-danger" style="margin-right: 0;" title="Remove from Team" onclick="demoteToClient('${c.id}')"><i class="fa-solid fa-user-minus"></i></button>` 
+                        : '-';
+                }
+            }
+
+            let nameDisplay = isCompanyAccount ? 'Marzoft' : (isFounder ? 'R. Maaz' : (c.full_name || 'Team Member'));
+            return `<tr><td><strong class="text-sm">${nameDisplay}</strong><br><span class="text-xs text-[var(--text-muted)]">${c.email}</span></td><td>${roleHtml}</td><td>${jobDisplay}</td><td class="text-right">${actionBtn}</td></tr>`;
+        }).join('');
+    }
+
+    window.editTeamMember = (id) => {
+        editingTeamId = id;
+        renderTeam(cachedTeamData);
+    };
+
+    window.cancelEditTeam = () => {
+        editingTeamId = null;
+        renderTeam(cachedTeamData);
+    };
+
+    function renderReviews(data) {
+        const tbody = document.getElementById('reviews-tbody');
+        if(!tbody) return;
+        if(!data || !data.length) {
+            tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-[var(--text-muted)]">No reviews found.</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = data.map(r => `
+            <tr>
+                <td><strong>${r.name || 'Anonymous'}</strong></td>
+                <td class="max-w-[200px] truncate" title="${(r.review_text || '').replace(/"/g, '&quot;')}">"${r.review_text || ''}"</td>
+                <td class="text-yellow-500 text-xs">${'★'.repeat(r.rating || 5)}</td>
+                <td><span class="badge ${r.published ? 'badge-green' : 'badge-gray'}">${r.published ? 'Published' : 'Hidden'}</span></td>
+                <td class="text-right whitespace-nowrap">
+                    <button class="btn-action" onclick="toggleReview('${r.id}', ${!r.published})"><i class="fa-solid ${r.published ? 'fa-eye-slash' : 'fa-eye'}"></i></button>
+                    <button class="btn-action" onclick="editReview('${r.id}')"><i class="fa-solid fa-pen"></i></button>
+                    ${currentAdminRole === 'admin' ? `<button class="btn-action btn-danger" style="margin-right: 0;" onclick="deleteReview('${r.id}')"><i class="fa-solid fa-trash"></i></button>` : ''}
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    function renderBroadcasts(data) {
+        const tbody = document.getElementById('broadcasts-tbody');
+        if(!tbody) return;
+        if(!data || !data.length) {
+            tbody.innerHTML = '<tr><td colspan="3" class="text-center py-4 text-[var(--text-muted)]">No broadcasts sent yet.</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = data.map(b => `
+            <tr>
+                <td class="whitespace-nowrap text-xs">${formatDate(b.created_at)}</td>
+                <td><strong>${b.title}</strong><br><span class="text-xs text-[var(--text-muted)]">${b.message}</span></td>
+                <td class="text-right"><button class="btn-action btn-danger" style="margin-right: 0;" onclick="deleteBroadcast('${b.id}')"><i class="fa-solid fa-trash"></i></button></td>
+            </tr>
+        `).join('');
+    }
+
+    function populateSettings(settings) {
+        if (!Array.isArray(settings) || !settings.length) return;
+        const setVal = (id, v) => { const el = document.getElementById(id); if (el) el.value = v; };
+        const setTxt = (id, v) => { const el = document.getElementById(id); if (el) el.innerText = v; };
+
+        // 1. WhatsApp Number
+        const numObj = settings.find(s => s.key === 'whatsapp_number' || s.key === 'waNumber');
+        if (numObj && numObj.value) {
+            let numStr = String(numObj.value).replace(/['"]/g, '').trim();
+            if (numStr.startsWith('91') && numStr.length > 10) {
+                setVal('wa-code', '91');
+                setVal('wa-number', numStr.substring(2));
+            } else {
+                setVal('wa-code', '91');
+                setVal('wa-number', numStr);
+            }
+        }
+
+        // 2. WhatsApp Greeting Messages
+        const msgObj = settings.find(s => s.key === 'whatsapp_greeting' || s.key === 'waMessages');
+        let waMsgs = msgObj ? msgObj.value : [];
+        if (typeof waMsgs === 'string') {
+            try { waMsgs = JSON.parse(waMsgs); } catch(e) { waMsgs = [waMsgs]; }
+        }
+        if (!Array.isArray(waMsgs)) waMsgs = waMsgs ? [waMsgs] : [];
+        
+        waMessagesArray = waMsgs.filter(m => m && String(m).trim() !== '');
+        renderWaMessages();
+
+        // 3. Secret Word & Alert Email
+        const secWord = settings.find(s => s.key === 'secret_word')?.value || 'adminx';
+        setTxt('current-sec-word', String(secWord).replace(/['"]/g, ''));
+        
+        const alertEmail = settings.find(s => s.key === 'admin_alert_email')?.value || 'hellomarzoft@gmail.com';
+        setVal('set-alert-email', String(alertEmail).replace(/['"]/g, ''));
+    }
+
+    // --- 5. AUDIT LOGS ---
+    window.loadAuditLogs = async function() {
+        const tbody = document.getElementById('audit-logs-tbody');
+        if (!tbody) return;
+        tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-[var(--text-muted)]"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Fetching security logs...</td></tr>';
+        try {
+            const { data, error } = await api.client.rpc('admin_get_audit_logs');
+            if (error) throw error;
+            tbody.innerHTML = !data?.length ? '<tr><td colspan="5" class="text-center py-4 text-[var(--text-muted)]">No security logs recorded yet.</td></tr>'
+                : data.map(log => `
+                <tr>
+                    <td class="whitespace-nowrap text-xs">${new Date(log.created_at).toLocaleString()}</td>
+                    <td><strong>${log.email || 'Anonymous'}</strong></td>
+                    <td class="text-xs font-mono">${log.event_type}</td>
+                    <td><span class="badge ${log.status === 'BLOCKED' ? 'bg-red-100 text-red-600' : 'badge-green'}">${log.status}</span></td>
+                    <td class="text-xs text-[var(--text-muted)]">${log.details || '-'}</td>
+                </tr>`).join('');
+        } catch(e) {
+            console.error("Audit log error:", e);
+            tbody.innerHTML = `<tr><td colspan="5" class="text-center py-4 text-red-500">Failed to load logs.</td></tr>`;
+        }
+    };
+
+    // --- 6. ACTIONS & INTERACTIONS ---
+    window.promoteSelectedToStaff = async () => {
+        const select = document.getElementById('new-staff-select');
+        if (!select || !select.value) return showToast("Select a client to promote.", "error");
+        
+        const userId = select.value;
+        try {
+            const { error } = await api.client.rpc('admin_update_staff', { 
+                p_user_id: userId, 
+                p_role: 'staff', 
+                p_job_title: 'Team Member' 
+            });
+            if (error) throw error;
+            
+            showToast("Added to Team!");
+            select.value = "";
+            window.loadData();
+        } catch(e) {
+            console.error("Promote error:", e);
+            showToast("Failed to promote: " + (e.message || "Error"), "error");
+        }
+    };
+
+    window.saveTeamMember = async (id) => {
+        const role = document.getElementById(`role-${id}`)?.value || 'staff';
+        const job = document.getElementById(`job-${id}`)?.value.trim() || '';
+        try {
+            const { error } = await api.client.rpc('admin_update_staff', { 
+                p_user_id: id, 
+                p_role: role, 
+                p_job_title: job 
+            });
+            if (error) throw error;
+            showToast("Team member updated!");
+            editingTeamId = null;
+            window.loadData();
+        } catch(e) {
+            console.error("Save team member error:", e);
+            showToast("Update failed: " + (e.message || "Error"), "error");
+        }
+    };
+
+    window.demoteToClient = async (id) => {
+        if (!confirm("Remove this member from team?")) return;
+        try {
+            const { error } = await api.client.rpc('admin_update_staff', { 
+                p_user_id: id, 
+                p_role: 'client', 
+                p_job_title: null 
+            });
+            if (error) throw error;
+            showToast("Removed from team.");
+            editingTeamId = null;
+            window.loadData();
+        } catch(e) {
+            console.error("Demote error:", e);
+            showToast("Removal failed: " + (e.message || "Error"), "error");
+        }
+    };
+
+    window.viewInquiry = (id) => {
+        const p = allInquiries.find(x => x.id === id); if(!p) return;
+        document.getElementById('modal-id').value = p.id;
+        document.getElementById('modal-client-info').innerHTML = `<strong>${p.name}</strong> • ${p.email} • ${p.whatsapp || '-'}`;
+        document.getElementById('modal-type').innerText = p.project_type || 'Custom';
+        document.getElementById('modal-budget').innerText = p.budget || '-';
+        let goals = p.goals; try { if(typeof goals === 'string') goals = JSON.parse(goals).join(', '); } catch(e){}
+        document.getElementById('modal-goals').innerText = Array.isArray(goals) ? goals.join(', ') : (goals || '-');
+        document.getElementById('modal-desc').innerText = p.description || 'No description.';
+        document.getElementById('modal-status').value = p.status;
+        document.getElementById('modal-note').value = p.admin_notes || '';
+        window.openModal('inquiry-modal', 'inquiry-box');
+    };
+
+    window.saveInquiryUpdate = async () => {
+        const id = document.getElementById('modal-id').value;
+        try { await api.client.from('project_requests').update({status: document.getElementById('modal-status').value, admin_notes: document.getElementById('modal-note').value.trim()}).eq('id', id); showToast("Project updated."); window.closeModal('inquiry-modal', 'inquiry-box'); window.loadData(); } 
+        catch(e) { showToast("Failed to update.", "error"); }
+    };
+
+    // --- REVIEWS CONTROLLERS ---
+    window.openAdminReviewModal = function() {
+        document.getElementById('admin-review-form').reset();
+        document.getElementById('admin-rev-id').value = '';
+        document.getElementById('admin-rev-rating').value = '5';
+        document.getElementById('admin-rev-publish').checked = true;
+        document.getElementById('admin-review-modal-title').innerText = 'Add Manual Review';
+        updateStarsDisplay(5);
+        window.openModal('admin-review-modal', 'admin-review-box');
+    };
+
+    window.editReview = function(id) {
+        const r = allReviews.find(x => x.id === id);
+        if(!r) return;
+        document.getElementById('admin-rev-id').value = r.id;
+        document.getElementById('admin-rev-name').value = r.name || '';
+        document.getElementById('admin-rev-text').value = r.review_text || '';
+        document.getElementById('admin-rev-rating').value = r.rating || 5;
+        document.getElementById('admin-rev-publish').checked = Boolean(r.published);
+        document.getElementById('admin-review-modal-title').innerText = 'Edit Review';
+        updateStarsDisplay(r.rating || 5);
+        window.openModal('admin-review-modal', 'admin-review-box');
+    };
+
+    function updateStarsDisplay(rating) {
+        document.querySelectorAll('#admin-rev-stars i').forEach(star => {
+            const val = parseInt(star.dataset.val);
+            if(val <= rating) {
+                star.classList.add('text-yellow-500');
+                star.classList.remove('text-gray-300', 'dark:text-gray-600');
+            } else {
+                star.classList.remove('text-yellow-500');
+                star.classList.add('text-gray-300', 'dark:text-gray-600');
+            }
+        });
+    }
+
+    document.querySelectorAll('#admin-rev-stars i').forEach(star => {
+        star.addEventListener('click', () => {
+            const val = parseInt(star.dataset.val);
+            document.getElementById('admin-rev-rating').value = val;
+            updateStarsDisplay(val);
+        });
+    });
+
+    document.getElementById('admin-review-form')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const id = document.getElementById('admin-rev-id').value;
+        const name = document.getElementById('admin-rev-name').value.trim();
+        const review_text = document.getElementById('admin-rev-text').value.trim();
+        const rating = parseInt(document.getElementById('admin-rev-rating').value) || 5;
+        const published = document.getElementById('admin-rev-publish').checked;
+
+        if(!name || !review_text) return showToast("Name and review text are required.", "error");
+
+        try {
+            if(id) {
+                const { error } = await api.client.from('reviews').update({ name, review_text, rating, published }).eq('id', id);
+                if(error) throw error;
+                showToast("Review updated successfully!");
+            } else {
+                const { error } = await api.client.from('reviews').insert([{ name, review_text, rating, published }]);
+                if(error) throw error;
+                showToast("Review added!");
+            }
+            window.closeModal('admin-review-modal', 'admin-review-box');
+            window.loadData();
+        } catch(err) {
+            console.error("Save review error:", err);
+            showToast("Failed to save review: " + (err.message || "Error"), "error");
+        }
+    });
+
+    window.toggleReview = async (id, state) => {
+        try { 
+            const { error } = await api.client.from('reviews').update({ published: state }).eq('id', id); 
+            if(error) throw error;
+            showToast(state ? "Review Published!" : "Review Hidden"); 
+            window.loadData(); 
+        } 
+        catch(e) { 
+            console.error("Toggle review error:", e);
+            showToast("Update failed: " + (e.message || "Error"), "error"); 
+        }
+    };
+
+    window.deleteReview = (id) => {
+        document.getElementById('confirm-btn').onclick = async () => {
+            try { 
+                const { error } = await api.client.from('reviews').delete().eq('id', id); 
+                if(error) throw error;
+                showToast("Review deleted."); 
+                window.closeModal('confirm-modal', 'confirm-box'); 
+                window.loadData(); 
+            } 
+            catch(e) { 
+                console.error("Delete review error:", e);
+                showToast("Delete failed: " + (e.message || "Error"), "error"); 
+            }
+        };
+        window.openModal('confirm-modal', 'confirm-box');
+    };
+
+    // --- BROADCAST CONTROLLERS ---
+    document.getElementById('broadcast-form')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const titleInput = document.getElementById('broadcast-title');
+        const msgInput = document.getElementById('broadcast-message');
+        const title = titleInput?.value.trim();
+        const message = msgInput?.value.trim();
+
+        if (!title || !message) return showToast("Title and message are required.", "error");
+
+        try {
+            const { data, error } = await api.client.from('broadcasts').insert([{ title, message }]).select();
+            if (error) throw error;
+
+            showToast("Broadcast sent to all clients!");
+            if (titleInput) titleInput.value = '';
+            if (msgInput) msgInput.value = '';
+            window.loadData();
+        } catch(err) {
+            console.error("Broadcast send error:", err);
+            showToast("Failed to send: " + (err.message || "Database error"), "error");
+        }
+    });
+
+    window.deleteBroadcast = async (id) => {
+        if (!confirm("Are you sure you want to delete this broadcast?")) return;
+        try {
+            const { error } = await api.client.from('broadcasts').delete().eq('id', id);
+            if (error) throw error;
+
+            showToast("Broadcast deleted.");
+            window.loadData();
+        } catch(e) {
+            console.error("Delete broadcast error:", e);
+            showToast("Delete failed: " + (e.message || "Error"), "error");
+        }
+    };
+
+    // --- WHATSAPP SETTINGS CONTROLLERS ---
+    function renderWaMessages() {
+        const list = document.getElementById('wa-messages-list');
+        const preview = document.getElementById('wa-preview-messages');
+        if (!list || !preview) return;
+        
+        if (!Array.isArray(waMessagesArray)) waMessagesArray = [];
+        let listHtml = '', previewHtml = '';
+        if (waMessagesArray.length === 0) {
+            listHtml = '<p class="text-xs text-[var(--text-muted)] p-2">No messages configured. Click + Add Line.</p>';
+        } else {
+            waMessagesArray.forEach((msg, idx) => {
+                const safeMsg = String(msg || '').replace(/"/g, '&quot;');
+                listHtml += `<div class="flex gap-2 items-start mb-2"><input type="text" class="admin-input flex-1 wa-msg-input" value="${safeMsg}" oninput="syncWaMessages()"><button type="button" class="btn-action btn-danger shrink-0" style="margin-right: 0;" onclick="removeWaMessage(${idx})"><i class="fa-solid fa-trash"></i></button></div>`;
+                if (safeMsg.trim()) previewHtml += `<div class="bg-white text-gray-800 p-2 rounded-lg rounded-tl-none max-w-[85%] text-xs shadow-sm self-start mb-1">${safeMsg}</div>`;
+            });
+        }
+        list.innerHTML = listHtml;
+        preview.innerHTML = previewHtml;
+    }
+    window.renderWaMessages = renderWaMessages;
+
+    window.syncWaMessages = function() {
+        const inputs = document.querySelectorAll('.wa-msg-input');
+        waMessagesArray = Array.from(inputs).map(input => input.value);
+        const preview = document.getElementById('wa-preview-messages');
+        if (preview) {
+            preview.innerHTML = waMessagesArray.map(msg => {
+                const safeMsg = String(msg || '');
+                return safeMsg.trim() ? `<div class="bg-white text-gray-800 p-2 rounded-lg rounded-tl-none max-w-[85%] text-xs shadow-sm self-start mb-1">${safeMsg}</div>` : '';
+            }).join('');
+        }
+    };
+
+    window.addWaMessage = function() {
+        if (!Array.isArray(waMessagesArray)) waMessagesArray = [];
+        window.syncWaMessages();
+        waMessagesArray.push('');
+        renderWaMessages();
+    };
+
+    window.removeWaMessage = function(idx) {
+        if (!Array.isArray(waMessagesArray)) return;
+        window.syncWaMessages();
+        waMessagesArray.splice(idx, 1);
+        renderWaMessages();
+    };
+
+    window.saveWhatsApp = async function() {
+        window.syncWaMessages();
+        const code = document.getElementById('wa-code').value.trim() || '91';
+        const num = document.getElementById('wa-number').value.trim();
+        const fullNum = num ? (num.startsWith(code) ? num : code + num) : '';
+        const validMsgs = waMessagesArray.filter(m => m && String(m).trim() !== '');
+        
+        try {
+            const { error: err1 } = await api.client.from('site_settings').upsert({
+                key: 'whatsapp_number',
+                value: fullNum
+            }, { onConflict: 'key' });
+            if (err1) throw err1;
+
+            const { error: err2 } = await api.client.from('site_settings').upsert({
+                key: 'whatsapp_greeting',
+                value: JSON.stringify(validMsgs)
+            }, { onConflict: 'key' });
+            if (err2) throw err2;
+
+            showToast("WhatsApp configuration saved!");
+            waMessagesArray = validMsgs;
+            renderWaMessages();
+        } catch(e) {
+            console.error("WhatsApp Save Error:", e);
+            showToast("Failed to save: " + (e.message || "Database error"), "error");
+        }
+    };
+
+    // --- SECURITY SETTINGS SAVERS ---
+    window.saveAdminPassword = async () => {
+        const pwd = document.getElementById('set-sec-pwd').value.trim();
+        if (!pwd) return showToast("Password cannot be empty.", "error");
+        try {
+            const { error } = await api.client.rpc('set_admin_password', { new_password: pwd });
+            if (error) throw error;
+
+            showToast("Admin Password Securely Updated!");
+            document.getElementById('set-sec-pwd').value = '';
+        } catch(e) {
+            console.error("Password update failed:", e);
+            showToast("Failed to update password: " + (e.message || "Error"), "error");
+        }
+    };
+
+    window.saveSecretWord = async () => {
+        const word = document.getElementById('set-sec-word').value.trim().toLowerCase();
+        if (!word) return showToast("Enter a word.", "error");
+        try {
+            const { error } = await api.client.from('site_settings').upsert({ key: 'secret_word', value: word }, { onConflict: 'key' });
+            if (error) throw error;
+            showToast("Secret Word Updated!");
+            document.getElementById('current-sec-word').innerText = word;
+            document.getElementById('set-sec-word').value = '';
+        } catch(e) {
+            showToast("Failed to update word.", "error");
+        }
+    };
+
+    window.saveAlertEmail = async () => {
+        const email = document.getElementById('set-alert-email').value.trim();
+        if (!email || !email.includes('@')) return showToast("Invalid email.", "error");
+        try {
+            const { error } = await api.client.from('site_settings').upsert({ key: 'admin_alert_email', value: email }, { onConflict: 'key' });
+            if (error) throw error;
+            showToast("Alert Email Updated!");
+        } catch(e) {
+            showToast("Failed to update email.", "error");
+        }
+    };
+</script>
+</body>
+</html>
