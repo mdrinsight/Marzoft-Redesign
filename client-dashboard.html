@@ -1804,15 +1804,17 @@
         }
     </style>
     <style id="dashboard-mobile-navigation-from-scratch">
-        .marzoft-dashboard-mobile-nav,
-        .marzoft-dashboard-mobile-backdrop {
-            display: none;
+        /* Hide mobile controls globally on desktop */
+        @media (min-width: 768px) {
+            .marzoft-dashboard-mobile-nav,
+            .marzoft-dashboard-mobile-backdrop,
+            .dashboard-mobile-sheet {
+                display: none !important;
+            }
         }
 
         @media (max-width: 767.98px) {
-            .site-header,
-            .dashboard-mobile-backdrop,
-            .dashboard-mobile-sheet {
+            .site-header {
                 display: none !important;
             }
 
