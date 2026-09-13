@@ -23887,6 +23887,43 @@
             }
         }
     </style>
+    <!-- MOBILE NATIVE SCROLL ENFORCEMENT - USER DIRECTIVE -->
+    <style id="mobile-native-scroll-enforcement">
+        @media (max-width: 767.98px) {
+            html, body {
+                overflow-y: auto !important;
+                overscroll-behavior-y: auto !important;
+                touch-action: pan-y !important;
+                scroll-behavior: auto !important;
+            }
+            * {
+                scroll-snap-type: none !important;
+                scroll-snap-align: none !important;
+                scroll-snap-stop: normal !important;
+            }
+            /* Remove sticky holding from large section wrappers */
+            .faq-intro, 
+            .journey-section, 
+            .process-section, 
+            .decision-window, 
+            .hero-exact-panel,
+            #problem,
+            #process,
+            #approach,
+            #faqs,
+            #booking {
+                position: static !important;
+            }
+            section {
+                height: auto !important;
+                min-height: auto !important;
+                overflow: visible !important;
+            }
+            #reviews .past-reviews-carousel {
+                touch-action: pan-y pinch-zoom !important;
+            }
+        }
+    </style>
 </head>
 
 <body>
