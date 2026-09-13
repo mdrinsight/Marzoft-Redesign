@@ -1940,17 +1940,6 @@
         }
 
         /* Responsive */
-        @media (max-width: 992px) {
-            .journey-container {
-                grid-template-columns: 1fr;
-                gap: 48px;
-            }
-
-            .journey-header {
-                max-width: 100%;
-                padding-right: 0;
-            }
-        }
 
         @media (max-width: 768px) {
             .decision-window {
@@ -4064,7 +4053,7 @@
         .process-steps-grid {
             display: grid;
             grid-template-columns: repeat(5, minmax(0, 1fr));
-            gap: 16px;
+            gap: clamp(10px, 1.2vw, 22px);
             position: relative;
             z-index: 1;
             align-items: stretch;
@@ -4076,9 +4065,11 @@
             isolation: isolate;
             overflow: hidden;
             background: #FFFFFF;
+            width: 100%;
+            min-width: 0;
             border: 1px solid rgba(226, 232, 240, 0.95);
             border-radius: 20px;
-            padding: 32px 18px 28px;
+            padding: clamp(20px, 2.5vw, 32px) clamp(10px, 1.5vw, 18px) clamp(18px, 2vw, 28px);
             box-shadow: 0 12px 32px -6px rgba(11, 16, 32, 0.06), 0 2px 6px rgba(11, 16, 32, 0.02);
             backdrop-filter: none;
             -webkit-backdrop-filter: none;
@@ -4086,7 +4077,7 @@
             flex-direction: column;
             align-items: center;
             justify-content: space-between;
-            min-height: 295px;
+            min-height: clamp(250px, 28vw, 305px);
             text-align: center;
             transform: translateY(var(--process-rest, 0));
             transition: transform 0.55s cubic-bezier(0.16, 1, 0.3, 1),
@@ -4143,7 +4134,7 @@
         /* Card Titles: Strong dark navy in light mode */
         .process-step-name {
             font-family: var(--font-sans);
-            font-size: 0.88rem;
+            font-size: clamp(11px, 1.1vw, 15px);
             font-weight: 800;
             letter-spacing: 0.08em;
             text-transform: uppercase;
@@ -4155,7 +4146,7 @@
         /* Card Body Text: Muted blue-grey text */
         .process-step-info {
             font-family: var(--font-sans);
-            font-size: 0.82rem;
+            font-size: clamp(10px, 0.9vw, 14px);
             line-height: 1.55;
             font-weight: 500;
             color: var(--text-muted);
@@ -4173,8 +4164,8 @@
         /* Icon Circles: Subtle tinted circular backgrounds, controlled glow */
         .process-visual-box {
             position: relative;
-            width: 58px;
-            height: 58px;
+            width: clamp(40px, 4.5vw, 58px);
+            height: clamp(40px, 4.5vw, 58px);
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -4234,20 +4225,6 @@
         }
 
         /* Responsive adaptation */
-        @media (max-width: 992px) {
-            .process-steps-grid {
-                grid-template-columns: repeat(3, minmax(0, 1fr));
-                gap: 16px;
-            }
-
-            .process-step-item:nth-child(2),
-            .process-step-item:nth-child(3),
-            .process-step-item:nth-child(4) {
-                --process-rest: 0px;
-                transform: none;
-            }
-        }
-
         @media (max-width: 680px) {
             .process-steps-grid {
                 grid-template-columns: 1fr;
@@ -4590,20 +4567,6 @@
             }
         }
 
-        @media (max-width: 1024px) {
-            .approach-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .approach-cards-row {
-                grid-template-columns: repeat(2, minmax(0, 1fr));
-            }
-
-            .process-steps-grid {
-                grid-template-columns: repeat(3, minmax(0, 1fr));
-            }
-        }
-
         @media (max-width: 768px) {
 
             .nav-links,
@@ -4886,30 +4849,6 @@
             font-size: 1rem;
         }
 
-        @media (max-width: 900px) {
-
-            .approach-reframe,
-            .booking-grid,
-            .faq-reframe {
-                grid-template-columns: 1fr;
-            }
-
-            .approach-intro {
-                padding-top: 0;
-            }
-
-            .approach-statement {
-                min-height: 430px;
-            }
-
-            .booking-grid {
-                gap: 38px;
-            }
-
-            .project-desk {
-                min-height: 410px;
-            }
-        }
 
         @media (max-width: 600px) {
             .approach-principles {
@@ -5340,19 +5279,6 @@
             border-color: transparent;
         }
 
-        @media (max-width: 900px) {
-            .faq-reframe {
-                grid-template-columns: 1fr;
-            }
-
-            .faq-intro {
-                position: static;
-            }
-
-            .faq-section {
-                min-height: auto;
-            }
-        }
 
         @media (max-width: 768px) {
             .hero-center-content::before {
@@ -5670,30 +5596,6 @@
             transform: translateX(4px);
         }
 
-        @media (max-width: 900px) {
-            .final-cta-grid {
-                grid-template-columns: 1fr;
-                text-align: center;
-                gap: 50px;
-            }
-
-            .final-cta-text-col {
-                align-items: center;
-                text-align: center;
-            }
-
-            .final-cta-text-col p {
-                margin-inline: auto;
-            }
-
-            .final-cta-links {
-                justify-content: center;
-            }
-
-            .final-action-card {
-                min-height: 460px;
-            }
-        }
 
         @media (max-width: 600px) {
             .final-cta-text-col h2 {
@@ -21463,21 +21365,19 @@
         }
     </style>
     <style id="proportion-balance-overrides">
-        html {
-            font-size: 15px
-        }
+        @media (min-width: 768px) {
+            html {
+                font-size: 15px
+            }
 
-        .container {
-            width: min(1160px, calc(100% - 56px))
-        }
+            .section-padding {
+                padding-block: clamp(64px, 6.3vw, 88px)
+            }
 
-        .section-padding {
-            padding-block: clamp(64px, 6.3vw, 88px)
-        }
-
-        .process-section,
-        .approach-section {
-            min-height: min(82svh, 700px)
+            .process-section,
+            .approach-section {
+                min-height: min(82svh, 700px)
+            }
         }
 
         .faq-section {
@@ -22155,6 +22055,7 @@
                 right: 10px;
                 bottom: 14px
             }
+        }
         }
     </style>
     <style id="approach-porcelain-styles">
@@ -23924,6 +23825,118 @@
             }
         }
     </style>
+    <style id="mobile-340px-compact-mode">
+        /* =========================================================
+           SMALL-PHONE COMPACT MODE (<= 340px)
+           Proportionally shrinks the UI by 10-15% to prevent it from feeling
+           oversized and cropped on screens like the iPhone SE (320px).
+           ========================================================= */
+        @media (max-width: 340px) {
+            /* Global */
+            html { scroll-padding-top: calc(66px + env(safe-area-inset-top, 0px)) !important; }
+            main > section { padding-block: clamp(60px, 18vw, 70px) !important; }
+            .section-headline { font-size: clamp(26px, 8vw, 30px) !important; }
+
+            /* Navbar */
+            .past-nav-pill, .past-navbar { height: 48px !important; }
+            .past-navbar { padding: 0 8px 0 12px !important; }
+            .past-nav-brand { font-size: 0.95rem !important; }
+            .theme-toggle-btn, .past-menu-toggle, .past-nav-project { 
+                width: 34px !important; min-width: 34px !important; 
+                height: 34px !important; min-height: 34px !important; 
+            }
+            .past-nav-actions { gap: 4px !important; }
+            .past-nav-project svg { width: 14px !important; height: 14px !important; }
+            
+            /* Hero */
+            #home.studio-split-hero { padding: calc(84px + env(safe-area-inset-top, 0px)) 0 60px !important; }
+            #home .hero-exact-title { font-size: clamp(34px, 10.5vw, 42px) !important; margin: 0 0 16px !important; }
+            #home .hero-exact-desc { font-size: 13px !important; margin-bottom: 24px !important; }
+            #home .hero-exact-actions { gap: 14px !important; margin-bottom: 28px !important; }
+            #home .hero-exact-btn-primary { padding: 14px 26px !important; font-size: 12.5px !important; min-height: 44px !important; }
+            #home .hero-exact-btn-link { font-size: 12.5px !important; }
+            #home .hero-exact-avatars img { width: 28px !important; height: 28px !important; margin-right: -8px !important; }
+            #home .hero-exact-avatars .avatars-badge { width: 28px !important; height: 28px !important; font-size: 0.6rem !important; }
+            #home .hero-exact-proof-text { font-size: 12px !important; }
+            
+            #home .hero-exact-panel { 
+                padding: 24px 20px !important; 
+                min-height: 380px !important; 
+                border-radius: 16px !important; 
+            }
+            #home .hero-exact-card-icon { 
+                width: 40px !important; 
+                height: 40px !important; 
+                font-size: 1rem !important; 
+                margin-bottom: 16px !important; 
+            }
+            #home .hero-exact-card-kicker { font-size: 0.65rem !important; }
+            #home .hero-exact-card-title { font-size: 1.45rem !important; margin-bottom: 24px !important; }
+            #home .hero-exact-card-point strong { font-size: 0.88rem !important; }
+            #home .hero-exact-card-point p { font-size: 12.5px !important; }
+            
+            /* Process */
+            #process.process-section { padding-block: 60px !important; }
+            #process .process-steps-grid { gap: 8px !important; padding: 4px 0 10px 24px !important; }
+            #process .process-step-item,
+            #process .process-step-item:nth-child(2),
+            #process .process-step-item:nth-child(3),
+            #process .process-step-item:nth-child(4) { 
+                padding: 12px 14px !important; 
+                border-radius: 16px !important; 
+                grid-template-columns: 40px minmax(0, 1fr) !important; 
+                gap: 2px 12px !important; 
+            }
+            #process .process-step-item .box-icon { width: 40px !important; height: 40px !important; font-size: 16px !important; }
+            #process .process-step-item .box-title { font-size: 12.5px !important; margin: 0 !important; }
+            #process .process-step-item .box-code { font-size: 11.5px !important; line-height: 1.4 !important; }
+            
+            /* Journey */
+            #problem .decision-window { border-radius: 16px !important; min-height: clamp(380px, 137vw, 420px) !important; }
+            #problem .decision-statement { font-size: 1.05rem !important; }
+            #problem .scene-search .search-bar { height: 44px !important; padding: 0 14px !important; font-size: 0.85rem !important; }
+            #problem .scene-decide .final-button { padding: 12px 24px !important; font-size: 0.85rem !important; }
+            
+            /* Approach */
+            #approach.approach-section { padding-block: 60px !important; }
+            #approach .approach-reframe { gap: 24px !important; }
+            #approach .approach-statement { padding: 26px 20px !important; border-radius: 16px !important; }
+            #approach .approach-statement > p { font-size: clamp(2rem, 9.5vw, 2.3rem) !important; margin: 24px 0 20px !important; }
+            #approach .approach-principles div { padding-top: 12px !important; }
+            #approach .approach-principles b { font-size: 0.6rem !important; }
+            #approach .approach-principles span { font-size: 12px !important; }
+            #approach .approach-intro h2 { font-size: clamp(26px, 9vw, 30px) !important; margin-bottom: 14px !important; }
+            #approach .approach-intro p { font-size: 14px !important; }
+            
+            /* Reviews */
+            #reviews.reviews-section { padding-top: 60px !important; }
+            #reviews .review-card { padding: 26px 22px !important; border-radius: 16px !important; }
+            #reviews .review-card blockquote { font-size: 1.25rem !important; margin-bottom: 24px !important; }
+            #reviews .review-person-copy strong { font-size: 0.95rem !important; }
+            #reviews .review-person-copy span { font-size: 12px !important; }
+            #reviews .testimonial-controls .btn-circle { width: 44px !important; height: 44px !important; }
+            
+            /* FAQs */
+            #faqs.faq-section { padding-block: 60px !important; }
+            #faqs .faq-intro h2 { font-size: clamp(28px, 9.5vw, 34px) !important; margin-bottom: 14px !important; }
+            #faqs .faq-intro > p { font-size: 14px !important; }
+            #faqs .faq-accordion-list { border-radius: 16px !important; padding: 6px !important; }
+            #faqs .faq-item { padding: 14px 16px !important; margin-bottom: 6px !important; border-radius: 12px !important; }
+            #faqs .faq-question { font-size: 13.5px !important; }
+            #faqs .faq-icon { width: 28px !important; height: 28px !important; }
+            #faqs .faq-icon svg { width: 10px !important; height: 10px !important; }
+            #faqs .faq-answer-inner { padding: 10px 0 6px !important; font-size: 13px !important; }
+            
+            /* Booking */
+            #booking .final-cta-text-col h2 { font-size: clamp(34px, 11vw, 42px) !important; margin-bottom: 12px !important; }
+            #booking .final-cta-text-col p { font-size: 14px !important; }
+            #booking .final-action-card.project-flow-card { padding: 32px 20px 0 !important; border-radius: 16px !important; min-height: 540px !important; }
+            #booking .project-flow-panel { padding-inline: 12px !important; }
+            #booking .step-pill { font-size: 10px !important; padding: 6px 12px !important; }
+            #booking .step-content h4 { font-size: 14px !important; }
+            #booking .step-content p { font-size: 12.5px !important; }
+        }
+    </style>
 </head>
 
 <body>
@@ -24306,14 +24319,14 @@
                 .hero-exact-glow-orb {
                     position: absolute;
                     z-index: -1;
-                    width: 64.5%;
+                    width: clamp(230px, 24vw, 380px);
                     aspect-ratio: 1;
                     border-radius: 50%;
                     background:
                         radial-gradient(ellipse at 52% 100%, rgba(111, 73, 255, 0.6) 0%, transparent 58%),
                         linear-gradient(165deg, #24174f 8%, #39258d 43%, #5034ca 73%, #603ded 100%);
-                    bottom: -12.1%;
-                    right: -2.7%;
+                    bottom: clamp(-90px, -6vw, -40px);
+                    right: clamp(-80px, -5vw, -35px);
                     box-shadow: 0 22px 62px rgba(73, 43, 202, 0.2);
                     isolation: isolate;
                     pointer-events: none;
@@ -24348,7 +24361,7 @@
                     z-index: 1;
                     display: grid;
                     /* --- SWAP THE PROPORTIONS SO THE CARD IS WIDER & MORE PROMINENT --- */
-                    grid-template-columns: minmax(0, 1fr) minmax(500px, 1.25fr);
+                    grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr);
                     gap: clamp(30px, 5vw, 80px);
                     align-items: center;
                     width: 100%;
@@ -24491,6 +24504,7 @@
                 /* --- RIGHT COLUMN: THE CARD --- */
                 .hero-exact-panel {
                     position: relative;
+                    z-index: auto !important;
                     background: #F5F6FF !important;
                     /* Reference white box surface */
                     border-radius: 20px !important;
@@ -33016,6 +33030,231 @@
             }
         }
     </style>
+
+    <!-- ============================================================
+         MASTER RESPONSIVE FOUNDATION — TWO-SYSTEM SCALING LAYER
+         Establishes unified container, fluid desktop, 768px boundary
+         ============================================================ -->
+    <style id="master-responsive-foundation">
+        /* ── 1. CSS Custom Properties: Two-System Container Grid ── */
+        :root {
+            --mrf-content-max: 1160px;
+            --mrf-content-gutter: clamp(20px, 3vw, 28px);
+            --mrf-content-width: min(var(--mrf-content-max), calc(100% - var(--mrf-content-gutter) * 2));
+        }
+
+        /* ── 2. Unified Container Override ── */
+        .container {
+            width: var(--mrf-content-width) !important;
+            max-width: var(--mrf-content-max) !important;
+            margin-inline: auto !important;
+            box-sizing: border-box;
+        }
+
+        /* ── 3. Global Overflow Guard ── */
+        html, body {
+            overflow-x: clip;
+        }
+
+        main,
+        main > section,
+        .site-footer {
+            max-width: 100%;
+            box-sizing: border-box;
+        }
+
+        /* ── 4. Desktop System (≥768px) — Fluid Scaling ── */
+        @media (min-width: 768px) {
+            :root {
+                --mrf-content-max: 1160px;
+                --mrf-content-gutter: clamp(24px, 3vw, 28px);
+            }
+
+            /* Fluid section padding */
+            .section-padding {
+                padding-block: clamp(56px, 6.5vw, 96px);
+            }
+
+            /* Key grid layouts stay 2-col on desktop/tablet */
+            .studio-split-grid {
+                grid-template-columns: minmax(280px, .9fr) minmax(360px, 1.1fr);
+            }
+
+            .approach-reframe {
+                grid-template-columns: minmax(0, .86fr) minmax(320px, 1.14fr);
+            }
+
+            .faq-reframe {
+                grid-template-columns: minmax(0, .86fr) minmax(320px, 1.14fr);
+            }
+
+            .final-cta-grid {
+                grid-template-columns: minmax(0, 1fr) minmax(300px, .88fr);
+            }
+
+            /* Fluid hero headline */
+            .hero-headline {
+                font-size: clamp(2.2rem, 3.5vw + 0.5rem, 4.8rem);
+            }
+
+            /* Fluid section headlines */
+            .section-headline {
+                font-size: clamp(2.2rem, 3.5vw + 0.3rem, 4.25rem);
+            }
+        }
+
+        /* ── 5. Mobile System (≤767.98px) — Single Column, Fluid Gutters ── */
+        @media (max-width: 767.98px) {
+            :root {
+                --mrf-content-max: 100%;
+                --mrf-content-gutter: clamp(12px, 4vw, 20px);
+            }
+
+            /* All multi-column grids → single column */
+            .studio-split-grid,
+            .approach-reframe,
+            .faq-reframe,
+            .final-cta-grid,
+            .journey-container,
+            .approach-grid,
+            .approach-cards-row,
+            .process-steps-grid,
+            .booking-grid {
+                grid-template-columns: 1fr !important;
+            }
+
+            /* Cards, panels, modals → fluid width, no overflow */
+            .split-panel,
+            .approach-statement,
+            .approach-card,
+            .final-action-card,
+            .project-desk,
+            .faq-accordion-list {
+                max-width: 100% !important;
+                box-sizing: border-box;
+            }
+
+            /* Hard-coded width elements → fluid */
+            .abstract-website,
+            .decision-window,
+            .journey-header {
+                max-width: 100% !important;
+                box-sizing: border-box;
+            }
+
+            /* Section min-heights → auto on mobile (prevent overflow) */
+            .process-section,
+            .approach-section,
+            .faq-section,
+            .final-cta-section {
+                min-height: auto !important;
+            }
+
+            /* Hero adjustments */
+            .studio-split-hero {
+                min-height: auto !important;
+            }
+
+            .split-panel {
+                min-height: 380px;
+            }
+
+            /* Final CTA center on mobile */
+            .final-cta-grid {
+                text-align: center;
+                gap: 40px;
+            }
+
+            .final-cta-text-col {
+                align-items: center;
+                text-align: center;
+            }
+
+            .final-cta-text-col p {
+                margin-inline: auto;
+            }
+
+            .final-cta-links {
+                justify-content: center;
+            }
+
+            /* FAQ section */
+            .faq-intro {
+                position: static;
+            }
+
+            .faq-accordion-list {
+                max-width: none !important;
+            }
+
+            /* Approach section */
+            .approach-intro {
+                padding-top: 0;
+            }
+
+            .approach-statement {
+                min-height: auto !important;
+            }
+
+            .approach-principles {
+                grid-template-columns: 1fr !important;
+                gap: 11px;
+            }
+
+            /* Journey section */
+            .journey-section {
+                height: auto !important;
+                min-height: auto !important;
+                position: relative;
+            }
+
+            .journey-header {
+                max-width: 100%;
+                padding-right: 0;
+            }
+        }
+
+        /* ── 6. Remap Non-Standard Breakpoints ──
+           Override elements that had intermediate breakpoints (900, 992, 1024, 1100)
+           to ensure they transition at exactly 768px boundary.
+           These use high-specificity selectors to override existing rules. ── */
+
+        /* 850px nav → remap to 768px */
+        @media (min-width: 768px) and (max-width: 850px) {
+            .past-nav-header {
+                top: 12px;
+                padding: 0 14px;
+            }
+
+            .past-nav-pill {
+                height: 58px;
+            }
+
+            .past-navbar {
+                padding-left: 20px;
+            }
+
+            .past-nav-links,
+            .past-nav-login {
+                display: none;
+            }
+
+            .past-menu-toggle {
+                display: grid;
+            }
+
+            .past-nav-actions {
+                gap: 9px;
+            }
+
+            .past-nav-project {
+                min-height: 40px;
+                padding: 0 14px;
+                font-size: .58rem;
+            }
+        }
+    </style>
+
     <style id="master-mobile-viewport-stability">
         @media (max-width: 767.98px) {
             html,
@@ -33038,21 +33277,6 @@
                 width: 100%;
                 max-width: 100%;
                 box-sizing: border-box;
-            }
-
-            html body main > section,
-            html body .site-footer {
-                overflow-x: hidden !important;
-            }
-
-            html body main section#home.hero-section,
-            html body main section#problem.journey-section,
-            html body main section#process.process-section,
-            html body main section#approach.approach-section,
-            html body main section#reviews.reviews-section.past-reviews-section,
-            html body main section#faqs.faq-section,
-            html body main section#booking.final-cta-section {
-                overflow-x: hidden !important;
             }
 
             #faqs::before,
@@ -33079,13 +33303,6 @@
                 left: auto !important;
                 max-width: 100% !important;
                 transform: none !important;
-            }
-
-            .container {
-                width: calc(100% - 24px) !important;
-                max-width: 430px !important;
-                margin-inline: auto !important;
-                box-sizing: border-box;
             }
 
             .site-header,
