@@ -30244,13 +30244,15 @@
         })();
     </script>
     <style id="mobile-kinetic-process">
-        /* Mobile-only kinetic process: a connected sequence, never a five-card stack. */
+        /* Mobile-only kinetic process: a connected sequence, buttery 60fps GPU compositor animation. */
         @media (max-width: 767.98px) {
             #process.process-section {
                 position: relative;
                 overflow: hidden !important;
                 padding: 76px 0 82px !important;
                 background: linear-gradient(180deg, #F9FAFF 0%, #F5F8FF 48%, #FBFCFF 100%) !important;
+                touch-action: pan-y;
+                contain: layout paint;
             }
 
             #process.process-section>.container {
@@ -30263,18 +30265,24 @@
                 z-index: 1;
                 margin: 0 0 30px !important;
                 text-align: left !important;
-                transform: translate3d(0, var(--process-heading-depth, 0px), 0);
             }
 
             #process .process-header .eyebrow-pill {
                 margin-bottom: 14px !important;
+                opacity: 0;
+                transform: translate3d(0, 8px, 0);
+                transition: opacity 350ms ease, transform 350ms ease;
+            }
+
+            #process .process-header.process-heading-entered .eyebrow-pill {
+                opacity: 1;
+                transform: translate3d(0, 0, 0);
             }
 
             html.mobile-process-motion #process .process-header,
             html.mobile-process-static #process .process-header {
                 opacity: 1 !important;
                 visibility: visible !important;
-                transform: translate3d(0, var(--process-heading-depth, 0px), 0) !important;
                 transition: none !important;
             }
 
@@ -30294,6 +30302,18 @@
 
             #process .process-heading-line {
                 display: block;
+                opacity: 0;
+                transform: translate3d(0, 10px, 0);
+                transition: opacity 400ms cubic-bezier(.22, .61, .36, 1), transform 400ms cubic-bezier(.22, .61, .36, 1);
+            }
+
+            #process .process-header.process-heading-entered .process-heading-line {
+                opacity: 1;
+                transform: translate3d(0, 0, 0);
+            }
+
+            #process .process-header.process-heading-entered .process-heading-line:last-child {
+                transition-delay: 80ms;
             }
 
             #process .section-headline span:not(.process-heading-accent) {
@@ -30314,7 +30334,6 @@
                 grid-template-columns: minmax(0, 1fr) !important;
                 gap: 7px !important;
                 padding: 4px 0 10px 35px !important;
-                transform: translate3d(0, var(--process-grid-depth, 0px), 0);
             }
 
             #process .process-steps-grid::before {
@@ -30337,8 +30356,9 @@
                 border-radius: 999px;
                 background: #2F6BFF;
                 box-shadow: 0 0 9px rgba(47, 107, 255, .18);
-                transform: translate3d(0, var(--process-signal-y), 0);
-                transition: transform .46s cubic-bezier(.16, 1, .3, 1);
+                transform: translate3d(0, var(--process-signal-y, 18px), 0);
+                transition: transform 380ms cubic-bezier(.22, .61, .36, 1);
+                will-change: transform;
             }
 
             #process .process-step-item,
@@ -30364,13 +30384,22 @@
                 color: #0B1020 !important;
                 text-align: left !important;
                 cursor: pointer;
-                transform: none !important;
-                transition:
-                    grid-template-rows .4s cubic-bezier(.16, 1, .3, 1),
-                    background-color .34s ease,
-                    border-color .34s ease,
-                    transform .4s cubic-bezier(.16, 1, .3, 1),
-                    box-shadow .34s ease !important;
+                touch-action: pan-y;
+                transform: none;
+                transition: background-color .32s ease, border-color .32s ease !important;
+            }
+
+            #process .process-step-item::before {
+                content: "";
+                position: absolute;
+                inset: -1px;
+                border-radius: 16px;
+                border: 1px solid rgba(47, 107, 255, .35);
+                box-shadow: 0 8px 24px rgba(27, 52, 110, .08);
+                pointer-events: none;
+                opacity: 0;
+                transition: opacity .36s ease;
+                z-index: 0;
             }
 
             #process .process-step-item:nth-child(1) {
@@ -30402,30 +30431,18 @@
                 text-align: right;
             }
 
-            #process .process-step-item:nth-child(1)::after {
-                content: "01";
-            }
-
-            #process .process-step-item:nth-child(2)::after {
-                content: "02";
-            }
-
-            #process .process-step-item:nth-child(3)::after {
-                content: "03";
-            }
-
-            #process .process-step-item:nth-child(4)::after {
-                content: "04";
-            }
-
-            #process .process-step-item:nth-child(5)::after {
-                content: "05";
-            }
+            #process .process-step-item:nth-child(1)::after { content: "01"; }
+            #process .process-step-item:nth-child(2)::after { content: "02"; }
+            #process .process-step-item:nth-child(3)::after { content: "03"; }
+            #process .process-step-item:nth-child(4)::after { content: "04"; }
+            #process .process-step-item:nth-child(5)::after { content: "05"; }
 
             #process .process-step-item>div:first-child {
                 grid-area: title !important;
                 align-self: center !important;
                 min-width: 0;
+                position: relative;
+                z-index: 1;
             }
 
             #process .process-step-name {
@@ -30434,7 +30451,7 @@
                 font-weight: 850 !important;
                 letter-spacing: .095em !important;
                 line-height: 1;
-                transition: transform .38s cubic-bezier(.16, 1, .3, 1), color .3s ease;
+                transition: color .3s ease, transform .36s cubic-bezier(.22, .61, .36, 1);
             }
 
             #process .process-step-info {
@@ -30442,22 +30459,26 @@
                 align-self: start;
                 min-height: 0;
                 margin: 0 !important;
+                padding-top: 0;
                 overflow: hidden;
                 color: #62708A !important;
                 font-size: .79rem !important;
                 line-height: 1.46 !important;
                 opacity: 0;
-                clip-path: inset(0 0 100% 0);
-                transform: translate3d(0, 5px, 0);
-                transition: clip-path .36s cubic-bezier(.16, 1, .3, 1), opacity .26s ease, transform .36s cubic-bezier(.16, 1, .3, 1);
+                transform: translate3d(0, 6px, 0);
+                transition: opacity .18s ease, transform .18s ease;
+                position: relative;
+                z-index: 1;
             }
 
             #process .process-step-item.process-stage-active {
                 grid-template-rows: 34px 1fr !important;
                 background: rgba(255, 255, 255, .94) !important;
                 border-color: rgba(47, 107, 255, .35) !important;
-                box-shadow: 0 8px 26px rgba(27, 52, 110, .07) !important;
-                transform: translate3d(var(--process-active-x), 0, 0) scale(1) !important;
+            }
+
+            #process .process-step-item.process-stage-active::before {
+                opacity: 1;
             }
 
             #process .process-step-item.process-stage-active::after {
@@ -30472,13 +30493,13 @@
             #process .process-step-item.process-stage-active .process-step-info {
                 padding-top: 8px;
                 opacity: 1;
-                clip-path: inset(0 0 0 0);
                 transform: translate3d(0, 0, 0);
+                transition: opacity .26s cubic-bezier(.22, .61, .36, 1) 70ms, transform .26s cubic-bezier(.22, .61, .36, 1) 70ms;
             }
 
-            /* Small monochrome tools replace the original multi-colour emoji treatment. */
             #process .process-visual-box {
                 position: relative;
+                z-index: 1;
                 grid-area: icon !important;
                 width: 32px !important;
                 height: 32px !important;
@@ -30490,7 +30511,7 @@
                 box-shadow: none !important;
                 color: #2F6BFF !important;
                 font-size: 0 !important;
-                transition: background-color .32s ease, border-color .32s ease, transform .38s cubic-bezier(.16, 1, .3, 1);
+                transition: background-color .3s ease, border-color .3s ease;
             }
 
             #process .process-step-item.process-stage-active .process-visual-box {
@@ -30577,226 +30598,172 @@
                 z-index: 1;
                 bottom: -14px;
                 left: 35px;
-                width: 0;
+                width: 54px;
                 height: 2px;
                 border-radius: 999px;
                 background: #2F6BFF;
                 opacity: 0;
+                transform: scaleX(0);
+                transform-origin: left center;
+                transition: transform 400ms cubic-bezier(.22, .61, .36, 1), opacity 300ms ease;
             }
 
             #process.process-launch-complete .process-section-completion-line {
-                animation: processLaunchLine .72s .18s cubic-bezier(.16, 1, .3, 1) both;
+                opacity: 1;
+                transform: scaleX(1);
             }
 
-            @media (prefers-reduced-motion: no-preference) {
-                html.mobile-process-motion #process .process-heading-line {
+            /* Initial Staggered Section Reveal */
+            html.mobile-process-motion #process .process-step-item {
+                opacity: 0;
+                transform: translate3d(0, 10px, 0);
+                transition: opacity 380ms cubic-bezier(.22, .61, .36, 1), transform 380ms cubic-bezier(.22, .61, .36, 1);
+            }
+
+            html.mobile-process-motion #process .process-step-item.mobile-process-entered {
+                opacity: 1;
+                transform: translate3d(0, 0, 0);
+            }
+
+            /* Compositor-friendly Icon Animations */
+            @keyframes processDiscoverIcon {
+                from {
+                    opacity: .2;
+                    transform: rotate(-24deg) scale(.78);
+                }
+                to {
+                    opacity: 1;
+                    transform: rotate(0) scale(1);
+                }
+            }
+
+            @keyframes processShapeIcon {
+                from {
+                    opacity: .3;
+                    transform: rotate(32deg) translate3d(-2px, -2px, 0);
+                }
+                to {
+                    opacity: 1;
+                    transform: rotate(45deg) translate3d(0, 0, 0);
+                }
+            }
+
+            @keyframes processCraftRing {
+                from {
+                    opacity: .2;
+                    transform: scale(.48);
+                }
+                60% {
+                    opacity: 1;
+                    transform: scale(1.12);
+                }
+                to {
+                    opacity: 1;
+                    transform: scale(1);
+                }
+            }
+
+            @keyframes processCraftPoint {
+                from {
                     opacity: 0;
-                    transform: translate3d(0, 108%, 0);
+                    transform: scale(.25);
                 }
-
-                html.mobile-process-motion #process .process-header.process-heading-entered .process-heading-line:first-child {
-                    animation: processHeadingReveal .62s cubic-bezier(.22, .61, .36, 1) both;
+                to {
+                    opacity: 1;
+                    transform: scale(1);
                 }
+            }
 
-                html.mobile-process-motion #process .process-header.process-heading-entered .process-heading-line:last-child {
-                    animation: processHeadingReveal .62s .14s cubic-bezier(.22, .61, .36, 1) both;
-                }
-
-                html.mobile-process-motion #process .process-header .eyebrow-pill {
+            @keyframes processRefineCheck {
+                from {
                     opacity: 0;
-                    transform: translate3d(0, 8px, 0);
+                    transform: translate3d(-3px, 1px, 0) scale(.8);
                 }
+                to {
+                    opacity: 1;
+                    transform: translate3d(0, 0, 0) scale(1);
+                }
+            }
 
-                html.mobile-process-motion #process .process-header.process-heading-entered .eyebrow-pill {
-                    animation: processEyebrowReveal .4s both;
+            @keyframes processLaunchIcon {
+                from {
+                    opacity: .3;
+                    transform: translate3d(0, 3px, 0);
                 }
+                to {
+                    opacity: 1;
+                    transform: translate3d(0, 0, 0);
+                }
+            }
 
-                html.mobile-process-motion #process .process-step-item {
-                    opacity: 0 !important;
-                    transform: translate3d(0, 14px, 0) scale(.99) !important;
-                }
+            #process .process-step-item.process-stage-active .box-idea::before {
+                animation: processDiscoverIcon 340ms cubic-bezier(.22, .61, .36, 1) both;
+            }
 
-                html.mobile-process-motion #process .process-step-item.mobile-process-entered {
-                    opacity: 1 !important;
-                    transform: translate3d(0, 0, 0) scale(1) !important;
-                    transition: opacity .46s cubic-bezier(.22, .61, .36, 1), transform .48s cubic-bezier(.22, .61, .36, 1), grid-template-rows .4s cubic-bezier(.16, 1, .3, 1), background-color .34s ease, border-color .34s ease, box-shadow .34s ease !important;
-                }
+            #process .process-step-item.process-stage-active .box-design::before {
+                animation: processShapeIcon 320ms cubic-bezier(.22, .61, .36, 1) both;
+            }
 
-                html.mobile-process-motion #process .process-step-item.process-stage-active.mobile-process-entered {
-                    transform: translate3d(var(--process-active-x), 0, 0) scale(1) !important;
-                }
+            #process .process-step-item.process-stage-active .box-code::before {
+                animation: processCraftRing 340ms cubic-bezier(.22, .61, .36, 1) both;
+            }
 
-                #process .process-step-item.process-stage-active .box-idea::before {
-                    animation: processDiscoverIcon .65s cubic-bezier(.16, 1, .3, 1) both;
-                }
+            #process .process-step-item.process-stage-active .box-code::after {
+                animation: processCraftPoint 280ms 70ms cubic-bezier(.22, .61, .36, 1) both;
+            }
 
-                #process .process-step-item.process-stage-active .box-design::before {
-                    animation: processShapeIcon .62s cubic-bezier(.16, 1, .3, 1) both;
-                }
+            #process .process-step-item.process-stage-active .box-test::after {
+                animation: processRefineCheck 300ms cubic-bezier(.22, .61, .36, 1) both;
+            }
 
-                #process .process-step-item.process-stage-active .box-code::before {
-                    animation: processCraftRing .65s cubic-bezier(.16, 1, .3, 1) both;
-                }
-
-                #process .process-step-item.process-stage-active .box-code::after {
-                    animation: processCraftPoint .52s .12s cubic-bezier(.16, 1, .3, 1) both;
-                }
-
-                #process .process-step-item.process-stage-active .box-test::after {
-                    animation: processRefineCheck .56s cubic-bezier(.16, 1, .3, 1) both;
-                }
-
-                #process .process-step-item.process-stage-active .box-launch::after {
-                    animation: processLaunchIcon .62s cubic-bezier(.16, 1, .3, 1) both;
-                }
+            #process .process-step-item.process-stage-active .box-launch::after {
+                animation: processLaunchIcon 320ms cubic-bezier(.22, .61, .36, 1) both;
             }
 
             @media (prefers-reduced-motion: reduce) {
-                html.mobile-process-static #process .process-step-item {
-                    grid-template-rows: 34px auto !important;
+                #process .process-step-item {
                     opacity: 1 !important;
                     transform: none !important;
-                    transition: background-color .2s ease, border-color .2s ease !important;
+                    transition: background-color .2s ease !important;
                 }
 
-                html.mobile-process-static #process .process-step-info {
-                    padding-top: 8px;
-                    opacity: 1;
-                    clip-path: none;
-                    transform: none;
-                    transition: none;
+                #process .process-step-item::before {
+                    transition: none !important;
                 }
 
-                html.mobile-process-static #process .process-steps-grid::after {
-                    transition: none;
+                #process .process-step-info {
+                    transition: none !important;
                 }
-            }
-        }
 
-        @keyframes processHeadingReveal {
-            from {
-                opacity: 0;
-                transform: translate3d(0, 108%, 0);
-            }
+                #process .process-steps-grid::after {
+                    transition: none !important;
+                }
 
-            to {
-                opacity: 1;
-                transform: translate3d(0, 0, 0);
-            }
-        }
-
-        @keyframes processEyebrowReveal {
-            from {
-                opacity: 0;
-                transform: translate3d(0, 8px, 0);
-            }
-
-            to {
-                opacity: 1;
-                transform: translate3d(0, 0, 0);
-            }
-        }
-
-        @keyframes processDiscoverIcon {
-            from {
-                transform: rotate(-26deg) scale(.78);
-                opacity: .2;
-            }
-
-            to {
-                transform: rotate(0) scale(1);
-                opacity: 1;
-            }
-        }
-
-        @keyframes processShapeIcon {
-            from {
-                clip-path: inset(0 100% 0 0);
-                opacity: .25;
-            }
-
-            to {
-                clip-path: inset(0 0 0 0);
-                opacity: 1;
-            }
-        }
-
-        @keyframes processCraftRing {
-            from {
-                transform: scale(.48);
-                opacity: .2;
-            }
-
-            62% {
-                transform: scale(1.14);
-                opacity: 1;
-            }
-
-            to {
-                transform: scale(1);
-                opacity: 1;
-            }
-        }
-
-        @keyframes processCraftPoint {
-            from {
-                transform: scale(.3);
-                opacity: 0;
-            }
-
-            to {
-                transform: scale(1);
-                opacity: 1;
-            }
-        }
-
-        @keyframes processRefineCheck {
-            from {
-                clip-path: inset(0 100% 0 0);
-                opacity: 0;
-                transform: translateX(-3px);
-            }
-
-            to {
-                clip-path: inset(0 0 0 0);
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-
-        @keyframes processLaunchIcon {
-            from {
-                opacity: 0;
-                transform: translate3d(-3px, 5px, 0);
-            }
-
-            65% {
-                opacity: 1;
-                transform: translate3d(1px, -4px, 0);
-            }
-
-            to {
-                opacity: 1;
-                transform: translate3d(0, 0, 0);
-            }
-        }
-
-        @keyframes processLaunchLine {
-            from {
-                width: 0;
-                opacity: 0;
-            }
-
-            to {
-                width: 54px;
-                opacity: 1;
+                #process .box-idea::before,
+                #process .box-design::before,
+                #process .box-code::before,
+                #process .box-code::after,
+                #process .box-test::after,
+                #process .box-launch::after {
+                    animation: none !important;
+                }
             }
         }
     </style>
     <script>
         (() => {
-            const initialiseMobileKineticProcess = () => {
-                if (!window.matchMedia('(max-width: 767.98px)').matches) return;
+            let cleanupMobileProcess = null;
+
+            const setupMobileProcess = () => {
+                const mediaQuery = window.matchMedia('(max-width: 767.98px)');
+                if (!mediaQuery.matches) {
+                    if (cleanupMobileProcess) {
+                        cleanupMobileProcess();
+                        cleanupMobileProcess = null;
+                    }
+                    return;
+                }
+                if (cleanupMobileProcess) return;
 
                 const section = document.getElementById('process');
                 const header = section?.querySelector('.process-header');
@@ -30822,104 +30789,280 @@
                     }
                 }
 
-                const completionLine = document.createElement('span');
-                completionLine.className = 'process-section-completion-line';
-                completionLine.setAttribute('aria-hidden', 'true');
-                grid.append(completionLine);
+                let completionLine = grid.querySelector('.process-section-completion-line');
+                if (!completionLine) {
+                    completionLine = document.createElement('span');
+                    completionLine.className = 'process-section-completion-line';
+                    completionLine.setAttribute('aria-hidden', 'true');
+                    grid.append(completionLine);
+                }
 
-                let activeIndex = 0;
-                const setSignalPosition = () => {
-                    const active = stages[activeIndex];
-                    if (!active) return;
-                    const y = active.offsetTop + 18;
+                let activeIndex = -1;
+                let isTransitioning = false;
+                let transitionTimer = null;
+
+                const updateSignalPosition = (targetIndex) => {
+                    const activeStage = stages[targetIndex];
+                    if (!activeStage) return;
+                    const y = activeStage.offsetTop + 18;
                     grid.style.setProperty('--process-signal-y', `${y}px`);
                 };
-                const setActiveStage = (index) => {
-                    const nextIndex = Math.max(0, Math.min(stages.length - 1, index));
-                    const changed = nextIndex !== activeIndex;
-                    activeIndex = nextIndex;
-                    stages.forEach((stage, stageIndex) => {
-                        const active = stageIndex === activeIndex;
-                        stage.classList.toggle('process-stage-active', active);
-                        stage.setAttribute('aria-expanded', String(active));
+
+                const resetInlineStyles = () => {
+                    stages.forEach((s) => {
+                        s.style.transition = '';
+                        s.style.transform = '';
+                        s.style.transformOrigin = '';
+                        s.style.willChange = 'auto';
+                        const title = s.querySelector('.process-step-name');
+                        if (title) { title.style.transition = ''; title.style.transform = ''; title.style.transformOrigin = ''; }
+                        const icon = s.querySelector('.process-visual-box');
+                        if (icon) { icon.style.transition = ''; icon.style.transform = ''; icon.style.transformOrigin = ''; }
+                        const desc = s.querySelector('.process-step-info');
+                        if (desc) { desc.style.transition = ''; desc.style.opacity = ''; desc.style.transform = ''; }
+                    });
+                };
+
+                const setActiveStage = (newIndex, animate = true) => {
+                    newIndex = Math.max(0, Math.min(stages.length - 1, newIndex));
+                    if (newIndex === activeIndex) return;
+
+                    if (transitionTimer) {
+                        clearTimeout(transitionTimer);
+                        transitionTimer = null;
+                    }
+                    if (isTransitioning) {
+                        resetInlineStyles();
+                        isTransitioning = false;
+                    }
+
+                    const prevIndex = activeIndex;
+                    activeIndex = newIndex;
+
+                    if (reducedMotion || !animate || prevIndex === -1) {
+                        stages.forEach((stage, idx) => {
+                            const isActive = idx === activeIndex;
+                            stage.classList.toggle('process-stage-active', isActive);
+                            stage.setAttribute('aria-expanded', String(isActive));
+                        });
+                        section.classList.toggle('process-launch-complete', activeIndex === stages.length - 1);
+                        window.requestAnimationFrame(() => updateSignalPosition(activeIndex));
+                        return;
+                    }
+
+                    // FLIP Animation: 1 instant layout flush, all motion on GPU compositor
+                    isTransitioning = true;
+                    const firstRects = stages.map((s) => s.getBoundingClientRect());
+
+                    stages.forEach((stage, idx) => {
+                        const isActive = idx === activeIndex;
+                        stage.classList.toggle('process-stage-active', isActive);
+                        stage.setAttribute('aria-expanded', String(isActive));
                     });
                     section.classList.toggle('process-launch-complete', activeIndex === stages.length - 1);
-                    window.requestAnimationFrame(setSignalPosition);
-                    if (changed) window.setTimeout(setSignalPosition, 420);
+                    updateSignalPosition(activeIndex);
+
+                    const lastRects = stages.map((s) => s.getBoundingClientRect());
+
+                    stages.forEach((stage, idx) => {
+                        const dy = firstRects[idx].top - lastRects[idx].top;
+                        const dh = firstRects[idx].height / (lastRects[idx].height || 1);
+
+                        if (Math.abs(dy) > 0.5 || Math.abs(dh - 1) > 0.01) {
+                            stage.style.willChange = 'transform';
+                            stage.style.transition = 'none';
+                            stage.style.transformOrigin = 'top left';
+                            stage.style.transform = `translate3d(0, ${dy.toFixed(2)}px, 0) scaleY(${dh.toFixed(4)})`;
+
+                            const title = stage.querySelector('.process-step-name');
+                            if (title && Math.abs(dh - 1) > 0.01) {
+                                title.style.transition = 'none';
+                                title.style.transformOrigin = 'top left';
+                                title.style.transform = `scaleY(${(1 / dh).toFixed(4)})`;
+                            }
+
+                            const icon = stage.querySelector('.process-visual-box');
+                            if (icon && Math.abs(dh - 1) > 0.01) {
+                                icon.style.transition = 'none';
+                                icon.style.transformOrigin = 'center center';
+                                icon.style.transform = `scaleY(${(1 / dh).toFixed(4)})`;
+                            }
+                        }
+
+                        const desc = stage.querySelector('.process-step-info');
+                        if (desc) {
+                            if (idx === activeIndex) {
+                                desc.style.transition = 'none';
+                                desc.style.opacity = '0';
+                                desc.style.transform = 'translate3d(0, 6px, 0)';
+                            } else if (idx === prevIndex) {
+                                desc.style.transition = 'opacity 180ms ease, transform 180ms ease';
+                                desc.style.opacity = '0';
+                                desc.style.transform = 'translate3d(0, 4px, 0)';
+                            }
+                        }
+                    });
+
+                    void section.offsetHeight;
+
+                    window.requestAnimationFrame(() => {
+                        stages.forEach((stage, idx) => {
+                            stage.style.transition = 'transform 420ms cubic-bezier(.22, .61, .36, 1)';
+                            const activeX = idx === activeIndex
+                                ? (getComputedStyle(stage).getPropertyValue('--process-active-x').trim() || '0px')
+                                : '0px';
+                            stage.style.transform = `translate3d(${activeX}, 0, 0) scaleY(1)`;
+
+                            const title = stage.querySelector('.process-step-name');
+                            if (title) {
+                                title.style.transition = 'transform 420ms cubic-bezier(.22, .61, .36, 1)';
+                                title.style.transform = 'scaleY(1)';
+                            }
+
+                            const icon = stage.querySelector('.process-visual-box');
+                            if (icon) {
+                                icon.style.transition = 'transform 420ms cubic-bezier(.22, .61, .36, 1)';
+                                icon.style.transform = 'scaleY(1)';
+                            }
+
+                            if (idx === activeIndex) {
+                                const desc = stage.querySelector('.process-step-info');
+                                if (desc) {
+                                    desc.style.transition = 'opacity 260ms cubic-bezier(.22, .61, .36, 1) 70ms, transform 260ms cubic-bezier(.22, .61, .36, 1) 70ms';
+                                    desc.style.opacity = '1';
+                                    desc.style.transform = 'translate3d(0, 0, 0)';
+                                }
+                            }
+                        });
+
+                        transitionTimer = window.setTimeout(() => {
+                            resetInlineStyles();
+                            isTransitioning = false;
+                            transitionTimer = null;
+                            updateSignalPosition(activeIndex);
+                        }, 450);
+                    });
                 };
 
                 stages.forEach((stage, index) => {
                     stage.setAttribute('role', 'button');
                     stage.setAttribute('aria-expanded', 'false');
-                    stage.addEventListener('click', () => setActiveStage(index));
+                    stage.addEventListener('click', () => setActiveStage(index, true));
                     stage.addEventListener('keydown', (event) => {
                         if (event.key !== 'Enter' && event.key !== ' ') return;
                         event.preventDefault();
-                        setActiveStage(index);
+                        setActiveStage(index, true);
                     });
                 });
-                setActiveStage(0);
 
-                if (reducedMotion) {
-                    stages.forEach((stage) => stage.classList.add('mobile-process-entered'));
-                    header.classList.add('process-heading-entered');
-                    window.requestAnimationFrame(setSignalPosition);
-                    return;
-                }
+                setActiveStage(0, false);
 
                 const revealProcess = () => {
                     header.classList.add('process-heading-entered');
                     stages.forEach((stage, index) => {
-                        window.setTimeout(() => stage.classList.add('mobile-process-entered'), index * 82);
+                        window.setTimeout(() => stage.classList.add('mobile-process-entered'), index * 50);
                     });
                 };
+
+                let entryObserver = null;
                 if ('IntersectionObserver' in window) {
-                    const entryObserver = new IntersectionObserver((entries, observer) => {
+                    entryObserver = new IntersectionObserver((entries, observer) => {
                         if (!entries[0]?.isIntersecting) return;
                         revealProcess();
                         observer.disconnect();
-                    }, { threshold: .12, rootMargin: '0px 0px -9% 0px' });
+                        entryObserver = null;
+                    }, { threshold: 0.1, rootMargin: '0px 0px -5% 0px' });
                     entryObserver.observe(section);
                 } else {
                     revealProcess();
                 }
 
-                let frame = 0;
-                const updateFromScroll = () => {
-                    frame = 0;
-                    const rect = section.getBoundingClientRect();
-                    const viewportHeight = window.innerHeight;
-                    if (rect.bottom < viewportHeight * .12 || rect.top > viewportHeight * .88) return;
+                let scrollTicking = false;
+                let isSectionVisible = false;
 
-                    const activationLine = viewportHeight * .60;
-                    let nearestIndex = activeIndex;
-                    let nearestDistance = Infinity;
-                    stages.forEach((stage, index) => {
-                        const stageRect = stage.getBoundingClientRect();
-                        const distance = Math.abs((stageRect.top + stageRect.height / 2) - activationLine);
-                        if (distance < nearestDistance) {
-                            nearestDistance = distance;
-                            nearestIndex = index;
+                const checkScroll = () => {
+                    scrollTicking = false;
+                    if (!isSectionVisible) return;
+
+                    const vh = window.innerHeight;
+                    const activationLine = vh * 0.58;
+
+                    const currentStage = stages[activeIndex];
+                    if (currentStage) {
+                        const curRect = currentStage.getBoundingClientRect();
+                        const curCenter = curRect.top + curRect.height / 2;
+                        const delta = curCenter - activationLine;
+                        if (Math.abs(delta) <= 36) return;
+                    }
+
+                    let closestIndex = activeIndex;
+                    let closestDist = Infinity;
+
+                    for (let i = 0; i < stages.length; i++) {
+                        const rect = stages[i].getBoundingClientRect();
+                        const center = rect.top + rect.height / 2;
+                        const dist = Math.abs(center - activationLine);
+                        if (dist < closestDist) {
+                            closestDist = dist;
+                            closestIndex = i;
                         }
-                    });
-                    setActiveStage(nearestIndex);
+                    }
 
-                    const progress = Math.max(-1, Math.min(1, (viewportHeight * .52 - rect.top) / Math.max(rect.height, 1)));
-                    header.style.setProperty('--process-heading-depth', `${Math.max(-10, Math.min(0, -progress * 10)).toFixed(2)}px`);
-                    grid.style.setProperty('--process-grid-depth', `${Math.max(0, Math.min(8, progress * 8)).toFixed(2)}px`);
+                    if (closestIndex !== activeIndex) {
+                        setActiveStage(closestIndex, true);
+                    }
                 };
-                const requestScrollUpdate = () => {
-                    if (!frame) frame = window.requestAnimationFrame(updateFromScroll);
+
+                const onScroll = () => {
+                    if (!scrollTicking && isSectionVisible) {
+                        scrollTicking = true;
+                        window.requestAnimationFrame(checkScroll);
+                    }
                 };
-                window.addEventListener('scroll', requestScrollUpdate, { passive: true });
-                window.addEventListener('resize', requestScrollUpdate, { passive: true });
-                requestScrollUpdate();
+
+                let visibilityObserver = null;
+                if ('IntersectionObserver' in window) {
+                    visibilityObserver = new IntersectionObserver((entries) => {
+                        isSectionVisible = entries[0]?.isIntersecting || false;
+                        if (isSectionVisible) onScroll();
+                    }, { rootMargin: '120px 0px 120px 0px' });
+                    visibilityObserver.observe(section);
+                } else {
+                    isSectionVisible = true;
+                }
+
+                window.addEventListener('scroll', onScroll, { passive: true });
+                window.addEventListener('resize', onScroll, { passive: true });
+
+                cleanupMobileProcess = () => {
+                    window.removeEventListener('scroll', onScroll);
+                    window.removeEventListener('resize', onScroll);
+                    if (entryObserver) { entryObserver.disconnect(); entryObserver = null; }
+                    if (visibilityObserver) { visibilityObserver.disconnect(); visibilityObserver = null; }
+                    if (transitionTimer) { clearTimeout(transitionTimer); transitionTimer = null; }
+                    resetInlineStyles();
+                    grid.style.removeProperty('--process-signal-y');
+                    section.classList.remove('mobile-process-static', 'mobile-process-motion', 'process-launch-complete');
+                    header.classList.remove('process-heading-entered');
+                    stages.forEach((stage) => {
+                        stage.classList.remove('mobile-process-entered', 'process-stage-active');
+                        stage.removeAttribute('role');
+                        stage.removeAttribute('aria-expanded');
+                    });
+                };
             };
 
+            const mediaQuery = window.matchMedia('(max-width: 767.98px)');
+            if (mediaQuery.addEventListener) {
+                mediaQuery.addEventListener('change', setupMobileProcess);
+            } else if (mediaQuery.addListener) {
+                mediaQuery.addListener(setupMobileProcess);
+            }
+
             if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', initialiseMobileKineticProcess, { once: true });
+                document.addEventListener('DOMContentLoaded', setupMobileProcess, { once: true });
             } else {
-                initialiseMobileKineticProcess();
+                setupMobileProcess();
             }
         })();
     </script>
@@ -31379,6 +31522,201 @@
                 color: #66738C !important;
             }
 
+            #problem .d-idx.i-2::before {
+                content: "03";
+            }
+
+            #problem .d-idx.i-3::before {
+                content: "04";
+            }
+
+            #problem .d-idx.i-4::before {
+                content: "05";
+            }
+
+            #problem .d-idx[aria-current="step"] {
+                width: auto !important;
+                min-width: 0 !important;
+                flex: 1 1 auto !important;
+                padding-inline: 9px !important;
+                background: rgba(47, 107, 255, .08) !important;
+            }
+
+            #problem .d-idx[aria-current="step"]::before {
+                color: #2F6BFF !important;
+                font-size: .54rem;
+                letter-spacing: .075em;
+            }
+
+            #problem .d-idx.i-0[aria-current="step"]::before {
+                content: "01 · HEAR";
+            }
+
+            #problem .d-idx.i-1[aria-current="step"]::before {
+                content: "02 · SEARCH";
+            }
+
+            #problem .d-idx.i-2[aria-current="step"]::before {
+                content: "03 · CHECK";
+            }
+
+            #problem .d-idx.i-3[aria-current="step"]::before {
+                content: "04 · COMPARE";
+            }
+
+            #problem .d-idx.i-4[aria-current="step"]::before {
+                content: "05 · DECIDE";
+            }
+
+            html.dark #problem .d-idx[aria-current="step"] {
+                background: rgba(93, 142, 255, .14) !important;
+            }
+
+            html.dark #problem .d-idx[aria-current="step"]::before {
+                color: #8FB2FF !important;
+            }
+        }
+    </style>
+    <style id="mobile-dark-mode-repair">
+        /* Final mobile theme layer: preserve the dark palette after the mobile art-direction overrides. */
+        @media (max-width: 767.98px) {
+            html.dark #process.process-section {
+                background: linear-gradient(180deg, #050918 0%, #071126 50%, #050A18 100%) !important;
+            }
+
+            html.dark #process .section-headline,
+            html.dark #process .process-step-name {
+                color: #F3F6FC !important;
+            }
+
+            html.dark #process .process-step-info {
+                color: #99A8C2 !important;
+            }
+
+            html.dark #process .process-steps-grid::before {
+                background: rgba(108, 147, 255, .22);
+            }
+
+            html.dark #process .process-step-item,
+            html.dark #process .process-step-item:nth-child(2),
+            html.dark #process .process-step-item:nth-child(3),
+            html.dark #process .process-step-item:nth-child(4) {
+                background: rgba(9, 20, 45, .86) !important;
+                border-color: rgba(126, 155, 226, .16) !important;
+                box-shadow: none !important;
+            }
+
+            html.dark #process .process-step-item.process-stage-active {
+                background: rgba(15, 31, 68, .96) !important;
+                border-color: rgba(92, 137, 255, .48) !important;
+                box-shadow: 0 8px 26px rgba(0, 0, 0, .22) !important;
+            }
+
+            html.dark #process .process-step-item.process-stage-active .process-step-name {
+                color: #AFC7FF !important;
+            }
+
+            html.dark #process .process-step-item::after {
+                color: #7182A3;
+            }
+
+            html.dark #process .process-step-item.process-stage-active::after {
+                color: #79A4FF;
+            }
+
+            html.dark #process .process-visual-box {
+                color: #79A4FF !important;
+                border-color: rgba(103, 150, 255, .28) !important;
+                background: rgba(47, 107, 255, .12) !important;
+            }
+
+            html.dark #process .process-step-item.process-stage-active .process-visual-box {
+                background: rgba(47, 107, 255, .19) !important;
+                border-color: rgba(116, 157, 255, .48) !important;
+            }
+
+            html.dark #problem .decision-window {
+                background-color: #07122A !important;
+                border-color: rgba(130, 150, 210, .14) !important;
+            }
+
+            html.dark #problem .decision-window.step-2 .scene-check .check-message {
+                background: rgba(7, 18, 42, .92) !important;
+                color: #D5E0F7 !important;
+            }
+
+            html.dark #problem .decision-window.step-3 .website-alt {
+                background: #0A1530 !important;
+            }
+
+            html.dark #problem .scene-websites .abstract-website {
+                border-color: rgba(120, 145, 205, .2) !important;
+                box-shadow: 0 18px 38px -24px rgba(0, 0, 0, .52) !important;
+            }
+        }
+    </style>
+    <style id="mobile-approach-typography">
+        @media (max-width: 767.98px) {
+
+            /* Give the Approach introduction the same visual authority as the statement card. */
+            #approach .approach-reframe {
+                gap: 32px !important;
+            }
+
+            #approach .approach-intro .eyebrow-pill {
+                margin-bottom: 16px !important;
+                font-size: .65rem !important;
+            }
+
+            #approach .approach-intro h2 {
+                max-width: 12ch !important;
+                margin-bottom: 18px !important;
+                color: #0B1020 !important;
+                font-size: clamp(2.4rem, 11vw, 3rem) !important;
+                line-height: .96 !important;
+                letter-spacing: -.065em !important;
+            }
+
+            #approach .approach-intro p {
+                max-width: 34rem !important;
+                color: #5E6D88 !important;
+                font-size: .97rem !important;
+                line-height: 1.62 !important;
+            }
+
+            html.dark #approach .approach-intro h2 {
+                color: #F6F8FE !important;
+            }
+
+            html.dark #approach .approach-intro p {
+                color: #A6B3C9 !important;
+            }
+        }
+    </style>
+    <style id="mobile-faq-dark-contrast">
+        @media (max-width: 767.98px) {
+
+            /* Match the desktop FAQ surface: porcelain accordion, navy labels, cobalt controls. */
+            html.dark #faqs .faq-accordion-list {
+                background: linear-gradient(145deg, #FBFCFF 0%, #F6F8FD 56%, #EEF2FA 100%) !important;
+                border-color: rgba(88, 110, 190, .15) !important;
+                box-shadow: 0 18px 42px rgba(0, 0, 0, .18) !important;
+            }
+
+            html.dark #faqs .faq-item {
+                background: transparent !important;
+                border-color: rgba(38, 60, 110, .10) !important;
+            }
+
+            html.dark #faqs .faq-header,
+            html.dark #faqs .faq-header>span:first-child {
+                color: #0A1020 !important;
+            }
+
+            html.dark #faqs .faq-body {
+                color: #66738C !important;
+            }
+
             html.dark #faqs .faq-icon {
                 color: #3471F5 !important;
                 background: #EEF2FF !important;
@@ -31430,10 +31768,9 @@
             #dd-chat-widget .past-wa-box {
                 right: 0 !important;
                 bottom: 70px !important;
-                width: min(326px, calc(100vw - 16px)) !important;
-                /* Preserve the desktop widget's portrait proportion without filling the viewport. */
-                height: min(430px, calc(100dvh - 96px)) !important;
-                max-height: min(430px, calc(100dvh - 96px)) !important;
+                width: min(280px, calc(100vw - 32px)) !important;
+                height: min(460px, calc(100dvh - 96px)) !important;
+                max-height: min(460px, calc(100dvh - 96px)) !important;
                 border-radius: 18px !important;
                 box-shadow: 0 18px 42px rgba(13, 38, 28, .20) !important;
                 overscroll-behavior: contain;
@@ -31486,7 +31823,6 @@
             }
 
             #dd-chat-widget .past-wa-compose textarea {
-                min-height: 39px !important;
                 max-height: 62px !important;
                 padding: 10px 11px !important;
                 border-radius: 11px !important;
@@ -32835,8 +33171,10 @@
 
             #dd-chat-widget .past-wa-box {
                 right: 0 !important;
-                width: min(326px, calc(100vw - 24px)) !important;
-                max-width: calc(100vw - 24px) !important;
+                width: min(280px, calc(100vw - 32px)) !important;
+                max-width: calc(100vw - 32px) !important;
+                height: min(460px, calc(100dvh - 96px)) !important;
+                max-height: min(460px, calc(100dvh - 96px)) !important;
             }
 
             body.review-modal-open #dd-chat-widget,
