@@ -8658,8 +8658,8 @@
 
         .past-wa-open {
             display: grid;
-            width: 62px;
-            height: 62px;
+            width: 56px;
+            height: 56px;
             border: 0;
             border-radius: 50%;
             color: #fff;
@@ -31337,9 +31337,9 @@
     <style id="mobile-whatsapp-compact">
         /* Keep the concierge useful on a phone without turning it into a full-screen modal. */
         #dd-chat-widget .past-wa-open {
-            width: 66px;
-            height: 66px;
-            font-size: 2.15rem;
+            width: 56px;
+            height: 56px;
+            font-size: 1.85rem;
         }
 
         #dd-chat-widget .past-wa-head i {
@@ -31348,17 +31348,20 @@
 
         @media (max-width: 767.98px) {
             #dd-chat-widget.past-wa-widget {
+                display: block !important;
+                visibility: visible !important;
+                opacity: 1 !important;
                 right: 12px !important;
                 bottom: calc(12px + env(safe-area-inset-bottom)) !important;
-                z-index: 2300 !important;
+                z-index: 9999 !important;
             }
 
             #dd-chat-widget .past-wa-open {
-                width: 56px !important;
-                height: 56px !important;
+                width: 48px !important;
+                height: 48px !important;
                 border-radius: 50% !important;
-                font-size: 1.78rem !important;
-                box-shadow: 0 10px 24px rgba(12, 130, 70, .24) !important;
+                font-size: 1.6rem !important;
+                box-shadow: 0 8px 24px rgba(12, 130, 70, .28) !important;
             }
 
             #dd-chat-widget .past-wa-open>span {
