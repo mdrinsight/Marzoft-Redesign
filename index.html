@@ -8157,7 +8157,7 @@
 
         .past-reviews-viewport {
             overflow-x: auto;
-            scroll-snap-type: x mandatory;
+            /* scroll-snap-type removed */
             scrollbar-width: none
         }
 
@@ -8189,7 +8189,7 @@
             border-radius: 24px;
             background: rgba(255, 255, 255, 0.6);
             box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
-            scroll-snap-align: center;
+            /* scroll-snap-align removed */
             isolation: isolate;
             opacity: 0.5;
             transform: scale(0.9);
@@ -18771,7 +18771,7 @@
             min-width: 0;
             overflow-x: auto;
             overscroll-behavior-inline: contain;
-            scroll-snap-type: x mandatory;
+            /* scroll-snap-type removed */
             scrollbar-width: none;
             outline: 0;
             -webkit-overflow-scrolling: touch;
@@ -18804,7 +18804,7 @@
             border-radius: 30px;
             background: rgba(255, 255, 255, .88);
             box-shadow: 0 22px 48px rgba(32, 53, 105, .09);
-            scroll-snap-align: start;
+            /* scroll-snap-align removed */
             isolation: isolate;
             transition: transform .58s cubic-bezier(.16, 1, .3, 1), box-shadow .55s ease, border-color .4s ease;
         }
@@ -20189,7 +20189,7 @@
 
         .reviews-viewport {
             padding-block: 7px 18px;
-            scroll-snap-type: x mandatory;
+            /* scroll-snap-type removed */
             scroll-padding-inline: var(--review-side-pad, 24px);
         }
 
@@ -20214,7 +20214,7 @@
             box-shadow: 0 20px 54px rgba(30, 52, 105, .09);
             opacity: .42;
             filter: blur(1.2px) saturate(.78);
-            scroll-snap-align: center;
+            /* scroll-snap-align removed */
             transform: perspective(1200px) translateY(18px) scale(.89);
             transform-origin: center;
             transition: opacity .8s ease, filter .9s ease, transform 1.05s cubic-bezier(.16, 1, .3, 1), box-shadow .9s ease, border-color .8s ease, background .8s ease, color .8s ease;
@@ -21653,7 +21653,7 @@
             box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05) !important;
             opacity: 0.5 !important;
             filter: none !important;
-            scroll-snap-align: center;
+            /* scroll-snap-align removed */
             transform: scale(0.9) !important;
             transform-origin: center;
             transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s ease, background-color 0.5s ease, border-color 0.5s ease, box-shadow 0.5s ease !important;
@@ -23272,7 +23272,7 @@
             .reviews-carousel {
                 display: flex;
                 overflow-x: auto;
-                scroll-snap-type: x mandatory;
+                /* scroll-snap-type removed */
                 scrollbar-width: none;
                 gap: 12px;
                 padding-bottom: 20px;
@@ -23283,7 +23283,7 @@
             }
 
             .review-card {
-                scroll-snap-align: center;
+                /* scroll-snap-align removed */
                 flex: 0 0 90% !important;
                 max-width: 350px !important;
                 height: auto !important;
@@ -23769,7 +23769,7 @@
             .reviews-carousel {
                 display: flex;
                 overflow-x: auto;
-                scroll-snap-type: x mandatory;
+                /* scroll-snap-type removed */
                 scrollbar-width: none;
                 gap: 12px;
                 padding-bottom: 20px;
@@ -23780,7 +23780,7 @@
             }
 
             .review-card {
-                scroll-snap-align: center;
+                /* scroll-snap-align removed */
                 flex: 0 0 90% !important;
                 max-width: 350px !important;
                 height: auto !important;
@@ -28906,36 +28906,6 @@
                 margin-inline: auto;
                 font-size: .96rem !important;
                 line-height: 1.55;
-            }
-
-            #reviews .past-reviews-carousel {
-                width: 100%;
-                margin-top: 38px;
-                display: grid;
-                grid-template-columns: 1fr 1fr;
-                grid-template-areas: "viewport viewport" "previous next";
-                justify-content: center;
-                gap: 20px 12px;
-            }
-
-            #reviews .past-reviews-viewport {
-                grid-area: viewport;
-                width: 100%;
-                overflow: visible !important;
-                scroll-snap-type: none !important;
-            }
-
-            #reviews .past-reviews-track {
-                width: 100%;
-                display: grid !important;
-                place-items: center;
-                gap: 0 !important;
-                padding: 0 !important;
-                transform: none !important;
-            }
-
-            #reviews .review-card[data-review-id]:not(.is-active) {
-                display: none !important;
             }
 
             #reviews .review-card,
