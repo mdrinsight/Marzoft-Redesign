@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Client Dashboard — MARZOFT</title>
 
 <!-- Instant Global Theme Persistence (Prevents white flash on load) -->
@@ -2438,6 +2438,63 @@
             }
         }
     </style>
+<style id="dashboard-mobile-viewport-stability">
+    .dashboard-whatsapp-floating { display: none; }
+
+    @media (max-width: 767.98px) {
+        *, *::before, *::after { box-sizing: border-box; }
+
+        html,
+        body {
+            width: 100% !important;
+            max-width: 100% !important;
+            min-height: 100%;
+            overflow-x: hidden !important;
+            overflow-y: auto !important;
+        }
+
+        body,
+        main,
+        .dashboard-main {
+            max-width: 100% !important;
+            transform: none !important;
+        }
+
+        input:not([type="radio"]):not([type="checkbox"]):not([type="hidden"]),
+        textarea,
+        select {
+            font-size: 16px !important;
+        }
+
+        #editProfileModal .modal-box {
+            width: calc(100% - 24px) !important;
+            max-width: 400px !important;
+            padding: 20px !important;
+        }
+
+        .dashboard-whatsapp-floating {
+            position: fixed;
+            z-index: 1700;
+            right: 12px;
+            bottom: calc(14px + env(safe-area-inset-bottom));
+            display: grid;
+            width: 48px;
+            height: 48px;
+            color: #fff;
+            border-radius: 50%;
+            background: linear-gradient(145deg, #20c76e, #0c9d54);
+            box-shadow: 0 12px 30px rgba(16, 164, 87, .34);
+            font-size: 1.55rem;
+            place-items: center;
+        }
+
+        body.dashboard-modal-open .dashboard-whatsapp-floating {
+            visibility: hidden;
+            opacity: 0;
+            pointer-events: none;
+        }
+    }
+</style>
 </head>
 <body>
     <div class="ambient-mesh"></div>
@@ -2530,13 +2587,18 @@
             
             <div class="action-card action-card-assist">
                 <h3 style="font-size: 1rem; margin-bottom: 8px;">Need assistance?</h3>
-                <a href="https://wa.me/919999999999" target="_blank" class="btn-outline">
+                <a href="https://wa.me/919999999999" target="_blank" rel="noopener" class="btn-outline dashboard-whatsapp-action">
                     <i class="fa-brands fa-whatsapp" style="margin:0; font-size: 1.1rem; color: inherit;"></i> Message us
                 </a>
             </div>
         </div>
     </div>
 </main>
+
+<a class="dashboard-whatsapp-floating dashboard-whatsapp-action" id="dashboardWhatsAppFloating"
+   href="https://wa.me/919999999999" target="_blank" rel="noopener" aria-label="Message Marzoft on WhatsApp">
+    <i class="fa-brands fa-whatsapp" aria-hidden="true"></i>
+</a>
 
 <div class="notifications-panel" id="notificationsPanel" aria-hidden="true">
     <div class="notifications-header">
@@ -2635,6 +2697,30 @@
         const READ_STORAGE_KEY = 'marzoft_read_broadcasts';
         let allBroadcasts = [];
         const api = window.marzoftBackend || window.MarzoftSupabase || {};
+        const whatsappActions = Array.from(document.querySelectorAll('.dashboard-whatsapp-action'));
+        const defaultWhatsAppNumber = '919999999999';
+        let dashboardWhatsAppNumber = defaultWhatsAppNumber;
+        let dashboardWhatsAppGreeting = 'Hi Marzoft — I need assistance with my project dashboard.';
+
+        const dashboardWhatsAppUrl = () => `https://wa.me/${dashboardWhatsAppNumber}?text=${encodeURIComponent(dashboardWhatsAppGreeting)}`;
+        const syncDashboardWhatsAppLinks = () => whatsappActions.forEach((action) => { action.href = dashboardWhatsAppUrl(); });
+        const openDashboardWhatsApp = (event) => {
+            event.currentTarget.href = dashboardWhatsAppUrl();
+        };
+
+        whatsappActions.forEach((action) => action.addEventListener('click', openDashboardWhatsApp));
+        syncDashboardWhatsAppLinks();
+
+        if (typeof api.getWhatsAppConfig === 'function') {
+            api.getWhatsAppConfig()
+                .then(({ data: config }) => {
+                    if (!config) return;
+                    dashboardWhatsAppNumber = config.number || defaultWhatsAppNumber;
+                    dashboardWhatsAppGreeting = String(config.greeting || '').trim() || dashboardWhatsAppGreeting;
+                    syncDashboardWhatsAppLinks();
+                })
+                .catch(() => { /* The configured fallback remains available. */ });
+        }
 
         // --- AUTHENTICATION ---
         try {
@@ -2670,12 +2756,14 @@
         const closeEditModal = () => {
             editProfileModal.style.opacity = '0';
             editProfileModal.querySelector('.modal-box').style.transform = 'translateY(20px)';
+            document.body.classList.remove('dashboard-modal-open');
             setTimeout(() => editProfileModal.style.display = 'none', 300);
         };
 
         btnEditProfile.addEventListener('click', () => {
             editNameInput.value = userNameDisplay.textContent;
             editProfileModal.style.display = 'flex';
+            document.body.classList.add('dashboard-modal-open');
             void editProfileModal.offsetWidth; // trigger reflow
             editProfileModal.style.opacity = '1';
             editProfileModal.querySelector('.modal-box').style.transform = 'translateY(0)';

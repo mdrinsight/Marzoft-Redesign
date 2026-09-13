@@ -104,6 +104,34 @@
             }).select().single();
         },
 
+        async getWhatsAppConfig() {
+            const missing = needClient();
+            if (missing) return missing;
+            const { data, error } = await client.from('site_settings')
+                .select('key, value')
+                .in('key', ['whatsapp_number', 'whatsapp_greeting']);
+            if (error) return { data: null, error };
+            const rawNumber = data?.find((setting) => setting.key === 'whatsapp_number')?.value || null;
+            const rawGreeting = data?.find((setting) => setting.key === 'whatsapp_greeting')?.value || null;
+            let messages = [];
+            if (rawGreeting) {
+                try {
+                    const parsed = typeof rawGreeting === 'string' ? JSON.parse(rawGreeting) : rawGreeting;
+                    messages = (Array.isArray(parsed) ? parsed : [parsed]).map(String).map((message) => message.trim()).filter(Boolean);
+                } catch {
+                    messages = [String(rawGreeting).trim()].filter(Boolean);
+                }
+            }
+            return {
+                data: {
+                    number: String(rawNumber || '').replace(/\D/g, '') || null,
+                    greeting: messages.join(' '),
+                    messages
+                },
+                error: null
+            };
+        },
+
     // Admin / Staff RPCs
         adminListProjectRequests() { return rpc('admin_list_project_requests'); },
         adminListReviews() { return rpc('admin_list_reviews'); },

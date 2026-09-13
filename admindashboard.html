@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <title>Workspace — MARZOFT</title>
 
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -88,7 +88,30 @@
         #toast.error { background: #EF4444; box-shadow: 0 10px 30px rgba(239, 68, 68, 0.3); }
       .role-select { padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: 800; text-transform: uppercase; border: 1px solid var(--border-color); background: var(--bg-main); color: var(--text-primary); outline: none; cursor: pointer; }
         
-    </style>
+    @media (max-width: 767.98px) {
+        *, *::before, *::after { box-sizing: border-box; }
+
+        html,
+        body {
+            width: 100% !important;
+            max-width: 100% !important;
+            min-height: 100%;
+            overflow-x: hidden !important;
+        }
+
+        body { height: 100dvh; }
+        main { width: 100% !important; max-width: 100% !important; transform: none !important; }
+
+        input:not([type="radio"]):not([type="checkbox"]):not([type="hidden"]),
+        textarea,
+        select { font-size: 16px !important; }
+
+        .modal-box {
+            width: calc(100% - 24px);
+            max-width: 600px;
+        }
+    }
+</style>
 </head>
 <body class="h-screen w-screen overflow-hidden flex relative">
 

@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 
     <!-- Primary SEO & Meta -->
     <title>MARZOFT — We Build Websites People Remember</title>
@@ -23928,6 +23928,59 @@
 
 <body>
 
+    <script id="mobile-viewport-scroll-lock">
+        (() => {
+            const mobileQuery = window.matchMedia('(max-width: 767.98px)');
+            const owners = new Set();
+            const bodyProperties = ['position', 'top', 'right', 'left', 'width', 'overflow', 'padding-right'];
+            let savedScrollY = 0;
+            let savedBodyStyles = null;
+            let savedHtmlOverflow = null;
+
+            const rememberProperty = (style, property) => ({
+                value: style.getPropertyValue(property),
+                priority: style.getPropertyPriority(property)
+            });
+
+            const restoreProperty = (style, property, saved) => {
+                if (saved.value) style.setProperty(property, saved.value, saved.priority);
+                else style.removeProperty(property);
+            };
+
+            const lock = (owner) => {
+                if (!mobileQuery.matches || owners.has(owner)) return;
+                owners.add(owner);
+                if (owners.size > 1) return;
+
+                savedScrollY = window.scrollY || window.pageYOffset || 0;
+                savedBodyStyles = Object.fromEntries(bodyProperties.map((property) => [property, rememberProperty(document.body.style, property)]));
+                savedHtmlOverflow = rememberProperty(document.documentElement.style, 'overflow');
+
+                document.documentElement.style.setProperty('overflow', 'hidden', 'important');
+                document.body.style.setProperty('position', 'fixed');
+                document.body.style.setProperty('top', `-${savedScrollY}px`);
+                document.body.style.setProperty('right', '0');
+                document.body.style.setProperty('left', '0');
+                document.body.style.setProperty('width', '100%', 'important');
+                document.body.style.setProperty('overflow', 'hidden', 'important');
+                document.body.style.setProperty('padding-right', '0');
+            };
+
+            const unlock = (owner) => {
+                owners.delete(owner);
+                if (owners.size || !savedBodyStyles) return;
+
+                bodyProperties.forEach((property) => restoreProperty(document.body.style, property, savedBodyStyles[property]));
+                restoreProperty(document.documentElement.style, 'overflow', savedHtmlOverflow);
+                savedBodyStyles = null;
+                savedHtmlOverflow = null;
+                window.scrollTo(0, savedScrollY);
+            };
+
+            window.marzoftMobileScrollLock = { lock, unlock };
+        })();
+    </script>
+
     <!-- Past-project navigation, re-themed for Marzoft. Triple-tap the logo or type the private word to reach admin. -->
     <header class="past-nav-header in-hero" id="siteHeader">
         <div class="past-nav-pill" id="navPill">
@@ -27235,12 +27288,15 @@
                 portal.classList.add('is-open');
                 portal.setAttribute('aria-hidden', 'false');
                 document.body.classList.add('auth-portal-open');
+                window.marzoftMobileScrollLock?.lock('auth-portal');
                 window.dispatchEvent(new CustomEvent('marzoft:navigation-state'));
                 window.clearTimeout(portalFocusTimer);
                 portalFocusTimer = window.setTimeout(() => {
-                    const compact = window.matchMedia('(max-width:820px)').matches;
-                    emailInput.focus({ preventScroll: !compact });
-                    if (compact) emailInput.scrollIntoView({ block: 'center', behavior: 'auto' });
+                    if (window.matchMedia('(max-width: 767.98px)').matches) {
+                        portal.querySelector('[data-auth-portal-close]')?.focus({ preventScroll: true });
+                    } else {
+                        emailInput.focus({ preventScroll: true });
+                    }
                 }, 320);
             };
 
@@ -27257,6 +27313,7 @@
                 portal.setAttribute('aria-hidden', 'true');
                 portal.inert = true;
                 document.body.classList.remove('auth-portal-open');
+                window.marzoftMobileScrollLock?.unlock('auth-portal');
                 passwordInput.value = '';
                 passwordInput.type = 'password';
                 passwordToggle.textContent = 'Show';
@@ -27702,8 +27759,15 @@
                 modal.classList.add('is-open');
                 modal.setAttribute('aria-hidden', 'false');
                 document.body.classList.add('review-modal-open');
+                window.marzoftMobileScrollLock?.lock('review-modal');
                 window.dispatchEvent(new CustomEvent('marzoft:navigation-state'));
-                window.setTimeout(() => nameInput.focus({ preventScroll: true }), reducedMotion ? 0 : 300);
+                window.setTimeout(() => {
+                    if (window.matchMedia('(max-width: 767.98px)').matches) {
+                        modal.querySelector('.review-modal-close')?.focus({ preventScroll: true });
+                    } else {
+                        nameInput.focus({ preventScroll: true });
+                    }
+                }, reducedMotion ? 0 : 300);
             };
 
             const closeModal = (restoreFocus = true) => {
@@ -27716,6 +27780,7 @@
                 modal.setAttribute('aria-hidden', 'true');
                 modal.inert = true;
                 document.body.classList.remove('review-modal-open');
+                window.marzoftMobileScrollLock?.unlock('review-modal');
                 setStatus();
                 window.dispatchEvent(new CustomEvent('marzoft:navigation-state'));
             };
@@ -27934,6 +27999,7 @@
                 modal.classList.add('is-open');
                 modal.setAttribute('aria-hidden', 'false');
                 document.body.classList.add('whatsapp-composer-open');
+                window.marzoftMobileScrollLock?.lock('whatsapp-composer');
                 updateMessageState();
                 window.dispatchEvent(new CustomEvent('marzoft:navigation-state'));
                 window.setTimeout(() => message.focus({ preventScroll: true }), reducedMotion ? 0 : 320);
@@ -27946,6 +28012,7 @@
                 modal.setAttribute('aria-hidden', 'true');
                 modal.inert = true;
                 document.body.classList.remove('whatsapp-composer-open');
+                window.marzoftMobileScrollLock?.unlock('whatsapp-composer');
                 target?.focus?.({ preventScroll: true });
                 window.dispatchEvent(new CustomEvent('marzoft:navigation-state'));
             };
@@ -28081,24 +28148,15 @@
             (async () => {
                 try {
                     const api = window.marzoftBackend || window.MarzoftSupabase || window.AdminAPI;
-                    if (api && api.client) {
-                        const { data } = await api.client.from('site_settings').select('key, value').in('key', ['whatsapp_number', 'whatsapp_greeting']);
-                        if (data) {
-                            const numSetting = data.find(s => s.key === 'whatsapp_number');
-                            const msgSetting = data.find(s => s.key === 'whatsapp_greeting');
-
-                            if (numSetting && numSetting.value) {
-                                currentPhone = String(numSetting.value).replace(/\D/g, '') || defaultPhone;
+                    if (typeof api?.getWhatsAppConfig === 'function') {
+                        const { data: config } = await api.getWhatsAppConfig();
+                        if (config) {
+                            if (config.number) {
+                                currentPhone = config.number || defaultPhone;
                             }
 
-                            if (msgSetting && msgSetting.value) {
-                                try {
-                                    let parsed = typeof msgSetting.value === 'string' ? JSON.parse(msgSetting.value) : msgSetting.value;
-                                    // Guarantee it is always an array
-                                    window.dynamicWaNotes = Array.isArray(parsed) ? parsed : [parsed];
-                                } catch (e) {
-                                    window.dynamicWaNotes = [msgSetting.value];
-                                }
+                            if (config.messages?.length) {
+                                window.dynamicWaNotes = config.messages;
                             }
                         }
                     }
@@ -31432,7 +31490,7 @@
                 max-height: 62px !important;
                 padding: 10px 11px !important;
                 border-radius: 11px !important;
-                font-size: .68rem !important;
+                font-size: 16px !important;
             }
 
             #dd-chat-widget .past-wa-send {
@@ -32619,6 +32677,174 @@
             to {
                 opacity: 1;
                 transform: translateY(0);
+            }
+        }
+    </style>
+    <style id="master-mobile-viewport-stability">
+        @media (max-width: 767.98px) {
+            html,
+            body {
+                width: 100% !important;
+                max-width: 100% !important;
+                min-height: 100%;
+                overflow-x: hidden !important;
+            }
+
+            body,
+            main {
+                transform: none !important;
+            }
+
+            main,
+            body > main,
+            main > section,
+            .site-footer {
+                width: 100%;
+                max-width: 100%;
+                box-sizing: border-box;
+            }
+
+            html body main > section,
+            html body .site-footer {
+                overflow-x: hidden !important;
+            }
+
+            html body main section#home.hero-section,
+            html body main section#problem.journey-section,
+            html body main section#process.process-section,
+            html body main section#approach.approach-section,
+            html body main section#reviews.reviews-section.past-reviews-section,
+            html body main section#faqs.faq-section,
+            html body main section#booking.final-cta-section {
+                overflow-x: hidden !important;
+            }
+
+            #faqs::before,
+            #faqs .faq-reframe::after {
+                right: 0 !important;
+                width: min(100%, 440px) !important;
+                max-width: 100% !important;
+            }
+
+            #approach::before {
+                right: 0 !important;
+                width: min(100%, 400px) !important;
+                max-width: 100% !important;
+            }
+
+            #booking::before {
+                left: 0 !important;
+            }
+
+            #booking::after,
+            #booking .final-action-card-wrapper::after,
+            #booking #projectFlowCard::before {
+                right: 0 !important;
+                left: auto !important;
+                max-width: 100% !important;
+                transform: none !important;
+            }
+
+            .container {
+                width: calc(100% - 24px) !important;
+                max-width: 430px !important;
+                margin-inline: auto !important;
+                box-sizing: border-box;
+            }
+
+            .site-header,
+            .past-nav-header,
+            .marzoft-mobile-nav {
+                max-width: 100% !important;
+                box-sizing: border-box;
+            }
+
+            #reviews,
+            #reviews .past-reviews-carousel,
+            #reviews .reviews-viewport {
+                width: 100% !important;
+                max-width: 100% !important;
+            }
+
+            #reviews .reviews-viewport {
+                overflow-x: auto !important;
+                overflow-y: hidden !important;
+                overscroll-behavior-inline: contain;
+                contain: inline-size layout paint;
+            }
+
+            input:not([type="radio"]):not([type="checkbox"]):not([type="hidden"]),
+            textarea,
+            select {
+                font-size: 16px !important;
+            }
+
+            .review-modal,
+            .auth-portal {
+                inset: 0;
+                width: 100%;
+                max-width: 100%;
+                padding: 0 !important;
+            }
+
+            .review-modal-shell,
+            .past-review-modal-shell {
+                width: calc(100% - 24px) !important;
+                max-width: 420px !important;
+                height: min(680px, calc(100dvh - 24px)) !important;
+                max-height: calc(100dvh - 24px) !important;
+                border: 1px solid rgba(255, 255, 255, .45) !important;
+                border-radius: 22px !important;
+                transform: none !important;
+            }
+
+            .auth-portal-shell {
+                width: calc(100% - 24px) !important;
+                max-width: 400px !important;
+                height: min(700px, calc(100dvh - 24px)) !important;
+                max-height: calc(100dvh - 24px) !important;
+                border-radius: 22px !important;
+                transform: none !important;
+            }
+
+            .auth-portal-form-side,
+            .review-modal-form-side,
+            .past-review-modal-content {
+                min-width: 0;
+                overflow-y: auto !important;
+                overscroll-behavior: contain;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            #dd-chat-widget.past-wa-widget {
+                position: fixed !important;
+                right: 12px !important;
+                bottom: calc(14px + env(safe-area-inset-bottom)) !important;
+                display: block !important;
+                width: 48px;
+                height: 48px;
+                visibility: visible !important;
+                opacity: 1 !important;
+                z-index: 2400 !important;
+            }
+
+            #dd-chat-widget .past-wa-open {
+                width: 48px !important;
+                height: 48px !important;
+            }
+
+            #dd-chat-widget .past-wa-box {
+                right: 0 !important;
+                width: min(326px, calc(100vw - 24px)) !important;
+                max-width: calc(100vw - 24px) !important;
+            }
+
+            body.review-modal-open #dd-chat-widget,
+            body.auth-portal-open #dd-chat-widget,
+            body.whatsapp-composer-open #dd-chat-widget {
+                visibility: hidden !important;
+                opacity: 0 !important;
+                pointer-events: none !important;
             }
         }
     </style>
