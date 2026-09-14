@@ -23939,6 +23939,132 @@
             #booking .step-content p { font-size: 12.5px !important; }
         }
     </style>
+    <style id="your-details-fixes">
+        /* 1. Desktop Grid (2x2) */
+        .project-details-form {
+            display: grid !important;
+            grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+            column-gap: 18px !important;
+            row-gap: 14px !important;
+        }
+
+        /* 2. Input Heights and Shared Component Family */
+        .project-field input,
+        .project-field select,
+        .project-budget-trigger {
+            height: 52px !important;
+            font-size: 0.8rem !important;
+        }
+        
+        /* 3. Dropdown Opened - Compact Rows & Upward Positioning to escape clipping */
+        .project-budget-options {
+            bottom: calc(100% + 6px) !important;
+            top: auto !important;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .project-budget-options button {
+            min-height: 40px !important;
+            padding: 0 12px !important;
+        }
+
+        /* 4. Field Label Alignment */
+        .project-field > span {
+            font-size: 0.6rem !important;
+            font-weight: 800 !important;
+            margin-bottom: 0px !important;
+            letter-spacing: 0.06em !important;
+            text-transform: uppercase !important;
+        }
+
+        /* 5. Budget Helper Text */
+        .project-budget-helper {
+            color: #7d8aa2 !important;
+            margin-top: 2px !important;
+            margin-bottom: 6px !important;
+            font-size: 10.5px !important;
+            line-height: 1.3 !important;
+        }
+
+        /* 6. Bottom Action Row */
+        .project-flow-panel[data-project-panel="details"] .project-panel-actions {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: space-between !important;
+            width: 100% !important;
+            margin-top: 28px !important;
+            padding-top: 0 !important;
+        }
+
+        /* 7. Violet Orb (Decorative Circle) Z-Index and positioning */
+        .project-flow-glow.glow-two {
+            z-index: 0 !important;
+        }
+        .project-flow-panel[data-project-panel="details"] {
+            z-index: 2 !important;
+        }
+        .project-flow-panel[data-project-panel="details"] .project-panel-actions {
+            z-index: 3 !important;
+            position: relative;
+        }
+
+        /* Mobile specific fixes */
+        @media (max-width: 767.98px) {
+            .project-details-form {
+                grid-template-columns: 1fr !important;
+                gap: 12px !important;
+            }
+            .project-field input,
+            .project-field select,
+            .project-budget-trigger {
+                height: 44px !important;
+            }
+            .project-budget-helper {
+                font-size: 10px !important;
+            }
+            .project-flow-panel[data-project-panel="details"] .project-panel-actions {
+                margin-top: 20px !important;
+            }
+            .project-budget-options button {
+                min-height: 38px !important;
+            }
+            /* Move orb farther down and slightly right on mobile */
+            .project-flow-glow.glow-two {
+                bottom: -150px !important;
+                right: -110px !important;
+            }
+        }
+    </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const trigger = document.getElementById('projectBudgetTrigger');
+            const options = document.getElementById('projectBudgetOptions');
+            const input = document.getElementById('projectBudget');
+            if (trigger && options) {
+                trigger.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const isOpen = trigger.getAttribute('aria-expanded') === 'true';
+                    trigger.setAttribute('aria-expanded', !isOpen);
+                    options.hidden = isOpen;
+                });
+                options.addEventListener('click', (e) => {
+                    if (e.target.tagName === 'BUTTON') {
+                        const val = e.target.getAttribute('data-project-budget');
+                        input.value = val;
+                        trigger.querySelector('span').textContent = val;
+                        trigger.setAttribute('aria-expanded', 'false');
+                        options.hidden = true;
+                    }
+                });
+                document.addEventListener('click', (e) => {
+                    if (!trigger.contains(e.target) && !options.contains(e.target)) {
+                        trigger.setAttribute('aria-expanded', 'false');
+                        options.hidden = true;
+                    }
+                });
+            }
+        });
+    </script>
 </head>
 
 <body>
@@ -25520,34 +25646,43 @@
 
                                 <section class="project-flow-panel" data-project-panel="details" aria-hidden="true">
                                     <div class="project-panel-heading compact">
-                                        <span class="project-panel-kicker">A WAY TO REACH YOU</span>
+                                        <span class="project-panel-kicker">YOUR DETAILS</span>
                                         <h3>Where should we<br>reach you?</h3>
-                                        <p>Your project stays a draft until you sign in.</p>
+                                        <p id="projectDetailsNote">We'll save this after you sign in.</p>
                                     </div>
                                     <form class="project-details-form" id="projectDetailsForm">
-                                        <label class="project-field"><span>Your name</span><input id="projectName"
+                                        <label class="project-field"><span>YOUR NAME</span><input id="projectName"
                                                 name="name" autocomplete="name" required
                                                 placeholder="Your full name"></label>
-                                        <label class="project-field"><span>Email</span><input id="projectEmail"
+                                        <label class="project-field"><span>EMAIL</span><input id="projectEmail"
                                                 name="email" type="email" autocomplete="email" required
                                                 placeholder="you@business.com"></label>
-                                        <label class="project-field"><span>WhatsApp</span><input id="projectWhatsapp"
-                                                name="whatsapp" type="tel" autocomplete="tel" required
-                                                placeholder="Your number"></label>
-                                        <label class="project-field"><span>Budget</span><select id="projectBudget"
-                                                name="budget" required>
-                                                <option value="">Choose a range</option>
-                                                <option>₹5k–₹10k</option>
-                                                <option>₹10k–₹25k</option>
-                                                <option>₹25k–₹50k</option>
-                                                <option>₹50k+</option>
-                                            </select></label>
+                                        <label class="project-field"><span>WHATSAPP</span><input id="projectWhatsapp"
+                                                name="whatsapp" type="tel" inputmode="numeric" autocomplete="tel"
+                                                pattern="[0-9]{10,15}" minlength="10" maxlength="15" required
+                                                aria-describedby="projectWhatsappError" placeholder="Your number"><small
+                                                class="project-field-error" id="projectWhatsappError" aria-live="polite"></small></label>
+                                        <label class="project-field project-budget-field"><span>BUDGET RANGE</span><small
+                                                class="project-budget-helper">Just an estimate — final price may vary.</small>
+                                            <input id="projectBudget" name="budget" type="hidden">
+                                            <div class="project-budget-picker" id="projectBudgetPicker">
+                                                <button type="button" class="project-budget-trigger" id="projectBudgetTrigger"
+                                                    aria-haspopup="listbox" aria-expanded="false" aria-controls="projectBudgetOptions"><span>Choose a range</span><i aria-hidden="true">⌄</i></button>
+                                                <div class="project-budget-options" id="projectBudgetOptions" role="listbox" aria-label="Estimated budget" hidden>
+                                                    <button type="button" role="option" aria-selected="false" data-project-budget="Under ₹10K">Under ₹10K</button>
+                                                    <button type="button" role="option" aria-selected="false" data-project-budget="₹10K – ₹25K">₹10K – ₹25K</button>
+                                                    <button type="button" role="option" aria-selected="false" data-project-budget="₹25K – ₹50K">₹25K – ₹50K</button>
+                                                    <button type="button" role="option" aria-selected="false" data-project-budget="₹50K+">₹50K+</button>
+                                                    <button type="button" role="option" aria-selected="false" data-project-budget="Not sure yet">Not sure yet</button>
+                                                </div>
+                                            </div><small class="project-field-error" id="projectBudgetError" aria-live="polite"></small></label>
                                     </form>
                                     <div class="project-panel-actions">
                                         <button type="button" class="project-back" data-project-back>← Back</button>
                                         <button type="button" class="project-next" data-project-next="auth">Save my
                                             brief <span>→</span></button>
                                     </div>
+
                                 </section>
 
                                 <section class="project-flow-panel project-auth-panel" data-project-panel="auth"
