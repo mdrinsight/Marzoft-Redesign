@@ -852,6 +852,8 @@
             line-height: 1.6;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
+            overscroll-behavior: none;
+            scroll-behavior: smooth;
         }
 
         img,
@@ -23877,7 +23879,7 @@
             
             /* Process */
             #process.process-section { padding-block: 60px !important; }
-            #process .process-steps-grid { gap: 8px !important; padding: 4px 0 10px 24px !important; }
+            #process .process-steps-grid { gap: 8px !important; padding: 4px 0 10px 0 !important; margin: 0 !important; width: 100% !important; }
             #process .process-step-item,
             #process .process-step-item:nth-child(2),
             #process .process-step-item:nth-child(3),
@@ -24015,7 +24017,7 @@
                         <i class="fa-solid fa-moon dark-icon-moon"></i>
                         <i class="fa-solid fa-sun dark-icon-sun"></i>
                     </button>
-                    <button type="button" class="past-nav-login" data-auth-portal-open>Client login</button>
+                    <button type="button" class="past-nav-login" data-auth-portal-open data-marzoft-dashboard-entry>Client login</button>
                     <a href="#booking" class="past-nav-project" data-nav-project><span>Have a project?</span><i
                             aria-hidden="true">↗</i></a>
                     <button class="past-menu-toggle" id="menuToggle" type="button" aria-label="Open Navigation Menu"
@@ -24033,7 +24035,7 @@
             </ul>
             <div class="past-mobile-actions">
                 <a href="#booking" data-nav-project>Have a project? <span>↗</span></a>
-                <button type="button" data-auth-portal-open>Client login / dashboard <span>→</span></button>
+                <button type="button" data-auth-portal-open data-marzoft-dashboard-entry>Client login / dashboard <span>→</span></button>
             </div>
         </div>
     </header>
@@ -24046,7 +24048,7 @@
                 <button class="marzoft-mobile-theme" id="marzoftMobileTheme" type="button" aria-label="Toggle theme">
                     <i class="fa-solid fa-moon" aria-hidden="true"></i><i class="fa-solid fa-sun" aria-hidden="true"></i>
                 </button>
-                <button class="marzoft-mobile-dashboard" type="button" data-auth-portal-open><i class="fa-solid fa-user" aria-hidden="true"></i><span>Dashboard</span></button>
+                <button class="marzoft-mobile-dashboard" type="button" data-auth-portal-open data-marzoft-dashboard-entry><i class="fa-solid fa-user" aria-hidden="true"></i><span>Dashboard</span></button>
                 <a class="marzoft-mobile-project" href="#booking" data-nav-project><span class="marzoft-mobile-project-full">Have a project?</span><span class="marzoft-mobile-project-short">Project</span><i aria-hidden="true">↗</i></a>
                 <button class="marzoft-mobile-menu-control" id="marzoftMobileMenuControl" type="button" aria-expanded="false" aria-controls="marzoftMobileMenuPanel" aria-label="Toggle Navigation Menu">
                     <span class="marzoft-mobile-hamburger-line top"></span>
@@ -25630,7 +25632,7 @@
          09. INTERACTIVE JAVASCRIPT & PARALLAX ENGINE
          ========================================================================== -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-    <script src="supabase.js?v=20260826-2"></script>
+    <script src="supabase.js?v=20260914-1"></script>
     <script>
         // 1. Mouse Movement Parallax Engine for Depth Layers
         document.addEventListener('mousemove', (e) => {
@@ -30347,7 +30349,10 @@
                 display: grid !important;
                 grid-template-columns: minmax(0, 1fr) !important;
                 gap: 7px !important;
-                padding: 4px 0 10px 35px !important;
+                padding: 4px 0 10px 0 !important;
+                margin-left: 0 !important;
+                margin-right: 0 !important;
+                width: 100% !important;
             }
 
             #process .process-steps-grid::before {
@@ -30358,6 +30363,7 @@
                 left: 10px;
                 width: 1px;
                 background: rgba(47, 107, 255, .18);
+                display: none;
             }
 
             #process .process-steps-grid::after {
@@ -30373,6 +30379,7 @@
                 transform: translate3d(0, var(--process-signal-y, 18px), 0);
                 transition: transform 380ms cubic-bezier(.22, .61, .36, 1);
                 will-change: transform;
+                display: none;
             }
 
             #process .process-step-item,
@@ -30443,6 +30450,7 @@
                 letter-spacing: .08em;
                 line-height: 1;
                 text-align: right;
+                display: none;
             }
 
             #process .process-step-item:nth-child(1)::after { content: "01"; }
@@ -33403,6 +33411,646 @@
             }
         }
     </style>
+    <style id="marzoft-broadcast-awareness-styles">
+        [data-marzoft-dashboard-entry].has-marzoft-broadcasts .marzoft-dashboard-label {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            isolation: isolate;
+        }
+
+        .marzoft-dashboard-label-text {
+            position: relative;
+            display: inline-block;
+        }
+
+        .marzoft-broadcast-underline {
+            position: absolute;
+            right: 0;
+            bottom: -7px;
+            left: 0;
+            height: 2px;
+            border-radius: 2px;
+            background: #2F6BFF;
+            opacity: 1;
+            transform: scaleX(1);
+            transform-origin: left;
+            transition: opacity .22s ease, transform .22s ease;
+        }
+
+        .marzoft-broadcast-activity-dot {
+            display: block;
+            width: 5px;
+            height: 5px;
+            flex: 0 0 5px;
+            border-radius: 50%;
+            background: #2F6BFF;
+            opacity: 1;
+            transform: scale(1);
+            transition: opacity .22s ease, transform .22s ease;
+        }
+
+        .marzoft-broadcast-count {
+            color: #2F6BFF;
+            font: 800 9px/1 'Manrope', sans-serif;
+            letter-spacing: .01em;
+            opacity: 1;
+            transform: translateY(0);
+            transition: opacity .22s ease, transform .22s ease;
+        }
+
+        [data-marzoft-dashboard-entry][data-marzoft-unread-single="true"] .marzoft-broadcast-count {
+            display: none;
+        }
+
+        [data-marzoft-dashboard-entry].marzoft-broadcast-indicator-entering .marzoft-broadcast-activity-dot {
+            animation: marzoftBroadcastDotIn .86s cubic-bezier(.22, .61, .36, 1) both;
+        }
+
+        [data-marzoft-dashboard-entry].marzoft-broadcast-indicator-entering .marzoft-broadcast-underline {
+            animation: marzoftBroadcastUnderlineIn .84s cubic-bezier(.22, .61, .36, 1) both;
+        }
+
+        [data-marzoft-dashboard-entry].marzoft-broadcast-indicator-entering .marzoft-dashboard-label::before {
+            position: absolute;
+            z-index: -1;
+            inset: -7px -10px;
+            border-radius: 999px;
+            content: '';
+            background: #2F6BFF;
+            opacity: 0;
+            pointer-events: none;
+            animation: marzoftBroadcastIllumination .86s cubic-bezier(.22, .61, .36, 1) both;
+        }
+
+        [data-marzoft-dashboard-entry].marzoft-broadcast-indicator-leaving .marzoft-broadcast-activity-dot,
+        [data-marzoft-dashboard-entry].marzoft-broadcast-indicator-leaving .marzoft-broadcast-count,
+        [data-marzoft-dashboard-entry].marzoft-broadcast-indicator-leaving .marzoft-broadcast-underline {
+            opacity: 0;
+        }
+
+        [data-marzoft-dashboard-entry].marzoft-broadcast-indicator-leaving .marzoft-broadcast-activity-dot {
+            transform: scale(0);
+        }
+
+        [data-marzoft-dashboard-entry].marzoft-broadcast-indicator-leaving .marzoft-broadcast-count {
+            transform: translateY(-2px);
+        }
+
+        [data-marzoft-dashboard-entry].marzoft-broadcast-indicator-leaving .marzoft-broadcast-underline {
+            transform: scaleX(0);
+        }
+
+        @keyframes marzoftBroadcastDotIn {
+            0% { opacity: 0; transform: scale(0); }
+            58% { opacity: 1; transform: scale(1.35); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        @keyframes marzoftBroadcastUnderlineIn {
+            from { opacity: 0; transform: scaleX(0); }
+            to { opacity: 1; transform: scaleX(1); }
+        }
+
+        @keyframes marzoftBroadcastIllumination {
+            0%, 100% { opacity: 0; }
+            48% { opacity: .10; }
+        }
+
+        .marzoft-broadcast-toast-region {
+            position: fixed;
+            z-index: 2190;
+            top: 92px;
+            right: max(22px, calc((100vw - 1180px) / 2));
+            width: min(420px, calc(100vw - 32px));
+            pointer-events: none;
+        }
+
+        .marzoft-broadcast-toast {
+            position: relative;
+            padding: 14px 18px 13px;
+            border: 1px solid #DCE5F2;
+            border-radius: 17px;
+            color: #0B1020;
+            background: rgba(252, 253, 255, .97);
+            box-shadow: 0 15px 36px rgba(14, 28, 58, .13);
+            opacity: 0;
+            pointer-events: auto;
+            transform: translateY(-8px) scale(.985);
+            transform-origin: top right;
+            transition: opacity .38s cubic-bezier(.22, .61, .36, 1), transform .38s cubic-bezier(.22, .61, .36, 1);
+        }
+
+        .marzoft-broadcast-toast.is-visible {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
+        .marzoft-broadcast-toast.is-closing {
+            opacity: 0;
+            transform: translateY(-5px) scale(1);
+        }
+
+        .marzoft-broadcast-toast-heading {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding-right: 30px;
+        }
+
+        .marzoft-broadcast-toast-heading i {
+            display: block;
+            width: 6px;
+            height: 6px;
+            flex: 0 0 6px;
+            border-radius: 50%;
+            background: #2F6BFF;
+        }
+
+        .marzoft-broadcast-toast strong {
+            font: 750 .84rem/1.25 'Manrope', sans-serif;
+            letter-spacing: -.01em;
+        }
+
+        .marzoft-broadcast-toast-summary {
+            display: block;
+            margin: 6px 0 0 14px;
+            color: #66738A;
+            font: 550 .75rem/1.45 'Manrope', sans-serif;
+        }
+
+        .marzoft-broadcast-toast a {
+            display: block;
+            width: max-content;
+            margin: 9px 0 0 auto;
+            color: #2F6BFF;
+            font: 750 .75rem/1.2 'Manrope', sans-serif;
+            text-decoration: none;
+        }
+
+        .marzoft-broadcast-toast a:hover,
+        .marzoft-broadcast-toast a:focus-visible {
+            text-decoration: underline;
+            text-underline-offset: 3px;
+        }
+
+        .marzoft-broadcast-toast-close {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            display: grid;
+            width: 28px;
+            height: 28px;
+            padding: 0;
+            place-items: center;
+            border: 0;
+            border-radius: 50%;
+            color: #7A879D;
+            background: transparent;
+            font-size: .75rem;
+        }
+
+        .marzoft-broadcast-toast-close:hover,
+        .marzoft-broadcast-toast-close:focus-visible {
+            color: #2F6BFF;
+            background: rgba(47, 107, 255, .08);
+        }
+
+        html.dark .marzoft-broadcast-toast {
+            border-color: rgba(104, 130, 190, .28);
+            color: #F5F7FC;
+            background: rgba(7, 17, 38, .97);
+            box-shadow: 0 16px 38px rgba(0, 0, 0, .28);
+        }
+
+        html.dark .marzoft-broadcast-toast span {
+            color: #A7B2C7;
+        }
+
+        @media (max-width: 767.98px) {
+            [data-marzoft-dashboard-entry].has-marzoft-broadcasts .marzoft-dashboard-label {
+                gap: 4px;
+            }
+
+            .marzoft-broadcast-activity-dot {
+                width: 4px;
+                height: 4px;
+                flex-basis: 4px;
+            }
+
+            .marzoft-broadcast-count {
+                font-size: 8px;
+            }
+
+            .marzoft-broadcast-underline {
+                bottom: -6px;
+            }
+
+            .marzoft-broadcast-toast-region {
+                z-index: 2490;
+                top: max(70px, calc(env(safe-area-inset-top, 0px) + 70px));
+                right: 8px;
+                left: auto;
+                width: min(330px, calc(100% - 28px));
+                transform: none;
+            }
+
+            .marzoft-broadcast-toast {
+                display: grid;
+                min-height: 54px;
+                padding: 8px 10px;
+                grid-template-columns: minmax(0, 1fr) auto;
+                grid-template-rows: auto auto;
+                column-gap: 10px;
+                row-gap: 4px;
+                border-color: rgba(47, 107, 255, .12);
+                border-radius: 14px;
+                background: rgba(255, 255, 255, .96);
+                box-shadow: 0 8px 24px rgba(15, 30, 60, .08);
+                transform: translateY(-4px);
+                transform-origin: top center;
+                transition: opacity .25s cubic-bezier(.22, .61, .36, 1), transform .25s cubic-bezier(.22, .61, .36, 1);
+            }
+
+            .marzoft-broadcast-toast.is-visible {
+                transform: translateY(0);
+            }
+
+            .marzoft-broadcast-toast.is-closing {
+                transform: translateY(-4px);
+            }
+
+            .marzoft-broadcast-toast-heading {
+                min-width: 0;
+                gap: 5px;
+                padding-right: 32px;
+                grid-column: 1 / -1;
+                grid-row: 1;
+            }
+
+            .marzoft-broadcast-toast-heading i {
+                width: 5px;
+                height: 5px;
+                flex-basis: 5px;
+            }
+
+            .marzoft-broadcast-toast strong {
+                overflow: hidden;
+                font-size: 11px;
+                line-height: 1.15;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+
+            .marzoft-broadcast-toast-summary {
+                margin: 0;
+                grid-column: 1;
+                grid-row: 2;
+                font-size: 10px;
+                line-height: 1.2;
+                white-space: nowrap;
+            }
+
+            .marzoft-broadcast-toast a {
+                margin: 0 10px 0 0;
+                align-self: center;
+                grid-column: 2;
+                grid-row: 2;
+                font-size: 10px;
+                line-height: 1.2;
+                white-space: nowrap;
+                transition: color .18s ease, transform .18s ease;
+            }
+
+            .marzoft-broadcast-toast a:active {
+                transform: translateX(2px);
+            }
+
+            .marzoft-broadcast-toast-close {
+                position: absolute;
+                top: 5px;
+                right: 6px;
+                width: 28px;
+                height: 28px;
+                font-size: 13px;
+            }
+
+            html.dark .marzoft-broadcast-toast {
+                border-color: rgba(86, 115, 190, .20);
+                background: #0A1630;
+                box-shadow: 0 8px 24px rgba(0, 0, 0, .22);
+            }
+        }
+
+        @media (max-width: 340px) {
+            .marzoft-broadcast-toast-region {
+                right: 6px;
+                left: auto;
+                width: calc(100% - 18px);
+                transform: none;
+            }
+
+            .marzoft-broadcast-toast {
+                padding: 7px 9px;
+                column-gap: 8px;
+                row-gap: 3px;
+            }
+
+            .marzoft-broadcast-toast strong { font-size: 10px; }
+            .marzoft-broadcast-toast-summary,
+            .marzoft-broadcast-toast a { font-size: 9px; }
+
+            .marzoft-broadcast-toast a { margin-right: 9px; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .marzoft-broadcast-toast,
+            .marzoft-broadcast-activity-dot,
+            .marzoft-broadcast-underline,
+            .marzoft-dashboard-label::before {
+                transition-duration: .01ms;
+                animation-duration: .01ms !important;
+            }
+        }
+    </style>
+    <script id="marzoft-broadcast-awareness">
+        (() => {
+            const api = window.marzoftBackend || window.MarzoftSupabase || window.marzoftSupabase;
+            if (!api?.client || typeof api.getBroadcastState !== 'function') return;
+
+            const entrySelector = '[data-marzoft-dashboard-entry]';
+            const pageStartedAt = performance.now();
+            const indicatorExitTimers = new WeakMap();
+            let unreadCount = 0;
+            let userId = null;
+            let latestUnreadId = null;
+            let latestDetectedAt = 0;
+            let activeToastId = null;
+            let queuedToastId = null;
+            let toastDelayTimer = null;
+            let refreshVersion = 0;
+            let pendingIndicatorAnimation = false;
+            let stopRealtime = () => {};
+            let stopReadSync = () => {};
+
+            const buildDashboardLabel = (entry) => {
+                const current = entry.querySelector('.marzoft-dashboard-label');
+                if (current) return current;
+
+                const existingSpan = Array.from(entry.children).find((child) =>
+                    child.tagName === 'SPAN' && child.textContent.trim().toLowerCase() === 'dashboard'
+                );
+                const label = existingSpan || document.createElement('span');
+                label.classList.add('marzoft-dashboard-label');
+                if (!existingSpan) {
+                    const textNode = Array.from(entry.childNodes).find((node) =>
+                        node.nodeType === Node.TEXT_NODE && /dashboard/i.test(node.nodeValue || '')
+                    );
+                    if (!textNode) return null;
+                    const source = textNode.nodeValue || '';
+                    const match = /dashboard/i.exec(source);
+                    const fragment = document.createDocumentFragment();
+                    if (match.index > 0) fragment.append(document.createTextNode(source.slice(0, match.index)));
+                    label.dataset.marzoftGeneratedLabel = 'true';
+                    fragment.append(label);
+                    const remainder = source.slice(match.index + match[0].length);
+                    if (remainder) fragment.append(document.createTextNode(remainder));
+                    textNode.replaceWith(fragment);
+                }
+
+                label.replaceChildren();
+                const text = document.createElement('span');
+                text.className = 'marzoft-dashboard-label-text';
+                text.textContent = 'Dashboard';
+                const underline = document.createElement('i');
+                underline.className = 'marzoft-broadcast-underline';
+                underline.setAttribute('aria-hidden', 'true');
+                text.appendChild(underline);
+
+                const dot = document.createElement('i');
+                dot.className = 'marzoft-broadcast-activity-dot';
+                dot.setAttribute('aria-hidden', 'true');
+                const count = document.createElement('small');
+                count.className = 'marzoft-broadcast-count';
+                count.setAttribute('aria-hidden', 'true');
+                label.append(text, dot, count);
+                return label;
+            };
+
+            const restoreDashboardLabel = (entry) => {
+                const label = entry.querySelector('.marzoft-dashboard-label');
+                if (label?.dataset.marzoftGeneratedLabel === 'true') {
+                    label.replaceWith(document.createTextNode('Dashboard'));
+                } else if (label) {
+                    label.classList.remove('marzoft-dashboard-label');
+                    label.textContent = 'Dashboard';
+                }
+                entry.classList.remove('has-marzoft-broadcasts', 'marzoft-broadcast-indicator-entering', 'marzoft-broadcast-indicator-leaving');
+                entry.removeAttribute('data-marzoft-unread-single');
+                entry.removeAttribute('data-marzoft-indicator-removing');
+                if (entry.hasAttribute('data-marzoft-original-aria-label')) {
+                    const originalLabel = entry.dataset.marzoftOriginalAriaLabel;
+                    if (originalLabel) entry.setAttribute('aria-label', originalLabel);
+                    else entry.removeAttribute('aria-label');
+                    entry.removeAttribute('data-marzoft-original-aria-label');
+                }
+            };
+
+            const renderIndicators = ({ animate = false } = {}) => {
+                if (animate) pendingIndicatorAnimation = true;
+                let animatedEntry = false;
+                document.querySelectorAll(entrySelector).forEach((entry) => {
+                    if (entry.hasAttribute('data-auth-portal-open')) return;
+
+                    if (!unreadCount) {
+                        if (!entry.querySelector('.marzoft-dashboard-label') || entry.hasAttribute('data-marzoft-indicator-removing')) return;
+                        entry.dataset.marzoftIndicatorRemoving = 'true';
+                        entry.classList.remove('marzoft-broadcast-indicator-entering');
+                        entry.classList.add('marzoft-broadcast-indicator-leaving');
+                        const exitTimer = window.setTimeout(() => {
+                            if (!unreadCount) restoreDashboardLabel(entry);
+                        }, 230);
+                        indicatorExitTimers.set(entry, exitTimer);
+                        return;
+                    }
+
+                    const exitTimer = indicatorExitTimers.get(entry);
+                    if (exitTimer) window.clearTimeout(exitTimer);
+                    entry.removeAttribute('data-marzoft-indicator-removing');
+                    entry.classList.remove('marzoft-broadcast-indicator-leaving');
+                    if (!entry.hasAttribute('data-marzoft-original-aria-label')) {
+                        entry.dataset.marzoftOriginalAriaLabel = entry.getAttribute('aria-label') || '';
+                    }
+                    const accessibleLabel = `Dashboard, ${unreadCount} unread ${unreadCount === 1 ? 'update' : 'updates'}`;
+                    if (entry.getAttribute('aria-label') !== accessibleLabel) entry.setAttribute('aria-label', accessibleLabel);
+
+                    const label = buildDashboardLabel(entry);
+                    if (!label) return;
+                    entry.classList.add('has-marzoft-broadcasts');
+                    entry.dataset.marzoftUnreadSingle = String(unreadCount === 1);
+                    const count = label.querySelector('.marzoft-broadcast-count');
+                    const countText = unreadCount > 99 ? '99+' : `+${unreadCount}`;
+                    if (count && count.textContent !== countText) count.textContent = countText;
+
+                    if (pendingIndicatorAnimation) {
+                        entry.classList.remove('marzoft-broadcast-indicator-entering');
+                        void entry.offsetWidth;
+                        entry.classList.add('marzoft-broadcast-indicator-entering');
+                        window.setTimeout(() => entry.classList.remove('marzoft-broadcast-indicator-entering'), 900);
+                        animatedEntry = true;
+                    }
+                });
+                if (animatedEntry) pendingIndicatorAnimation = false;
+            };
+
+            const dismissalKey = () => `marzoft_broadcast_capsule_dismissed:${userId}`;
+
+            const dismissedForSession = (broadcastId) => {
+                try { return sessionStorage.getItem(dismissalKey()) === String(broadcastId); }
+                catch { return false; }
+            };
+
+            const rememberDismissal = (broadcastId) => {
+                if (broadcastId == null || !userId) return;
+                try { sessionStorage.setItem(dismissalKey(), String(broadcastId)); }
+                catch { /* The in-page state still prevents an immediate reopen. */ }
+            };
+
+            const removeToastImmediately = () => {
+                window.clearTimeout(toastDelayTimer);
+                document.querySelector('.marzoft-broadcast-toast-region')?.remove();
+                activeToastId = null;
+                queuedToastId = null;
+            };
+
+            const dismissToast = ({ remember = false, broadcastId = activeToastId || queuedToastId } = {}) => {
+                window.clearTimeout(toastDelayTimer);
+                if (remember) rememberDismissal(broadcastId);
+                queuedToastId = null;
+                const region = document.querySelector('.marzoft-broadcast-toast-region');
+                const toast = region?.querySelector('.marzoft-broadcast-toast');
+                if (!toast) {
+                    activeToastId = null;
+                    return;
+                }
+                toast.classList.add('is-closing');
+                toast.classList.remove('is-visible');
+                window.setTimeout(() => {
+                    region.remove();
+                    if (String(activeToastId) === String(broadcastId)) activeToastId = null;
+                }, 400);
+            };
+
+            const updateToastContent = (toast, count, newestUnread) => {
+                const title = toast.querySelector('strong');
+                const summary = toast.querySelector('.marzoft-broadcast-toast-summary');
+                const link = toast.querySelector('a');
+                if (title) title.textContent = count === 1 ? 'New update from Marzoft' : 'New updates from Marzoft';
+                if (summary) summary.textContent = `You have ${count} unread ${count === 1 ? 'message' : 'messages'}.`;
+                if (link) link.textContent = count === 1 ? 'View update →' : 'View updates →';
+            };
+
+            const queueToast = (count, newestUnread) => {
+                if (!count || !newestUnread || !userId) return;
+                const broadcastId = String(newestUnread.id);
+                if (dismissedForSession(broadcastId)) return;
+
+                const currentToast = document.querySelector('.marzoft-broadcast-toast');
+                if (currentToast && String(activeToastId) === broadcastId) {
+                    updateToastContent(currentToast, count, newestUnread);
+                    return;
+                }
+                if (String(queuedToastId) === broadcastId) return;
+                if (currentToast || queuedToastId) removeToastImmediately();
+
+                queuedToastId = broadcastId;
+                const remainingDelay = Math.max(0, 950 - (performance.now() - pageStartedAt));
+                toastDelayTimer = window.setTimeout(() => {
+                    if (!unreadCount || String(latestUnreadId) !== broadcastId || dismissedForSession(broadcastId)) {
+                        queuedToastId = null;
+                        return;
+                    }
+
+                    const region = document.createElement('div');
+                    region.className = 'marzoft-broadcast-toast-region';
+                    region.setAttribute('aria-live', 'polite');
+
+                    const toast = document.createElement('aside');
+                    toast.className = 'marzoft-broadcast-toast';
+                    toast.setAttribute('aria-label', 'New update from Marzoft');
+                    toast.dataset.broadcastId = broadcastId;
+
+                    const heading = document.createElement('div');
+                    heading.className = 'marzoft-broadcast-toast-heading';
+                    const accent = document.createElement('i');
+                    accent.setAttribute('aria-hidden', 'true');
+                    const title = document.createElement('strong');
+                    title.textContent = 'New update from Marzoft';
+                    heading.append(accent, title);
+                    const summary = document.createElement('span');
+                    summary.className = 'marzoft-broadcast-toast-summary';
+                    const link = document.createElement('a');
+                    link.href = 'client-dashboard.html#notifications';
+                    link.textContent = 'View update →';
+                    link.addEventListener('click', () => rememberDismissal(broadcastId));
+                    const close = document.createElement('button');
+                    close.className = 'marzoft-broadcast-toast-close';
+                    close.type = 'button';
+                    close.setAttribute('aria-label', 'Dismiss notification');
+                    close.innerHTML = '<i class="fa-solid fa-xmark" aria-hidden="true"></i>';
+                    close.addEventListener('click', () => dismissToast({ remember: true, broadcastId }));
+
+                    toast.append(heading, summary, link, close);
+                    updateToastContent(toast, unreadCount, newestUnread);
+                    region.appendChild(toast);
+                    document.body.appendChild(region);
+                    queuedToastId = null;
+                    activeToastId = broadcastId;
+                    requestAnimationFrame(() => toast.classList.add('is-visible'));
+                }, remainingDelay);
+            };
+
+            const refresh = async ({ allowToast = false } = {}) => {
+                const version = ++refreshVersion;
+                const { data, error } = await api.getBroadcastState();
+                if (version !== refreshVersion || error || !data?.user) return;
+                userId = data.user.id;
+                unreadCount = data.unreadCount || 0;
+                const newestUnread = data.unread?.[0] || null;
+                latestUnreadId = newestUnread?.id ?? null;
+                const detectedAt = Date.parse(newestUnread?.created_at || '') || 0;
+                const animateIndicator = unreadCount > 0 && detectedAt > latestDetectedAt;
+                if (detectedAt > latestDetectedAt) latestDetectedAt = detectedAt;
+                renderIndicators({ animate: animateIndicator });
+                if (!unreadCount) dismissToast();
+                if (allowToast) queueToast(unreadCount, newestUnread);
+            };
+
+            const init = async () => {
+                const { data: { session } } = await api.client.auth.getSession();
+                if (!session?.user) return;
+                userId = session.user.id;
+
+                const observer = new MutationObserver(renderIndicators);
+                observer.observe(document.body, { childList: true, subtree: true });
+                await refresh({ allowToast: true });
+
+                stopRealtime = api.subscribeToBroadcasts?.(() => refresh({ allowToast: true })) || (() => {});
+                stopReadSync = api.onBroadcastReadStateChange?.(userId, () => refresh()) || (() => {});
+                document.addEventListener('visibilitychange', () => {
+                    if (document.visibilityState === 'visible') refresh({ allowToast: true });
+                });
+                window.addEventListener('pagehide', () => {
+                    observer.disconnect();
+                    stopRealtime();
+                    stopReadSync();
+                }, { once: true });
+            };
+
+            init().catch((error) => console.error('Broadcast awareness failed:', error));
+        })();
+    </script>
     <script id="marzoft-mobile-horizontal-navigation-behavior">
         (() => {
             const nav = document.getElementById('marzoftMobileNav');

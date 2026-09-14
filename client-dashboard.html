@@ -2602,7 +2602,7 @@
 
 <div class="notifications-panel" id="notificationsPanel" aria-hidden="true">
     <div class="notifications-header">
-        <h3>Broadcasts & Updates</h3>
+        <h3 id="notificationsHeading">Broadcasts & Updates</h3>
         <button id="closeNotifications" class="btn-logout" style="padding: 6px 12px; font-size: 0.75rem;"><i class="fa-solid fa-xmark"></i></button>
     </div>
     <div class="notifications-list" id="notificationsList">
@@ -2635,7 +2635,7 @@
 
 <!-- Supabase & Backend Scripts -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-<script src="supabase.js"></script>
+<script src="supabase.js?v=20260914-1"></script>
 
 <script>
     // --- HELPER FUNCTIONS (GLOBAL SCOPE) ---
@@ -2694,8 +2694,9 @@
         const closeNotifications = document.getElementById('closeNotifications');
         const markAllRead = document.getElementById('markAllRead');
         
-        const READ_STORAGE_KEY = 'marzoft_read_broadcasts';
         let allBroadcasts = [];
+        let stopBroadcastRealtime = () => {};
+        let stopBroadcastReadSync = () => {};
         const api = window.marzoftBackend || window.MarzoftSupabase || {};
         const whatsappActions = Array.from(document.querySelectorAll('.dashboard-whatsapp-action'));
         const defaultWhatsAppNumber = '919999999999';
@@ -2739,7 +2740,9 @@
 
             // Load initial data
             loadProjects();
-            loadNotifications();
+            await loadNotifications();
+            stopBroadcastRealtime = api.subscribeToBroadcasts?.(() => loadNotifications()) || (() => {});
+            stopBroadcastReadSync = api.onBroadcastReadStateChange?.(user.id, () => loadNotifications()) || (() => {});
 
         } catch (err) {
             console.error("Auth Error:", err);
@@ -2797,10 +2800,10 @@
         });
 
         // Notification Panel Listeners
-        notificationBell.addEventListener('click', () => {
+        notificationBell.addEventListener('click', async () => {
             notificationsPanel.classList.add('is-open');
             notificationsPanel.setAttribute('aria-hidden', 'false');
-            markAsRead();
+            await markAsRead();
         });
         
         closeNotifications.addEventListener('click', () => {
@@ -2808,11 +2811,17 @@
             notificationsPanel.setAttribute('aria-hidden', 'true');
         });
 
-        markAllRead.addEventListener('click', () => {
-            markAsRead();
-            markAllRead.textContent = 'All Caught Up!';
+        markAllRead.addEventListener('click', async () => {
+            const marked = await markAsRead();
+            markAllRead.textContent = marked ? 'All Caught Up!' : 'Please try again';
             setTimeout(() => markAllRead.textContent = 'Mark all as read', 1500);
         });
+
+        const notificationTarget = new URLSearchParams(window.location.search).get('panel') === 'notifications'
+            || window.location.hash === '#notifications';
+        if (notificationTarget) {
+            requestAnimationFrame(() => notificationBell.click());
+        }
 
         // Theme Engine & Cross-tab Sync
         const dashboardThemeToggle = document.getElementById('dashboardThemeToggle');
@@ -2828,28 +2837,35 @@
         });
 
         // --- DATA FUNCTIONS ---
-        function getReadIds() {
-            try { return JSON.parse(localStorage.getItem(READ_STORAGE_KEY) || '[]'); } 
-            catch { return []; }
-        }
+        const escapeNotificationText = (value) => String(value ?? '').replace(/[&<>'"]/g, (character) => ({
+            '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+        })[character]);
 
-        function markAsRead() {
-            const allIds = allBroadcasts.map(b => b.id);
-            localStorage.setItem(READ_STORAGE_KEY, JSON.stringify(allIds));
+        async function markAsRead() {
+            if (!allBroadcasts.length) return true;
+            const { data, error } = typeof api.markBroadcastsRead === 'function'
+                ? await api.markBroadcastsRead(allBroadcasts)
+                : { data: null, error: new Error('Broadcast read service is unavailable.') };
+            if (error || !data) {
+                console.error('Failed to save broadcast read state:', error);
+                return false;
+            }
+
             unreadDot.classList.remove('visible');
             document.querySelectorAll('.notification-item.is-unread').forEach(item => item.classList.remove('is-unread'));
+            return true;
         }
 
         async function loadNotifications() {
             try {
-                const { data, error } = await api.client.from('broadcasts').select('*').order('created_at', { ascending: false });
+                const { data, error } = typeof api.getBroadcastState === 'function'
+                    ? await api.getBroadcastState()
+                    : { data: null, error: new Error('Broadcast service is unavailable.') };
                 if (error) throw error;
                 
-                allBroadcasts = data || [];
-                const readIds = getReadIds();
-                const unreadCount = allBroadcasts.filter(b => !readIds.includes(b.id)).length;
-                
-                if (unreadCount > 0) unreadDot.classList.add('visible');
+                allBroadcasts = data?.broadcasts || [];
+                const unreadIds = new Set((data?.unread || []).map((broadcast) => String(broadcast.id)));
+                unreadDot.classList.toggle('visible', unreadIds.size > 0);
 
                 if (allBroadcasts.length === 0) {
                     notificationsList.innerHTML = `<p class="text-center text-sm text-muted">No updates from the studio yet.</p>`;
@@ -2857,11 +2873,11 @@
                 }
 
                 notificationsList.innerHTML = allBroadcasts.map(b => `
-                    <div class="notification-item ${readIds.includes(b.id) ? '' : 'is-unread'}">
+                    <div class="notification-item ${unreadIds.has(String(b.id)) ? 'is-unread' : ''}">
                         <div class="notification-icon"><i class="fa-solid fa-bullhorn"></i></div>
                         <div class="notification-content">
-                            <h4>${b.title}</h4>
-                            <p>${b.message}</p>
+                            <h4>${escapeNotificationText(b.title)}</h4>
+                            <p>${escapeNotificationText(b.message)}</p>
                             <time>${timeAgo(b.created_at)}</time>
                         </div>
                     </div>
@@ -2871,6 +2887,11 @@
                 notificationsList.innerHTML = `<p class="text-center text-sm text-red-500">Could not load updates.</p>`;
             }
         }
+
+        window.addEventListener('pagehide', () => {
+            stopBroadcastRealtime();
+            stopBroadcastReadSync();
+        }, { once: true });
         
         async function loadProjects() {
             try {
