@@ -23950,22 +23950,9 @@
 
         /* 2. Input Heights and Shared Component Family */
         .project-field input,
-        .project-field select,
-        .project-budget-trigger {
+        .project-field select {
             height: 52px !important;
             font-size: 0.8rem !important;
-        }
-        
-        /* 3. Dropdown Opened - Compact Rows & Upward Positioning to escape clipping */
-        .project-budget-options {
-            bottom: calc(100% + 6px) !important;
-            top: auto !important;
-            max-height: 200px;
-            overflow-y: auto;
-        }
-        .project-budget-options button {
-            min-height: 40px !important;
-            padding: 0 12px !important;
         }
 
         /* 4. Field Label Alignment */
@@ -24008,6 +23995,145 @@
             position: relative;
         }
 
+        /* BUDGET SPECTRUM CUSTOM CONTROL */
+        .budget-spectrum-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            width: 100%;
+            height: 70px;
+            justify-content: flex-end;
+            margin-top: 8px;
+        }
+
+        .budget-spectrum {
+            position: relative;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            height: 40px;
+        }
+
+        .spectrum-rail-bg {
+            position: absolute;
+            top: 10px;
+            left: 5px;
+            right: 5px;
+            height: 2px;
+            background: #dce4f2;
+            border-radius: 2px;
+            z-index: 1;
+        }
+        html.dark .spectrum-rail-bg {
+            background: #394b6d;
+        }
+
+        .spectrum-rail-fill {
+            position: absolute;
+            top: 10px;
+            left: 5px;
+            right: 5px;
+            height: 2px;
+            background: #2F6BFF;
+            border-radius: 2px;
+            z-index: 2;
+            transform-origin: left;
+            transform: scaleX(0);
+            transition: transform 260ms cubic-bezier(.22,.61,.36,1);
+        }
+
+        .spectrum-stop {
+            position: relative;
+            z-index: 3;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: transparent;
+            border: none;
+            padding: 0;
+            width: 25%;
+            cursor: pointer;
+            outline: none;
+        }
+
+        .spectrum-dot {
+            width: 11px;
+            height: 11px;
+            border-radius: 50%;
+            background: #dce4f2;
+            transition: transform 260ms cubic-bezier(.22,.61,.36,1), background 260ms ease;
+            position: relative;
+        }
+        html.dark .spectrum-dot {
+            background: #394b6d;
+        }
+
+        .spectrum-stop[aria-checked="true"] .spectrum-dot,
+        .spectrum-stop.is-active-trail .spectrum-dot {
+            background: #2F6BFF;
+        }
+        .spectrum-stop[aria-checked="true"] .spectrum-dot {
+            transform: scale(1.35);
+        }
+
+        .spectrum-label {
+            margin-top: 8px;
+            font-size: 11.5px;
+            color: #7d8aa2;
+            font-weight: 700;
+            transition: color 260ms ease, transform 260ms ease, opacity 260ms ease;
+        }
+        html.dark .spectrum-label {
+            color: #8a9bb8;
+        }
+
+        .spectrum-stop[aria-checked="true"] .spectrum-label {
+            color: #111a31;
+            transform: translateY(1px);
+        }
+        html.dark .spectrum-stop[aria-checked="true"] .spectrum-label {
+            color: #f0f4fa;
+        }
+
+        .budget-spectrum-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 4px;
+            min-height: 16px;
+        }
+
+        .budget-selected-display {
+            font-size: 11px;
+            font-weight: 700;
+            color: #111a31;
+            opacity: 0;
+            transition: opacity 260ms ease;
+        }
+        .budget-selected-display.is-visible {
+            opacity: 1;
+        }
+        html.dark .budget-selected-display {
+            color: #f0f4fa;
+        }
+
+        .budget-not-sure-btn {
+            font-size: 11px;
+            font-weight: 700;
+            color: #7d8aa2;
+            background: none;
+            border: none;
+            padding: 2px 6px;
+            margin: 0;
+            cursor: pointer;
+            transition: color 200ms ease;
+            margin-left: auto;
+        }
+        .budget-not-sure-btn:hover, .budget-not-sure-btn.is-active {
+            color: #2F6BFF;
+        }
+
         /* Mobile specific fixes */
         @media (max-width: 767.98px) {
             .project-details-form {
@@ -24015,8 +24141,7 @@
                 gap: 12px !important;
             }
             .project-field input,
-            .project-field select,
-            .project-budget-trigger {
+            .project-field select {
                 height: 44px !important;
             }
             .project-budget-helper {
@@ -24025,42 +24150,83 @@
             .project-flow-panel[data-project-panel="details"] .project-panel-actions {
                 margin-top: 20px !important;
             }
-            .project-budget-options button {
-                min-height: 38px !important;
-            }
             /* Move orb farther down and slightly right on mobile */
             .project-flow-glow.glow-two {
                 bottom: -150px !important;
                 right: -110px !important;
             }
+            .spectrum-label {
+                font-size: 9.5px;
+            }
+            .budget-selected-display, .budget-not-sure-btn {
+                font-size: 10px;
+            }
+            .budget-spectrum-wrapper {
+                height: 65px;
+            }
         }
     </style>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const trigger = document.getElementById('projectBudgetTrigger');
-            const options = document.getElementById('projectBudgetOptions');
+            const wrapper = document.querySelector('.budget-spectrum-wrapper');
+            if (!wrapper) return;
+            
+            const stops = Array.from(wrapper.querySelectorAll('.spectrum-stop'));
+            const railFill = document.getElementById('budgetRailFill');
+            const selectedDisplay = document.getElementById('budgetSelectedDisplay');
+            const notSureBtn = document.getElementById('budgetNotSureBtn');
             const input = document.getElementById('projectBudget');
-            if (trigger && options) {
-                trigger.addEventListener('click', (e) => {
+            
+            function updateSpectrum(selectedIndex, val, labelText) {
+                // Update input
+                input.value = val;
+                
+                if (selectedIndex === -1) {
+                    // Not sure selected
+                    stops.forEach(stop => {
+                        stop.setAttribute('aria-checked', 'false');
+                        stop.classList.remove('is-active-trail');
+                    });
+                    railFill.style.transform = 'scaleX(0)';
+                    notSureBtn.classList.add('is-active');
+                    selectedDisplay.textContent = 'Selected: Not sure yet';
+                    selectedDisplay.classList.add('is-visible');
+                } else {
+                    // Normal stop selected
+                    notSureBtn.classList.remove('is-active');
+                    
+                    const percentage = selectedIndex / (stops.length - 1);
+                    railFill.style.transform = `scaleX(${percentage})`;
+                    
+                    stops.forEach((stop, idx) => {
+                        const isSelected = idx === selectedIndex;
+                        const isTrail = idx <= selectedIndex;
+                        stop.setAttribute('aria-checked', String(isSelected));
+                        if (isTrail) {
+                            stop.classList.add('is-active-trail');
+                        } else {
+                            stop.classList.remove('is-active-trail');
+                        }
+                    });
+                    
+                    selectedDisplay.textContent = `Selected: ${labelText}`;
+                    selectedDisplay.classList.add('is-visible');
+                }
+            }
+
+            stops.forEach((stop, idx) => {
+                stop.addEventListener('click', (e) => {
                     e.preventDefault();
-                    const isOpen = trigger.getAttribute('aria-expanded') === 'true';
-                    trigger.setAttribute('aria-expanded', !isOpen);
-                    options.hidden = isOpen;
+                    const val = stop.getAttribute('data-budget-val');
+                    const label = stop.getAttribute('data-budget-label');
+                    updateSpectrum(idx, val, label);
                 });
-                options.addEventListener('click', (e) => {
-                    if (e.target.tagName === 'BUTTON') {
-                        const val = e.target.getAttribute('data-project-budget');
-                        input.value = val;
-                        trigger.querySelector('span').textContent = val;
-                        trigger.setAttribute('aria-expanded', 'false');
-                        options.hidden = true;
-                    }
-                });
-                document.addEventListener('click', (e) => {
-                    if (!trigger.contains(e.target) && !options.contains(e.target)) {
-                        trigger.setAttribute('aria-expanded', 'false');
-                        options.hidden = true;
-                    }
+            });
+
+            if (notSureBtn) {
+                notSureBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    updateSpectrum(-1, 'not_sure', 'Not sure yet');
                 });
             }
         });
@@ -25664,16 +25830,32 @@
                                                 class="project-field-error" id="projectWhatsappError" aria-live="polite"></small></label>
                                         <label class="project-field project-budget-field"><span>BUDGET RANGE</span><small
                                                 class="project-budget-helper">Just an estimate — final price may vary.</small>
-                                            <input id="projectBudget" name="budget" type="hidden">
-                                            <div class="project-budget-picker" id="projectBudgetPicker">
-                                                <button type="button" class="project-budget-trigger" id="projectBudgetTrigger"
-                                                    aria-haspopup="listbox" aria-expanded="false" aria-controls="projectBudgetOptions"><span>Choose a range</span><i aria-hidden="true">⌄</i></button>
-                                                <div class="project-budget-options" id="projectBudgetOptions" role="listbox" aria-label="Estimated budget" hidden>
-                                                    <button type="button" role="option" aria-selected="false" data-project-budget="Under ₹10K">Under ₹10K</button>
-                                                    <button type="button" role="option" aria-selected="false" data-project-budget="₹10K – ₹25K">₹10K – ₹25K</button>
-                                                    <button type="button" role="option" aria-selected="false" data-project-budget="₹25K – ₹50K">₹25K – ₹50K</button>
-                                                    <button type="button" role="option" aria-selected="false" data-project-budget="₹50K+">₹50K+</button>
-                                                    <button type="button" role="option" aria-selected="false" data-project-budget="Not sure yet">Not sure yet</button>
+                                            <input id="projectBudget" name="budget" type="hidden" value="">
+                                            <div class="budget-spectrum-wrapper">
+                                                <div class="budget-spectrum" role="radiogroup" aria-label="Estimated budget">
+                                                    <div class="spectrum-rail-bg"></div>
+                                                    <div class="spectrum-rail-fill" id="budgetRailFill"></div>
+                                                    
+                                                    <button type="button" role="radio" aria-checked="false" class="spectrum-stop" data-budget-val="under_10k" data-budget-label="Under ₹10K">
+                                                        <span class="spectrum-dot"></span>
+                                                        <span class="spectrum-label">&lt;₹10K</span>
+                                                    </button>
+                                                    <button type="button" role="radio" aria-checked="false" class="spectrum-stop" data-budget-val="10k_25k" data-budget-label="₹10K–₹25K">
+                                                        <span class="spectrum-dot"></span>
+                                                        <span class="spectrum-label">₹10–25K</span>
+                                                    </button>
+                                                    <button type="button" role="radio" aria-checked="false" class="spectrum-stop" data-budget-val="25k_50k" data-budget-label="₹25K–₹50K">
+                                                        <span class="spectrum-dot"></span>
+                                                        <span class="spectrum-label">₹25–50K</span>
+                                                    </button>
+                                                    <button type="button" role="radio" aria-checked="false" class="spectrum-stop" data-budget-val="50k_plus" data-budget-label="₹50K+">
+                                                        <span class="spectrum-dot"></span>
+                                                        <span class="spectrum-label">₹50K+</span>
+                                                    </button>
+                                                </div>
+                                                <div class="budget-spectrum-footer">
+                                                    <span class="budget-selected-display" id="budgetSelectedDisplay"></span>
+                                                    <button type="button" class="budget-not-sure-btn" id="budgetNotSureBtn">Not sure yet</button>
                                                 </div>
                                             </div><small class="project-field-error" id="projectBudgetError" aria-live="polite"></small></label>
                                     </form>
